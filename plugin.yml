@@ -1,0 +1,24 @@
+name: Dominion
+main: com.pico52.dominion.Dominion
+version: 0.1.0
+author: Pico52
+commands:
+  dominion:
+    aliases: [dom, d]
+    description: This is for all users to manage their settlements.
+    usage: /<command> [info/mats/withdraw/deposit]
+    permission: dominion
+    permission-message: You don't have <permission>.
+  admindominion:
+    aliases: [admind, admindom, ad, adom, adominion, dadmin, domadmin, dominionadmin]
+    description: This is used for administrators to control mod functions within the database.
+    usage: /<command>
+    permission: admindominion
+    permission-message: You don't have <permission>.
+permissions:
+  dominion:
+    description:  This is for all users to manage their settlements.
+    default: true
+  admindominion:
+    description:  This is used for administrators to control mod functions.
+    default: op
