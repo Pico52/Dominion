@@ -24,7 +24,7 @@ public class AdminBuild extends AdminSubCommand{
 	 * @param instance - The {@link Dominion} plugin this command executor will be running on.
 	 */
 	public AdminBuild(Dominion instance) {
-		super(instance, "");
+		super(instance, "/ad build [settlement] [class]");
 	}
 	
 	/** 
@@ -40,7 +40,30 @@ public class AdminBuild extends AdminSubCommand{
 	 */
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		sender.sendMessage("This command will construct a new building or structure for the specified settlement.");
+		if(args.length == 0){	// - They only specified "build" but gave no other arguments.
+			sender.sendMessage(plugin.getLogPrefix() + "Constructs a new building at your location.");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			return true;
+		}
+		if(args.length == 1){
+			sender.sendMessage(plugin.getLogPrefix() + "You must provide a class type for this building.");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			return true;
+		}
+		String settlement = args[0];
+		String classification = args[1];
+		if(!plugin.getDBHandler().settlementExists(settlement)){
+			sender.sendMessage(plugin.getLogPrefix() + settlement + " is not a valid settlement.");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			return true;
+		}
+		if(plugin.getDBHandler().createBuilding(settlement, classification)){
+			sender.sendMessage(plugin.getLogPrefix() + "Successfully created a " + classification + " for " + settlement + "!");
+			plugin.getLogger().info("Successfully created a " + classification + " for " + settlement + "!");
+		} else {
+			sender.sendMessage(plugin.getLogPrefix() + "Failed to create the " + classification + " for " + settlement + ".");
+			plugin.getLogger().info("Failed to create the " + classification + " for " + settlement + ".");
+		}
 		
 		return true;
 	}

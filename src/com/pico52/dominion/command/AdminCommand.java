@@ -100,13 +100,13 @@ public class AdminCommand implements CommandExecutor{
 		if(subCommand.equalsIgnoreCase("create") | subCommand.equalsIgnoreCase("found")){
 			return adminCreate.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("remove") | subCommand.equalsIgnoreCase("delete")){
+		if(subCommand.equalsIgnoreCase("remove") | subCommand.equalsIgnoreCase("delete") | subCommand.equalsIgnoreCase("destroy")){
 			return adminRemove.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("force")){
+		if(subCommand.equalsIgnoreCase("force") | subCommand.equalsIgnoreCase("owner")){
 			return adminForce.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("update")){
+		if(subCommand.equalsIgnoreCase("update") | subCommand.equalsIgnoreCase("change")){
 			return adminUpdate.execute(sender, args);
 		}
 		

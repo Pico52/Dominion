@@ -18,12 +18,13 @@ public class DominionDatabaseHandler extends SQLite{
 		"INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", 
 		"INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", 
 		"INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0"};
-	private static String[] buildingColumns = 	{"building_id", "settlement_id", "owner", "class", "resourcetype", "maxproduction", "level", "employed", "employment"};
-	private static String[] buildingDims = 	{"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "TEXT", "TEXT", "TEXT", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0"};
-	private static String[] tradeColumns = 	{"trade_id", "settlement1_id", "settlement2_id", "income"};
-	private static String[] tradeDims = 		{"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0"};
-	private static String[] kingdomColumns = 	{"kingdom_id", "name", "monarch_id", "primarycolor", "secondarycolor"};
-	private static String[] kingdomDims = 		{"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT UNIQUE", "TEXT", "TEXT", "TEXT"};
+	private static String[] buildingColumns = {"building_id", "settlement_id", "owner_id", "class", "resource", "level", "xcoord", "zcoord", "employed", "bonus"};
+	private static String[] buildingDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "TEXT", "INT DEFAULT 0", "DOUBLE DEFAULT 0", 
+		"DOUBLE DEFAULT 0", "INT DEFAULT 0","TEXT"};
+	private static String[] tradeColumns = {"trade_id", "settlement1_id", "settlement2_id", "income"};
+	private static String[] tradeDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0"};
+	private static String[] kingdomColumns = {"kingdom_id", "name", "monarch_id", "primarycolor", "secondarycolor"};
+	private static String[] kingdomDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT UNIQUE", "TEXT", "TEXT", "TEXT"};
 	private static String[] playerColumns = {"player_id", "name", "liege_id"};
 	private static String[] playerDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT UNIQUE", "INT DEFAULT 0"};
 //===================Database Setup Complete===================//
@@ -255,6 +256,22 @@ public class DominionDatabaseHandler extends SQLite{
 		return queryWithResult(query);
 	}
 	
+	/** 
+	 * <b>remove</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean remove({@link String} entity, int id)
+	 * <br>
+	 * <br>
+	 * 
+	 * @param entity - The entity type.  Should be a table name.
+	 * @param id - The id number of the entity to be removed.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean remove(String entity, int id){
+		String query = "DELETE FROM " + entity + " WHERE " + entity + "_id" + "=" + id;
+		return queryWithResult(query);
+	}
+	
 //--- CREATE A KINGDOM ---//
 	/** 
 	 * <b>createKingdom</b><br>
@@ -343,6 +360,79 @@ public class DominionDatabaseHandler extends SQLite{
 		}
 		return false;
 	}	
+	
+	/** 
+	 * <b>createBuilding</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createBuildingr({@link String} settlement, {@link String} classification)
+	 * <br>
+	 * <br>
+	 * Creates a building in the database with specified values.  Uses default values for unspecified variables.
+	 * @param settlement - The settlement this building will be associated with
+	 * @param classification - The classification of the building.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createBuilding(String settlement, String classification){
+		return createBuilding(settlement, 0,classification, 0, 0);
+	}
+	
+	/** 
+	 * <b>createBuilding</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createBuildingr({@link String} settlement, {@link String} classification, double xcoord, double zcoord)
+	 * <br>
+	 * <br>
+	 * Creates a building in the database with specified values.  Uses default values for unspecified variables.
+	 * @param settlement - The settlement this building will be associated with
+	 * @param classification - The classification of the building.
+	 * @param xcoord - The x coordinate this building is located on.
+	 * @param zcoord - The z coordinate this building is located on.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createBuilding(String settlement, String classification, double xcoord, double zcoord){
+		return createBuilding(settlement, 0,classification, xcoord, zcoord);
+	}
+	
+	/** 
+	 * <b>createBuilding</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createBuildingr({@link String} settlement, {@link String} owner, {@link String} classification)
+	 * <br>
+	 * <br>
+	 * Creates a building in the database with specified values.  Uses default values for unspecified variables.
+	 * @param settlement - The settlement this building will be associated with
+	 * @param owner - The player that will own this building.
+	 * @param classification - The classification of the building.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createBuilding(String settlement, String owner, String classification){
+		return createBuilding(settlement, getPlayerId(owner),classification, 0, 0);
+	}
+	
+	/** 
+	 * <b>createBuilding</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createBuildingr({@link String} settlement, int owner, {@link String} classification, double xcoord, double zcoord)
+	 * <br>
+	 * <br>
+	 * Creates a building in the database with specified values.  Uses default values for unspecified variables.
+	 * @param settlement - The settlement this building will be associated with.
+	 * @param owner - The id of the player that will own this building.
+	 * @param classification - The classification of the building.
+	 * @param xcoord - The x coordinate this building is located on.
+	 * @param zcoord - The z coordinate this building is located on.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createBuilding(String settlement, int owner, String classification, double xcoord, double zcoord){
+		int settlementId = getSettlementId(settlement);
+		String query = "INSERT INTO building(settlement_id, owner_id, class, xcoord, zcoord) VALUES (" + settlementId + "," + owner + ",\'" + classification + "\'," + xcoord +"," + zcoord +")";
+		if(queryWithResult(query)){
+			plugin.getLogger().info("A new " + classification + " building has been created in " + settlement + " at x-" + xcoord + " z-" + zcoord + ".");
+			return true;
+		}
+		return false;
+	}	
+	//building_id", "settlement_id", "owner_id", "class", "resource", "level", "employed", "bonus
 	
 //--- CHECK EXISTENCE OF OBJECT ---//
 	/** 
@@ -435,7 +525,7 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @return The results if there are any.  Null if there are not.
 	 */
 	public ResultSet getKingdomData(String name, String column){
-		return getThingData("kingdom", getKingdomId(name), column, "kingdom_id");
+		return getTableData("kingdom", getKingdomId(name), column, "kingdom_id");
 	}
 	
 	/** 
@@ -452,7 +542,7 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @return The results if there are any.  Null if there are not.
 	 */
 	public ResultSet getSettlementData(String name, String column){
-		return getThingData("settlement", getSettlementId(name), column, "settlement_id");
+		return getTableData("settlement", getSettlementId(name), column, "settlement_id");
 	}
 	
 	/** 
@@ -469,13 +559,13 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @return The results if there are any.  Null if there are not.
 	 */
 	public ResultSet getPlayerData(String name, String column){
-		return getThingData("player", getPlayerId(name), column, "player_id");
+		return getTableData("player", getPlayerId(name), column, "player_id");
 	}
 	
 	/** 
-	 * <b>getThingData</b><br>
+	 * <b>getTableData</b><br>
 	 * <br>
-	 * &nbsp;&nbsp;public {@link ResultSet} getThingData({@link String} table, int id, {@link String} column, {@link String} idName)
+	 * &nbsp;&nbsp;public {@link ResultSet} getTableData({@link String} table, int id, {@link String} column, {@link String} idName)
 	 * <br>
 	 * <br>
 	 * Gets the column data from a table.  Use "*" to retrieve all data.  Make sure to issue 
@@ -487,8 +577,28 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @param idName - The name of the identifying column.
 	 * @return The results if there are any.  Null if there are not.
 	 */
-	private ResultSet getThingData(String table, int id, String column, String idName){
+	public ResultSet getTableData(String table, int id, String column, String idName){
 		String query = "SELECT " + column + " FROM " + table + " WHERE " + idName + "=" + id;
+		return  querySelect(query);
+	}
+	
+	/** 
+	 * <b>getAllTableData</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link ResultSet} getAllTableData({@link String} table, {@link String} column)
+	 * <br>
+	 * <br>
+	 * Gets the column data from a table.  Use "*" to retrieve all data.  Make sure to issue 
+	 * .getStatement().close(); on your {@link ResultSet} object in order to free space on the database.  
+	 * Otherwise, a database locked exception may occur.
+	 * @param table - The name of the table to reference.
+	 * @param id - The id number of the thing you want to find.
+	 * @param column - The column to reference.
+	 * @param idName - The name of the identifying column.
+	 * @return The results if there are any.  Null if there are not.
+	 */
+	public ResultSet getAllTableData(String table,String column){
+		String query = "SELECT " + column + " FROM " + table;
 		return  querySelect(query);
 	}
 	
@@ -535,7 +645,7 @@ public class DominionDatabaseHandler extends SQLite{
 	/** 
 	 * <b>getThingName</b><br>
 	 * <br>
-	 * &nbsp;&nbsp;public {@link String} getThingName(int  id, {@link String} table, {@link String} idName)
+	 * &nbsp;&nbsp;private {@link String} getThingName(int  id, {@link String} table, {@link String} idName)
 	 * <br>
 	 * <br>
 	 * Gets the name of a thing via referencing the id number.
@@ -674,6 +784,46 @@ public class DominionDatabaseHandler extends SQLite{
 				int liege = results.getInt("liege_id");
 				results.getStatement().close();
 				return liege;
+			}
+		} catch (SQLException ex){
+			writeError(ex.getMessage(), true);
+		}
+		return -1;
+	}
+	
+	/**
+	 * <b>getOwnerId</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public int getOwnerId({@link String} table, int id)
+	 * <br>
+	 * <br>
+	 * Gets the id of the player that owns this entity.
+	 * @param entity - The entity being accessed.
+	 * @param id - The row identifier.
+	 * @return The id of the owner of this entity if there is one. -1 if there is not.
+	 */
+	public int getOwnerId(String entity, int id){
+		if(entity == null | entity == "" | id <= 0){
+			return -1;
+		}
+		String identifyBy = entity + "_id";
+		String owner = "";
+		if(entity.equalsIgnoreCase("building"))
+			owner = "owner_id";
+		else if(entity.equalsIgnoreCase("settlement"))
+			owner = "lord_id";
+		else if(entity.equalsIgnoreCase("kingdom"))
+			owner = "monarch_id";
+		if(owner == "")
+			return -1;
+		
+		String query = "SELECT " + owner + " FROM " + entity + " WHERE " + identifyBy + "=" + id;
+		ResultSet results = querySelect(query);
+		try{
+			if(results.next()){
+				int ownerId = results.getInt(owner);
+				results.getStatement().close();
+				return ownerId;
 			}
 		} catch (SQLException ex){
 			writeError(ex.getMessage(), true);

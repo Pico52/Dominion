@@ -15,7 +15,7 @@ import com.pico52.dominion.Dominion;
 public abstract class PlayerSubCommand {
 	
 	protected static Dominion plugin;
-	private static String usageMessage;
+	private String usageMessage;
 	
 	/** 
 	 * <b>PlayerSubCommand</b><br>

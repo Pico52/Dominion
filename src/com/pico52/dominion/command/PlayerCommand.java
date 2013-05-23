@@ -10,7 +10,9 @@ import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
 import com.pico52.dominion.command.player.PlayerDeposit;
+import com.pico52.dominion.command.player.PlayerDestroy;
 import com.pico52.dominion.command.player.PlayerInfo;
+import com.pico52.dominion.command.player.PlayerList;
 import com.pico52.dominion.command.player.PlayerStorage;
 import com.pico52.dominion.command.player.PlayerWithdraw;
 
@@ -29,6 +31,8 @@ public class PlayerCommand implements CommandExecutor{
 	private static PlayerStorage playerStorage;
 	private static PlayerWithdraw playerWithdraw;
 	private static PlayerDeposit playerDeposit;
+	private static PlayerList playerList;
+	private static PlayerDestroy playerDestroy;
 	
 	/** 
 	 * <b>PlayerCommand</b><br>
@@ -46,6 +50,8 @@ public class PlayerCommand implements CommandExecutor{
 		playerStorage = new PlayerStorage(plugin);
 		playerWithdraw = new PlayerWithdraw(plugin);
 		playerDeposit = new PlayerDeposit(plugin);
+		playerList = new PlayerList(plugin);
+		playerDestroy = new PlayerDestroy(plugin);
 	}
 
 	@Override
@@ -71,17 +77,24 @@ public class PlayerCommand implements CommandExecutor{
 		args = arguments.toArray(new String[arguments.size()]);
 		
 		//--- SUB-COMMAND EXECUTORS ---//
-		if (subCommand.equalsIgnoreCase("info") | subCommand.equalsIgnoreCase("view")){
+		if (subCommand.equalsIgnoreCase("info") | subCommand.equalsIgnoreCase("view") | subCommand.equalsIgnoreCase("i")){
 			return playerInfo.execute(sender, args);
 		}
-		if (subCommand.equalsIgnoreCase("storage") | subCommand.equalsIgnoreCase("stores") | subCommand.equalsIgnoreCase("materials") | subCommand.equalsIgnoreCase("mats")){
+		if (subCommand.equalsIgnoreCase("storage") | subCommand.equalsIgnoreCase("stores") | subCommand.equalsIgnoreCase("materials")
+				| subCommand.equalsIgnoreCase("mats") | subCommand.equalsIgnoreCase("s")){
 			return playerStorage.execute(sender,args);
 		}
 		if (subCommand.equalsIgnoreCase("withdraw") | subCommand.equalsIgnoreCase("wd") | subCommand.equalsIgnoreCase("w")){
 			return playerWithdraw.execute(sender, args);
 		}
-		if (subCommand.equalsIgnoreCase("deposit")){
+		if (subCommand.equalsIgnoreCase("deposit") | subCommand.equalsIgnoreCase("d")){
 			return playerDeposit.execute(sender,args);
+		}
+		if(subCommand.equalsIgnoreCase("list") | subCommand.equalsIgnoreCase("l")){
+			return playerList.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("destroy") | subCommand.equalsIgnoreCase("dismantle") | subCommand.equalsIgnoreCase("burn")){
+			return playerDestroy.execute(sender, args);
 		}
 		
 		return false;

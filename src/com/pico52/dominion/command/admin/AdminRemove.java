@@ -24,7 +24,7 @@ public class AdminRemove extends AdminSubCommand{
 	 * @param instance - The {@link Dominion} plugin this command executor will be running on.
 	 */
 	public AdminRemove(Dominion instance) {
-		super(instance, "");
+		super(instance, "/ad remove [entity] [id]");
 	}
 
 	/** 
@@ -40,8 +40,25 @@ public class AdminRemove extends AdminSubCommand{
 	 */
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		sender.sendMessage("This command will remove an object.");
-		
+		if(args.length == 0){
+			sender.sendMessage(plugin.getLogPrefix() + "Removes an entity.");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			return true;
+		}
+		if(args.length == 1){
+			sender.sendMessage(plugin.getLogPrefix() + "You need to provide the id number of the object you want to remove.");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			return true;
+		}
+		String entity = args[0];
+		int id = Integer.parseInt(args[1]);
+		if(plugin.getDBHandler().remove(entity, id)){
+			sender.sendMessage(plugin.getLogPrefix() + "Successfully removed the " + entity + "!");
+			plugin.getLogger().info("Successfully removed a " + entity + ".");
+		} else {
+			sender.sendMessage(plugin.getLogPrefix() + "Failed to destroy the " + entity + "!");
+			plugin.getLogger().info("Failed to remove a " + entity + ".");
+		}
 		return true;
 	}
 }

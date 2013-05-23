@@ -200,7 +200,8 @@ public class SQLite extends Database {
 			this.writeError(ex.getMessage(), true);
 			try{  // - Last chance to close this statement.
 				statement.close();
-			}finally{  // - Statement closed or not, we're out of here!
+			} catch (SQLException e){}
+			finally{  // - Statement closed or not, we're out of here!
 				return false;
 			}
 		}
@@ -212,10 +213,13 @@ public class SQLite extends Database {
 		try {
 			dbm = this.open().getMetaData();
 			ResultSet tables = dbm.getTables(null, null, table, null);
-			if (tables.next())
-			  return true;
-			else
-			  return false;
+			if (tables.next()){
+				tables.getStatement().close();
+				return true;
+			}else{
+				tables.getStatement().close();
+				return false;
+			}
 		} catch (SQLException e) {
 			this.writeError("Failed to check if table \"" + table + "\" exists: " + e.getMessage(), true);
 			return false;

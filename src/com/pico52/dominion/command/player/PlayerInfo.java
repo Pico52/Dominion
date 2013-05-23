@@ -49,27 +49,26 @@ public class PlayerInfo extends PlayerSubCommand{
 			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
 			return true;
 		}
-		// There will at least be an argument here, hopefully a settlement name.
+		// - There will at least be an argument here, hopefully a settlement name.
 		String settlement = args[0];
+		if(!plugin.getDBHandler().settlementExists(settlement)){
+			sender.sendMessage(plugin.getLogPrefix() + "No such settlement \"" + settlement + "\".");
+			return true;
+		}
 		ResultSet results = plugin.getDBHandler().getSettlementData(settlement, "*");
+		String allData = "§a======" + settlement + "======§r\n";
 		try {
-			if(!plugin.getDBHandler().settlementExists(settlement)){
-				results.getStatement().close();
-				sender.sendMessage(plugin.getLogPrefix() + "No such settlement \"" + args[0] + "\".");
-				return true;
-			}
-			String allData = "§a======" + settlement + "======§r\n";
-			while(results.next()){
-				allData += "§aLord: §f" 			+ plugin.getDBHandler().getPlayerName(results.getInt("lord_id")) 		+ "\n";
-				allData += "§aKingdom: §f" 	+ plugin.getDBHandler().getKingdomName(results.getInt("kingdom_id")) + "\n";
-				allData += "§aBiome: §f" 		+ results.getString("biome") 	+ "\n";
-				allData += "§aClass: §f" 		+ results.getString("class") 		+ "\n";
-				allData += "§aX-coord: §f" 	+ results.getDouble("xcoord")	+ "  ";
-				allData += "§aZ-coord: §f" 	+ results.getDouble("zcoord")		+ "\n";
-				allData += "§aMana: §f" 		+ results.getInt("mana") 		+ "\n";
-				allData += "§aPopulation: §f"+ results.getInt("population")	+ "\n";
-				allData += "§aRecruits: §f" 	+ results.getInt("recruit") 		+ "\n";
-				allData += "§aPrisoners: §f" 	+ results.getInt("prisoner")		+ "\n";
+			if(results.next()){
+				allData += "§aLord: §f" + plugin.getDBHandler().getPlayerName(results.getInt("lord_id")) 		+ "\n";
+				allData += "§aKingdom: §f" + plugin.getDBHandler().getKingdomName(results.getInt("kingdom_id")) + "\n";
+				allData += "§aBiome: §f" + results.getString("biome") 	+ "\n";
+				allData += "§aClass: §f" + results.getString("class") + "\n";
+				allData += "§aX-coord: §f" + results.getDouble("xcoord") + "  ";
+				allData += "§aZ-coord: §f" + results.getDouble("zcoord") + "\n";
+				allData += "§aMana: §f" + results.getInt("mana") + "\n";
+				allData += "§aPopulation: §f" + results.getInt("population") + "\n";
+				allData += "§aRecruits: §f" + results.getInt("recruit") + "\n";
+				allData += "§aPrisoners: §f" + results.getInt("prisoner") + "\n";
 				allData += "§a======";
 				for(int i=0; i<settlement.length();i++)
 					allData += "=";
@@ -77,8 +76,9 @@ public class PlayerInfo extends PlayerSubCommand{
 				sender.sendMessage(allData);
 			}
 			results.getStatement().close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException ex) {
+			sender.sendMessage("There was an error communicating with the database.");
+			ex.printStackTrace();
 			return false;
 		}
 

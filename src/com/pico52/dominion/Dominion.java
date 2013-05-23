@@ -26,7 +26,7 @@ import com.pico52.dominion.event.DominionPlayerListener;
 public final class Dominion extends JavaPlugin{
 	//*****Class Variables*****//
 	public Logger log = Logger.getLogger("Minecraft");
-	private  final static String logPrefix = "[Dominion] "; // Prefix to go in front of all log entries
+	private  final static String logPrefix = "§a[Dominion]§r "; // Prefix to go in front of all log entries
 	private File pFolder = new File("plugins" + File.separator + "Dominion"); // Folder to store plugin settings file and database
 	private DominionDatabaseHandler dbHandler = null; // SQLite handler
 	private HashMap<String, Integer> commandUsers = new HashMap<String, Integer>(); //Stores info about people using commands	

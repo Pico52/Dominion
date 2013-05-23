@@ -15,7 +15,7 @@ import com.pico52.dominion.Dominion;
 public abstract class AdminSubCommand {
 	
 	protected static Dominion plugin;
-	private static String usageMessage;
+	private String usageMessage;
 	
 	/** 
 	 * <b>AdminSubCommand</b><br>

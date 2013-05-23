@@ -98,7 +98,7 @@ public abstract class Database {
 	 * &nbsp;&nbsp;Opens a connection with the database.
 	 * <br>
 	 * <br>
-	 * @return the success of the method.
+	 * @return The connection that has been opened.
 	 */
 	abstract Connection open();
 	
