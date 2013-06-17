@@ -63,12 +63,13 @@ public class PlayerInfo extends PlayerSubCommand{
 				allData += "§aKingdom: §f" + plugin.getDBHandler().getKingdomName(results.getInt("kingdom_id")) + "\n";
 				allData += "§aBiome: §f" + results.getString("biome") 	+ "\n";
 				allData += "§aClass: §f" + results.getString("class") + "\n";
+				allData += "§aBase Defense: §f" + (int) results.getDouble("wall") + "\n";
 				allData += "§aX-coord: §f" + results.getDouble("xcoord") + "  ";
 				allData += "§aZ-coord: §f" + results.getDouble("zcoord") + "\n";
-				allData += "§aMana: §f" + results.getInt("mana") + "\n";
-				allData += "§aPopulation: §f" + results.getInt("population") + "\n";
-				allData += "§aRecruits: §f" + results.getInt("recruit") + "\n";
-				allData += "§aPrisoners: §f" + results.getInt("prisoner") + "\n";
+				allData += "§aMana: §f" + (int) results.getDouble("mana") + "/" + plugin.getSettlementManager().getMaxMana(settlement) + "\n";
+				allData += "§aPopulation: §f" + (int) results.getDouble("population") + "\n";
+				allData += "§aRecruits: §f" + (int) results.getDouble("recruit") + "\n";
+				allData += "§aPrisoners: §f" + (int) results.getDouble("prisoner") + "\n";
 				allData += "§a======";
 				for(int i=0; i<settlement.length();i++)
 					allData += "=";

@@ -8,8 +8,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.pico52.dominion.command.AdminCommand;
 import com.pico52.dominion.command.PlayerCommand;
+import com.pico52.dominion.datasheet.BiomeData;
 import com.pico52.dominion.db.DominionDatabaseHandler;
 import com.pico52.dominion.event.DominionPlayerListener;
+import com.pico52.dominion.object.BuildingManager;
+import com.pico52.dominion.object.SettlementManager;
 
 /**
  * <b>Dominion plugin for Bukkit</b><br>
@@ -31,6 +34,9 @@ public final class Dominion extends JavaPlugin{
 	private DominionDatabaseHandler dbHandler = null; // SQLite handler
 	private HashMap<String, Integer> commandUsers = new HashMap<String, Integer>(); //Stores info about people using commands	
 	private DominionPlayerListener playerEvent;
+	private BuildingManager buildingManager;
+	private SettlementManager settlementManager;
+	private BiomeData biomeData;
 	
 	@Override
 	public void onEnable(){
@@ -38,6 +44,9 @@ public final class Dominion extends JavaPlugin{
 		dbHandler = new DominionDatabaseHandler(this, log, logPrefix, "Dominion", pFolder.getPath());	// - Starting up the database connection.
 		dbHandler.getConnection();  // - Open up the connection.
 		dbHandler.setDefaultTables();
+		buildingManager = new BuildingManager(this);
+		settlementManager = new SettlementManager(this);
+		biomeData = new BiomeData();
 		
 		playerEvent = new DominionPlayerListener(this);
 		getServer().getPluginManager().registerEvents(playerEvent, this);
@@ -99,5 +108,41 @@ public final class Dominion extends JavaPlugin{
 	 */
 	public HashMap<String, Integer> getCommandUsers(){
 		return commandUsers;
+	}
+	
+	/** 
+	 * <b>getBuildingManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link BuildingManager} getBuildingManager()
+	 * <br>
+	 * <br>
+	 * @return The manager controlling building data.
+	 */
+	public BuildingManager getBuildingManager(){
+		return buildingManager;
+	}
+	
+	/** 
+	 * <b>getSettlementManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link SettlementManager} getSettlementManager()
+	 * <br>
+	 * <br>
+	 * @return The manager controlling settlement data.
+	 */
+	public SettlementManager getSettlementManager(){
+		return settlementManager;
+	}
+	
+	/** 
+	 * <b>getBiomeData</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link BiomeData} getBiomeData()
+	 * <br>
+	 * <br>
+	 * @return The data sheet for biome bonuses and penalties.
+	 */
+	public BiomeData getBiomeData(){
+		return biomeData;
 	}
 }

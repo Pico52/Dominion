@@ -13,6 +13,7 @@ import com.pico52.dominion.command.admin.AdminAdd;
 import com.pico52.dominion.command.admin.AdminBuild;
 import com.pico52.dominion.command.admin.AdminCreate;
 import com.pico52.dominion.command.admin.AdminForce;
+import com.pico52.dominion.command.admin.AdminManualUpdate;
 import com.pico52.dominion.command.admin.AdminRemove;
 import com.pico52.dominion.command.admin.AdminSet;
 import com.pico52.dominion.command.admin.AdminSubtract;
@@ -37,6 +38,7 @@ public class AdminCommand implements CommandExecutor{
 	private static AdminRemove adminRemove;
 	private static AdminForce adminForce;
 	private static AdminUpdate adminUpdate;
+	private static AdminManualUpdate adminManualUpdate;
 	
 	/** 
 	 * <b>AdminCommand</b><br>
@@ -59,23 +61,18 @@ public class AdminCommand implements CommandExecutor{
 		adminRemove	= new AdminRemove(plugin);
 		adminForce 	= new AdminForce(plugin);
 		adminUpdate	= new AdminUpdate(plugin);
+		adminManualUpdate = new AdminManualUpdate(plugin);
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-		String command = "[ADMIN_COMMAND]" + sender.getName() + ":/" + commandLabel + " ";
-		for(String arg: args){
-			command += arg + " ";
-		}
-		plugin.getLogger().info(command);
-		
 		if(!sender.hasPermission("admin") || !sender.isOp()){
 			sender.sendMessage(plugin.getLogPrefix() + "You must have the administrator permission to use this command.");
 			return false;
 		}
 		if(args.length == 0){
 			sender.sendMessage("The primary controller for all administrator commands.");
-			sender.sendMessage("Usage:  /admindominion [set/add/subtract/build/create/remove/force/update]");
+			sender.sendMessage("Usage:  /admindominion [set / add / subtract / build / create / remove / force / update / manualupdate]");
 			return true;
 		}
 		String subCommand = args[0];
@@ -108,6 +105,9 @@ public class AdminCommand implements CommandExecutor{
 		}
 		if(subCommand.equalsIgnoreCase("update") | subCommand.equalsIgnoreCase("change")){
 			return adminUpdate.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("manualupdate") | subCommand.equalsIgnoreCase("mu")){
+			return adminManualUpdate.execute(sender, args);
 		}
 		
 		return false;

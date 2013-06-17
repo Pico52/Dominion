@@ -9,10 +9,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.command.player.PlayerData;
 import com.pico52.dominion.command.player.PlayerDeposit;
 import com.pico52.dominion.command.player.PlayerDestroy;
+import com.pico52.dominion.command.player.PlayerEmploy;
+import com.pico52.dominion.command.player.PlayerEmployment;
 import com.pico52.dominion.command.player.PlayerInfo;
 import com.pico52.dominion.command.player.PlayerList;
+import com.pico52.dominion.command.player.PlayerProduction;
 import com.pico52.dominion.command.player.PlayerStorage;
 import com.pico52.dominion.command.player.PlayerWithdraw;
 
@@ -33,6 +37,10 @@ public class PlayerCommand implements CommandExecutor{
 	private static PlayerDeposit playerDeposit;
 	private static PlayerList playerList;
 	private static PlayerDestroy playerDestroy;
+	private static PlayerEmploy playerEmploy;
+	private static PlayerEmployment playerEmployment;
+	private static PlayerData playerData;
+	private static PlayerProduction playerProduction;
 	
 	/** 
 	 * <b>PlayerCommand</b><br>
@@ -52,22 +60,19 @@ public class PlayerCommand implements CommandExecutor{
 		playerDeposit = new PlayerDeposit(plugin);
 		playerList = new PlayerList(plugin);
 		playerDestroy = new PlayerDestroy(plugin);
+		playerEmploy = new PlayerEmploy(plugin);
+		playerEmployment = new PlayerEmployment(plugin);
+		playerData = new PlayerData(plugin);
+		playerProduction = new PlayerProduction(plugin);
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-		
-		String command = "[PLAYER_COMMAND]" + sender.getName() + ":/" + commandLabel + " ";
-		for(String arg: args){
-			command += arg + " ";
-		}
-		plugin.getLogger().info(command);
-		
 		/* Default view
 		 * View the information of the default settlement.
 		 */
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Usage:  /dominion [info / storage / withdraw / deposit]");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage:  /dominion [info / storage / withdraw / deposit / list / destroy / employ / employment / data / production]");
 			return true;
 		}
 		String subCommand = args[0];
@@ -95,6 +100,18 @@ public class PlayerCommand implements CommandExecutor{
 		}
 		if(subCommand.equalsIgnoreCase("destroy") | subCommand.equalsIgnoreCase("dismantle") | subCommand.equalsIgnoreCase("burn")){
 			return playerDestroy.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("employ")){
+			return playerEmploy.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("employment")){
+			return playerEmployment.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("data")){
+			return playerData.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("production") | subCommand.equalsIgnoreCase("prod") | subCommand.equalsIgnoreCase("p")){
+			return playerProduction.execute(sender, args);
 		}
 		
 		return false;

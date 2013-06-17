@@ -7,31 +7,53 @@ import java.util.logging.Logger;
 
 import com.pico52.dominion.Dominion;
 
+/** 
+ * <b>DominionDatabaseHandler</b><br>
+ * <br>
+ * &nbsp;&nbsp;public class DominionDatabaseHandler extends {@link SQLite}
+ * <br>
+ * <br>
+ * The main file for all Dominion-based database transactions.
+ */
 public class DominionDatabaseHandler extends SQLite{
 //===================Default database setup.===================//
 	private static String[] settlementColumns = 
-		{"settlement_id", "name", "lord_id", "kingdom_id", "biome", "xcoord", "zcoord", "class", "mana", "population", "wealth", "food", "wood", "cobblestone", "stone", "sand", 
-		"gravel", "dirt", "iron", "iron_ore", "gold", "gold_ore", "flint", "feather", "lapis_ore", "diamond", "obsidian", "netherrack", "nether_brick", "redstone", "brick", 
-		"clay", "coal", "wool", "leather", "arrow", "armor", "snow", "recruit", "prisoner"};
+		{"settlement_id", "name", "lord_id", "kingdom_id", "biome", "xcoord", "zcoord", "class", "wall", "mana", "population", "wealth", "food", "wood", "cobblestone", "stone", "sand", 
+		"gravel", "dirt", "iron_ingot", "iron_ore", "emerald", "emerald_ore", "gold_ingot", "gold_ore", "flint", "feather", "lapis_ore", "diamond", "obsidian", "netherrack", "nether_brick", "redstone", "brick", 
+		"glowstone", "clay", "coal", "wool", "leather", "arrow", "armor", "weapon", "snow", "recruit", "prisoner"};
 	private static String[] settlementDims = 
-		{"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "TEXT", "INT DEFAULT 0", "INT DEFAULT 0", 
-		"INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", 
-		"INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", 
-		"INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0"};
-	private static String[] buildingColumns = {"building_id", "settlement_id", "owner_id", "class", "resource", "level", "xcoord", "zcoord", "employed", "bonus"};
+		{"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "TEXT", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", 
+		"DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", 
+		"DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", 
+		"DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", 
+		"DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0"};
+	private static String[] buildingColumns = {"building_id", "settlement_id", "owner_id", "class", "resource", "level", "xcoord", "zcoord", "employed"};
 	private static String[] buildingDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "TEXT", "INT DEFAULT 0", "DOUBLE DEFAULT 0", 
-		"DOUBLE DEFAULT 0", "INT DEFAULT 0","TEXT"};
+		"DOUBLE DEFAULT 0", "INT DEFAULT 0"};
 	private static String[] tradeColumns = {"trade_id", "settlement1_id", "settlement2_id", "income"};
-	private static String[] tradeDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0"};
+	private static String[] tradeDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "DOUBLE DEFAULT 0"};
 	private static String[] kingdomColumns = {"kingdom_id", "name", "monarch_id", "primarycolor", "secondarycolor"};
 	private static String[] kingdomDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT UNIQUE", "TEXT", "TEXT", "TEXT"};
 	private static String[] playerColumns = {"player_id", "name", "liege_id"};
 	private static String[] playerDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT UNIQUE", "INT DEFAULT 0"};
+	private static String[] unitColumns = {"unit_id", "owner_id", "settlement_id", "class", "xcoord", "zcoord", "experience"};
+	private static String[] unitDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "INT DEFAULT 0"};
+	private static String[] spellColumns = {"spell_id", "caster_id", "object_id", "object", "class", "power", "duration"};
+	private static String[] spellDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "TEXT", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0"};
 //===================Database Setup Complete===================//
 			
 	private static Dominion plugin;
 
 //--- CONSTRUCTOR AND DEFAULTS ---//
+	/** 
+	 * <b>DominionDatabaseHandler</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public DominionDatabaseHandler({@link Dominion} instance)
+	 * <br>
+	 * <br>
+	 * The constructor clause for the {@link DominionDatabaseHandler} class.
+	 * @param instance - The {@link Dominion} plugin this handler will be running on.
+	 */
 	public DominionDatabaseHandler(Dominion instance, Logger log, String prefix, String name, String location) {
 		super(log, prefix, name, location);
 		plugin = instance;
@@ -67,8 +89,16 @@ public class DominionDatabaseHandler extends SQLite{
 			plugin.getLogger().info(plugin.getLogPrefix() + "Must create the player table..");
 			createTable("player", playerColumns, playerDims);
 		}
+		if(!checkTable("unit")){
+			plugin.getLogger().info(plugin.getLogPrefix() + "Must create the unit table..");
+			createTable("unit", unitColumns, unitDims);
+		}
+		if(!checkTable("spell")){
+			plugin.getLogger().info(plugin.getLogPrefix() + "Must create the spell table..");
+			createTable("spell", spellColumns, spellDims);
+		}
 		// - All tables should now exist.
-		if(checkTable("settlement") & checkTable("building") & checkTable("trade") & checkTable("kingdom") & checkTable("player"))
+		if(checkTable("settlement") & checkTable("building") & checkTable("trade") & checkTable("kingdom") & checkTable("player") & checkTable("unit") & checkTable("spell"))
 			return true;
 		return false;
 	}
@@ -514,6 +544,23 @@ public class DominionDatabaseHandler extends SQLite{
 	/** 
 	 * <b>getKingdomData</b><br>
 	 * <br>
+	 * &nbsp;&nbsp;public {@link ResultSet} getKingdomData(int kingdom_id, {@link String} column)
+	 * <br>
+	 * <br>
+	 * Gets the column data from the kingdom table.  Use "*" to retrieve all data.  Make sure to issue 
+	 * .getStatement().close(); on your {@link ResultSet} object in order to free space on the database.  
+	 * Otherwise, a database locked exception may occur.
+	 * @param kingdom_id - The ID of the kingdom.
+	 * @param column - The column to reference.
+	 * @return The results if there are any.  Null if there are not.
+	 */
+	public ResultSet getKingdomData(int kingdom_id, String column){
+		return getTableData("kingdom", kingdom_id, column, "kingdom_id");
+	}
+	
+	/** 
+	 * <b>getKingdomData</b><br>
+	 * <br>
 	 * &nbsp;&nbsp;public {@link ResultSet} getKingdomData({@link String} name, {@link String} column)
 	 * <br>
 	 * <br>
@@ -526,6 +573,23 @@ public class DominionDatabaseHandler extends SQLite{
 	 */
 	public ResultSet getKingdomData(String name, String column){
 		return getTableData("kingdom", getKingdomId(name), column, "kingdom_id");
+	}
+	
+	/** 
+	 * <b>getSettlementData</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link ResultSet} getSettlementData(int settlement_id, {@link String} column)
+	 * <br>
+	 * <br>
+	 * Gets the column data from the settlement table.  Use "*" to retrieve all data.  Make sure to issue 
+	 * .getStatement().close(); on your {@link ResultSet} object in order to free space on the database.  
+	 * Otherwise, a database locked exception may occur.
+	 * @param settlement_id - The ID of the settlement.
+	 * @param column - The column to reference.
+	 * @return The results if there are any.  Null if there are not.
+	 */
+	public ResultSet getSettlementData(int settlement_id, String column){
+		return getTableData("settlement", settlement_id, column, "settlement_id");
 	}
 	
 	/** 
@@ -548,6 +612,23 @@ public class DominionDatabaseHandler extends SQLite{
 	/** 
 	 * <b>getPlayerData</b><br>
 	 * <br>
+	 * &nbsp;&nbsp;public {@link ResultSet} getPlayerData(int player_id, {@link String} column)
+	 * <br>
+	 * <br>
+	 * Gets the column data from the player table.  Use "*" to retrieve all data.  Make sure to issue 
+	 * .getStatement().close(); on your {@link ResultSet} object in order to free space on the database.  
+	 * Otherwise, a database locked exception may occur.
+	 * @param player_id - The ID of the player.
+	 * @param column - The column to reference.
+	 * @return The results if there are any.  Null if there are not.
+	 */
+	public ResultSet getPlayerData(int player_id, String column){
+		return getTableData("player", player_id, column, "player_id");
+	}
+	
+	/** 
+	 * <b>getPlayerData</b><br>
+	 * <br>
 	 * &nbsp;&nbsp;public {@link ResultSet} getPlayerData({@link String} name, {@link String} column)
 	 * <br>
 	 * <br>
@@ -560,6 +641,23 @@ public class DominionDatabaseHandler extends SQLite{
 	 */
 	public ResultSet getPlayerData(String name, String column){
 		return getTableData("player", getPlayerId(name), column, "player_id");
+	}
+	
+	/** 
+	 * <b>getBuildingData</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link ResultSet} getBuildingData(int id, {@link String} column)
+	 * <br>
+	 * <br>
+	 * Gets the column data from the building table.  Use "*" to retrieve all data.  Make sure to issue 
+	 * .getStatement().close(); on your {@link ResultSet} object in order to free space on the database.  
+	 * Otherwise, a database locked exception may occur.
+	 * @param id - The id of the building.
+	 * @param column - The column to reference.
+	 * @return The results if there are any.  Null if there are not.
+	 */
+	public ResultSet getBuildingData(int id, String column){
+		return getTableData("building", id, column, "building_id");
 	}
 	
 	/** 
@@ -592,13 +690,30 @@ public class DominionDatabaseHandler extends SQLite{
 	 * .getStatement().close(); on your {@link ResultSet} object in order to free space on the database.  
 	 * Otherwise, a database locked exception may occur.
 	 * @param table - The name of the table to reference.
-	 * @param id - The id number of the thing you want to find.
 	 * @param column - The column to reference.
-	 * @param idName - The name of the identifying column.
 	 * @return The results if there are any.  Null if there are not.
 	 */
-	public ResultSet getAllTableData(String table,String column){
+	public ResultSet getAllTableData(String table, String column){
 		String query = "SELECT " + column + " FROM " + table;
+		return  querySelect(query);
+	}
+	
+	/** 
+	 * <b>getAllTableData</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link ResultSet} getAllTableData({@link String} table, {@link String} column, {@link String} where)
+	 * <br>
+	 * <br>
+	 * Gets the column data from a table.  Use "*" to retrieve all data.  Make sure to issue 
+	 * .getStatement().close(); on your {@link ResultSet} object in order to free space on the database.  
+	 * Otherwise, a database locked exception may occur.
+	 * @param table - The name of the table to reference.
+	 * @param column - The column to reference.
+	 * @param where - The exact SQL where clause without the "where" part.  "settlement_id=1" for example.
+	 * @return The results if there are any.  Null if there are not.
+	 */
+	public ResultSet getAllTableData(String table, String column, String where){
+		String query = "SELECT " + column + " FROM " + table + " WHERE " + where;
 		return  querySelect(query);
 	}
 	
