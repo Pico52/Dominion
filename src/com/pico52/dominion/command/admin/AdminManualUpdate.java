@@ -40,7 +40,12 @@ public class AdminManualUpdate extends AdminSubCommand{
 	 */
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		return plugin.getSettlementManager().updateAll();
+		if(plugin.getSettlementManager().updateAll()){
+			sender.sendMessage("Successfully updated all settlements.");
+		} else {
+			sender.sendMessage("At least one of the settlements has not been updated.");
+		}
+		return true;
 	}
 
 }

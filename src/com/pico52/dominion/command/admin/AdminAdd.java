@@ -74,7 +74,7 @@ public class AdminAdd extends AdminSubCommand{
 			return true;
 		}
 		// - Add the material to the database.
-		if(plugin.getDBHandler().add(settlement, material, amount))
+		if(plugin.getDBHandler().addMaterial(settlement, material, amount))
 			sender.sendMessage(plugin.getLogPrefix() + "Successfully added " + amount + " " + material + " to " + settlement + ".");
 		else
 			sender.sendMessage(plugin.getLogPrefix() + "Failed to add " + amount + " " + material + " to " + settlement + ".");

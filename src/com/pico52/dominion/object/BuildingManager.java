@@ -42,9 +42,8 @@ import com.pico52.dominion.object.building.Woodshop;
  * <br>
  * Controller for buildings.
  */
-public class BuildingManager{
+public class BuildingManager extends DominionObjectManager{
 	
-	private static Dominion plugin;
 	private static ArcheryRange archeryRange;
 	private static Armory armory;
 	private static Bank bank;
@@ -76,14 +75,14 @@ public class BuildingManager{
 	/** 
 	 * <b>BuildingManager</b><br>
 	 * <br>
-	 * &nbsp;&nbsp;public BuildingManager()
+	 * &nbsp;&nbsp;public BuildingManager({@link Dominion} plugin)
 	 * <br>
 	 * <br>
 	 * The constructor clause for the {@link BuildingManager} class.
 	 * @param instance - The {@link Dominion} plugin this manager will be running on.
 	 */
-	public BuildingManager(Dominion instance){
-		plugin = instance;
+	public BuildingManager(Dominion plugin){
+		super(plugin);
 		archeryRange = new ArcheryRange();
 		armory = new Armory();
 		bank = new Bank();

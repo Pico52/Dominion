@@ -65,7 +65,14 @@ public class PlayerDeposit extends PlayerSubCommand{
 		// - Setting names to the arguments for easy readability.
 		String settlement = args[0];
 		String material = args[1].toLowerCase();
-		int depositAmount = Integer.parseInt(args[2]);
+		int depositAmount = 0;
+		try{
+			depositAmount = Integer.parseInt(args[2]);
+		} catch (NumberFormatException ex){
+			sender.sendMessage(plugin.getLogPrefix() + "Incorrect input.  " + args[2] + " is not a number.");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			return true;
+		}
 		// - Make sure the settlement is legitimate
 		if(!plugin.getDBHandler().settlementExists(settlement)){
 			sender.sendMessage(plugin.getLogPrefix() + "Settlement: \"" + settlement + "\" does not exist.  (Case-sensitive)");
@@ -90,7 +97,7 @@ public class PlayerDeposit extends PlayerSubCommand{
 		int notDeposited = depositAmount - actualCount;
 		depositAmount = actualCount;
 		// - Add the material to the database.
-		if(plugin.getDBHandler().add(settlement, material, depositAmount))
+		if(plugin.getDBHandler().addMaterial(settlement, material, depositAmount))
 			sender.sendMessage(plugin.getLogPrefix() + "Successfully deposited " + depositAmount + " " + material + " with " + notDeposited + " not deposited.");
 		else
 			sender.sendMessage(plugin.getLogPrefix() + "Failed to deposit.");

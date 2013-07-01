@@ -42,15 +42,14 @@ public class PlayerProduction extends PlayerSubCommand{
 	 */
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		if(args.length == 0){	// - They only specified "mats" but gave no settlement.
+		if(args.length == 0){
 			sender.sendMessage(plugin.getLogPrefix() + "Outputs materials production of a settlement.");
 			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
 			return true;
 		}
-		// There will at least be an argument here, hopefully a settlement name.
 		String settlement = args[0];
 		if(!plugin.getDBHandler().settlementExists(settlement)){
-			sender.sendMessage(plugin.getLogPrefix() + "No such kingdom \"" + settlement + "\".");
+			sender.sendMessage(plugin.getLogPrefix() + "No such settlement \"" + settlement + "\".");
 			return true;
 		}
 		ProductionSheet results = plugin.getBuildingManager().getProductions(settlement);

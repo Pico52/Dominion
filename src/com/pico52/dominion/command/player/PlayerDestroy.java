@@ -53,7 +53,14 @@ public class PlayerDestroy extends PlayerSubCommand{
 			return true;
 		}
 		// - There should be an argument by this point.  Hopefully it's a building Id.
-		int building = Integer.parseInt(args[0]);
+		int building = 0;
+		try{
+			building = Integer.parseInt(args[0]);
+		} catch (NumberFormatException ex){
+			sender.sendMessage(plugin.getLogPrefix() + "Incorrect input.  " + args[0] + " is not a number.");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			return true;
+		}
 		int playerId;
 		if((playerId = plugin.getDBHandler().getPlayerId(player.getName())) == -1){
 			sender.sendMessage(plugin.getLogPrefix() + "Could not find your player Id!");

@@ -74,7 +74,7 @@ public class AdminSubtract extends AdminSubCommand{
 		// - Remember, admins don't need to be the lord to issue this command, so we will continue.
 		// - Admins can also subtract the resource to make a negative value, so we will still continue.
 		// - Subtract the material from the database.
-		if(plugin.getDBHandler().subtract(settlement, material, amount)){
+		if(plugin.getDBHandler().subtractMaterial(settlement, material, amount)){
 			sender.sendMessage(plugin.getLogPrefix() + "Successfully subtracted " + amount + " " + material + " from " + settlement + "!");
 			plugin.getLogger().info(plugin.getLogPrefix() + "Successful subtraction for command sender: " + sender.getName());
 			return true;

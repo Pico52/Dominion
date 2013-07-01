@@ -113,7 +113,7 @@ public class AdminForce extends AdminSubCommand{
 				sender.sendMessage(plugin.getLogPrefix() + "The kingdom \"" + entity + "\" does not exist.");
 				return true;
 			}
-			if(plugin.getDBHandler().update("kingdom", "monarch_id", playerId, "kingdom_id", plugin.getDBHandler().getKingdomId(entity)))
+			if(plugin.getDBHandler().update("kingdom", "owner_id", playerId, "kingdom_id", plugin.getDBHandler().getKingdomId(entity)))
 				sender.sendMessage(plugin.getLogPrefix() + player + " is now the monarch of " + entity + ".");
 			else
 				sender.sendMessage(plugin.getLogPrefix() + "Failed to make " + player + " the monarch of " + entity + ".");			
@@ -126,7 +126,7 @@ public class AdminForce extends AdminSubCommand{
 				sender.sendMessage(plugin.getLogPrefix() + "The settlement \"" + entity + "\" does not exist.");
 				return true;
 			}
-			if(plugin.getDBHandler().update("settlement", "lord_id", playerId, "settlement_id", plugin.getDBHandler().getSettlementId(entity)))
+			if(plugin.getDBHandler().update("settlement", "owner_id", playerId, "settlement_id", plugin.getDBHandler().getSettlementId(entity)))
 				sender.sendMessage(plugin.getLogPrefix() + player + " is now the lord of " + entity + ".");
 			else
 				sender.sendMessage(plugin.getLogPrefix() + "Failed to make " + player + " the lord of " + entity + ".");				
@@ -143,7 +143,7 @@ public class AdminForce extends AdminSubCommand{
 				sender.sendMessage(plugin.getLogPrefix() + "The player \"" + player + "\" does not exist.");
 				return true;
 			}
-			if(plugin.getDBHandler().update("player", "liege_id", playerId, "player_id", plugin.getDBHandler().getPlayerId(entity)))
+			if(plugin.getDBHandler().update("player", "owner_id", playerId, "player_id", plugin.getDBHandler().getPlayerId(entity)))
 				sender.sendMessage(plugin.getLogPrefix() + player + " is now the liege lord of " + entity + ".");
 			else
 				sender.sendMessage(plugin.getLogPrefix() + "Failed to make " + player + " the liege lord of " + entity + ".");

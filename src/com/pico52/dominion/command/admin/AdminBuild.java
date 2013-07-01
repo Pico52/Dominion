@@ -58,7 +58,8 @@ public class AdminBuild extends AdminSubCommand{
 			return true;
 		}
 		if(plugin.getDBHandler().createBuilding(settlement, classification)){
-			sender.sendMessage(plugin.getLogPrefix() + "Successfully created a " + classification + " for " + settlement + "!");
+			int newBuildingId = plugin.getDBHandler().getNewestId("building");
+			sender.sendMessage(plugin.getLogPrefix() + "Successfully created a " + classification + " id#: " + newBuildingId + " for " + settlement + "!");
 			plugin.getLogger().info("Successfully created a " + classification + " for " + settlement + "!");
 		} else {
 			sender.sendMessage(plugin.getLogPrefix() + "Failed to create the " + classification + " for " + settlement + ".");

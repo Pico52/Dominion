@@ -136,4 +136,21 @@ public class BiomeData implements DataSheet{
 		"§aHerding Grounds:§f -" + desertHerdingGroundsPenalty + "\n";
 		return output;
 	}
+	
+	/** 
+	 * <b>isBiome</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean isBiome({@link String} biome)
+	 * <br>
+	 * <br>
+	 * @param biome - The name of the biome.
+	 * @return True if the argument is a biome.  False if it is not.
+	 */
+	public boolean isBiome(String biome){
+		if(biome.equalsIgnoreCase("plains") | biome.equalsIgnoreCase("forest") | biome.equalsIgnoreCase("mountain") | 
+				biome.equalsIgnoreCase("snow") | biome.equalsIgnoreCase("jungle") | biome.equalsIgnoreCase("swamp") | 
+				biome.equalsIgnoreCase("mushroom") | biome.equalsIgnoreCase("ocean") | biome.equalsIgnoreCase("desert"))
+			return true;
+		return false;
+	}
 }

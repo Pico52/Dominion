@@ -71,7 +71,14 @@ public class PlayerWithdraw extends PlayerSubCommand{
 		// - Setting names to the arguments for easy readability.
 		String settlement = args[0];
 		String material = args[1].toLowerCase();
-		int withdrawAmount = Integer.parseInt(args[2]);
+		int withdrawAmount = 0;
+		try{
+			withdrawAmount = Integer.parseInt(args[2]);
+		} catch (NumberFormatException ex){
+			sender.sendMessage(plugin.getLogPrefix() + "Incorrect input.  " + args[2] + " is not a number.");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			return true;
+		}
 		if(!plugin.getDBHandler().settlementExists(settlement)){ // - Make sure this settlement is legitimate.
 			sender.sendMessage(plugin.getLogPrefix() + "Settlement: " + settlement + " does not exist.");
 			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
@@ -117,7 +124,7 @@ public class PlayerWithdraw extends PlayerSubCommand{
 			}
 			sender.sendMessage(plugin.getLogPrefix() + "Total withdraw: " + actualWithdraw + ".  Remainder not withdrawn: " + remainder);
 			// - Subtract the material from the database.
-			if(plugin.getDBHandler().subtract(settlement, material.toLowerCase(), actualWithdraw)){
+			if(plugin.getDBHandler().subtractMaterial(settlement, material.toLowerCase(), actualWithdraw)){
 				sender.sendMessage(plugin.getLogPrefix() + "Withdraw successful!");
 				plugin.getLogger().info(plugin.getLogPrefix() + "Withdraw successful for command sender: " + sender.getName());
 				return true;

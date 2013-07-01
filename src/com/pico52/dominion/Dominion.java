@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.pico52.dominion.command.AdminCommand;
@@ -13,6 +14,9 @@ import com.pico52.dominion.db.DominionDatabaseHandler;
 import com.pico52.dominion.event.DominionPlayerListener;
 import com.pico52.dominion.object.BuildingManager;
 import com.pico52.dominion.object.SettlementManager;
+import com.pico52.dominion.object.SpellManager;
+import com.pico52.dominion.object.UnitManager;
+import com.pico52.dominion.task.TaskManager;
 
 /**
  * <b>Dominion plugin for Bukkit</b><br>
@@ -36,7 +40,10 @@ public final class Dominion extends JavaPlugin{
 	private DominionPlayerListener playerEvent;
 	private BuildingManager buildingManager;
 	private SettlementManager settlementManager;
+	private UnitManager unitManager;
 	private BiomeData biomeData;
+	private TaskManager taskManager;
+	private SpellManager spellManager;
 	
 	@Override
 	public void onEnable(){
@@ -44,8 +51,11 @@ public final class Dominion extends JavaPlugin{
 		dbHandler = new DominionDatabaseHandler(this, log, logPrefix, "Dominion", pFolder.getPath());	// - Starting up the database connection.
 		dbHandler.getConnection();  // - Open up the connection.
 		dbHandler.setDefaultTables();
+		DominionSettings.setDefaults();
 		buildingManager = new BuildingManager(this);
 		settlementManager = new SettlementManager(this);
+		unitManager = new UnitManager(this);
+		spellManager = new SpellManager(this);
 		biomeData = new BiomeData();
 		
 		playerEvent = new DominionPlayerListener(this);
@@ -53,13 +63,34 @@ public final class Dominion extends JavaPlugin{
 
 		getCommand("dominion").setExecutor(new PlayerCommand(this));
 		getCommand("admindominion").setExecutor(new AdminCommand(this));
+		
+		taskManager = new TaskManager(this);
+		taskManager.startTimers();
 	}
 	
 	@Override
 	public void onDisable(){
 		dbHandler.close();	// Close the database connection.
+		taskManager.onDisable();
 		log.info(logPrefix + "has been disabled."); // Let the console know the plugin has been shut down.
-	}	
+	}
+	
+	/** 
+	 * <b>isPlayerOnline</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean isPlayerOnline({@link String} player)
+	 * <br>
+	 * <br>
+	 * @param player - The name of the player.
+	 * @return True if the player is online.  False if they are not.
+	 */
+	public boolean isPlayerOnline(String player){
+		for(Player players: getServer().getOnlinePlayers()){
+			if(player.equalsIgnoreCase(players.getName()))
+				return true;
+		}
+		return false;
+	}
 
 	//--Accessors--//
 	/** 
@@ -116,7 +147,7 @@ public final class Dominion extends JavaPlugin{
 	 * &nbsp;&nbsp;public {@link BuildingManager} getBuildingManager()
 	 * <br>
 	 * <br>
-	 * @return The manager controlling building data.
+	 * @return The manager controlling buildings.
 	 */
 	public BuildingManager getBuildingManager(){
 		return buildingManager;
@@ -128,10 +159,34 @@ public final class Dominion extends JavaPlugin{
 	 * &nbsp;&nbsp;public {@link SettlementManager} getSettlementManager()
 	 * <br>
 	 * <br>
-	 * @return The manager controlling settlement data.
+	 * @return The manager controlling settlements.
 	 */
 	public SettlementManager getSettlementManager(){
 		return settlementManager;
+	}
+	
+	/** 
+	 * <b>getUnitManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link UnitManager} getUnitManager()
+	 * <br>
+	 * <br>
+	 * @return The manager controlling units.
+	 */
+	public UnitManager getUnitManager(){
+		return unitManager;
+	}
+	
+	/** 
+	 * <b>getSpellManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link SpellManager} getSpellManager()
+	 * <br>
+	 * <br>
+	 * @return The manager controlling spells.
+	 */
+	public SpellManager getSpellManager(){
+		return spellManager;
 	}
 	
 	/** 

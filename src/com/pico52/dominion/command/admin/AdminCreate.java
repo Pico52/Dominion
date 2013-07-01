@@ -24,7 +24,7 @@ public class AdminCreate extends AdminSubCommand{
 	 * @param instance - The {@link Dominion} plugin this command executor will be running on.
 	 */
 	public AdminCreate(Dominion instance){
-		super(instance, "/admindominion create [kingdom/settlement] [kingdom/settlement name]");
+		super(instance, "/ad create [kingdom/settlement] [kingdom/settlement name]");
 	}
 	
 	/** 
@@ -42,6 +42,7 @@ public class AdminCreate extends AdminSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){
+			sender.sendMessage(plugin.getLogPrefix() + "Creates a kingdom or settlement.");
 			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
 			return true;
 		}

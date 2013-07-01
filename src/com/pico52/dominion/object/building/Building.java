@@ -10,7 +10,8 @@ package com.pico52.dominion.object.building;
  */
 public abstract class Building {
 	
-	public int defense, workers;
+	public int workers;
+	public float defense;
 	private boolean structure;
 
 	/** 
@@ -23,7 +24,7 @@ public abstract class Building {
 	 * @param defense - The base defense this building provides.
 	 * @param workers - The maximum number of workers that may work here.
 	 */
-	protected Building(int defense, int workers){
+	protected Building(float defense, int workers){
 		this(defense, workers, false);
 	}
 	
@@ -38,7 +39,7 @@ public abstract class Building {
 	 * @param workers - The maximum number of workers that may work here.
 	 * @param structure - Whether or not this building is a structure (can be built outside of a city).
 	 */
-	protected Building(int defense, int workers, boolean structure){
+	protected Building(float defense, int workers, boolean structure){
 		this.defense = defense;
 		this.workers = workers;
 		this.structure = structure;

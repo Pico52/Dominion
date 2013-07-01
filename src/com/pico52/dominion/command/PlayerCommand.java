@@ -9,6 +9,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.command.player.PlayerCast;
 import com.pico52.dominion.command.player.PlayerData;
 import com.pico52.dominion.command.player.PlayerDeposit;
 import com.pico52.dominion.command.player.PlayerDestroy;
@@ -16,8 +17,15 @@ import com.pico52.dominion.command.player.PlayerEmploy;
 import com.pico52.dominion.command.player.PlayerEmployment;
 import com.pico52.dominion.command.player.PlayerInfo;
 import com.pico52.dominion.command.player.PlayerList;
+import com.pico52.dominion.command.player.PlayerListMy;
 import com.pico52.dominion.command.player.PlayerProduction;
 import com.pico52.dominion.command.player.PlayerStorage;
+import com.pico52.dominion.command.player.PlayerTrain;
+import com.pico52.dominion.command.player.PlayerUnitAttack;
+import com.pico52.dominion.command.player.PlayerUnitCamp;
+import com.pico52.dominion.command.player.PlayerUnitDisband;
+import com.pico52.dominion.command.player.PlayerUnitDrop;
+import com.pico52.dominion.command.player.PlayerUnitMove;
 import com.pico52.dominion.command.player.PlayerWithdraw;
 
 /** 
@@ -41,6 +49,14 @@ public class PlayerCommand implements CommandExecutor{
 	private static PlayerEmployment playerEmployment;
 	private static PlayerData playerData;
 	private static PlayerProduction playerProduction;
+	private static PlayerTrain playerTrain;
+	private static PlayerUnitMove playerUnitMove;
+	private static PlayerUnitAttack playerUnitAttack;
+	private static PlayerUnitCamp playerUnitCamp;
+	private static PlayerUnitDrop playerUnitDrop;
+	private static PlayerUnitDisband playerUnitDisband;
+	private static PlayerListMy playerListMy;
+	private static PlayerCast playerCast;
 	
 	/** 
 	 * <b>PlayerCommand</b><br>
@@ -64,6 +80,14 @@ public class PlayerCommand implements CommandExecutor{
 		playerEmployment = new PlayerEmployment(plugin);
 		playerData = new PlayerData(plugin);
 		playerProduction = new PlayerProduction(plugin);
+		playerTrain = new PlayerTrain(plugin);
+		playerUnitMove = new PlayerUnitMove(plugin);
+		playerUnitAttack = new PlayerUnitAttack(plugin);
+		playerUnitCamp = new PlayerUnitCamp(plugin);
+		playerUnitDrop = new PlayerUnitDrop(plugin);
+		playerUnitDisband = new PlayerUnitDisband(plugin);
+		playerListMy = new PlayerListMy(plugin);
+		playerCast = new PlayerCast(plugin);
 	}
 
 	@Override
@@ -72,7 +96,7 @@ public class PlayerCommand implements CommandExecutor{
 		 * View the information of the default settlement.
 		 */
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Usage:  /dominion [info / storage / withdraw / deposit / list / destroy / employ / employment / data / production]");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage:  /dominion [info / storage / withdraw / deposit / list / listmy / destroy / employ / employment / data / production / train / attack / move / camp / disband]");
 			return true;
 		}
 		String subCommand = args[0];
@@ -112,6 +136,30 @@ public class PlayerCommand implements CommandExecutor{
 		}
 		if(subCommand.equalsIgnoreCase("production") | subCommand.equalsIgnoreCase("prod") | subCommand.equalsIgnoreCase("p")){
 			return playerProduction.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("train") | subCommand.equalsIgnoreCase("t")){
+			return playerTrain.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("attack") | subCommand.equalsIgnoreCase("assault") | subCommand.equalsIgnoreCase("a")){
+			return playerUnitAttack.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("move") | subCommand.equalsIgnoreCase("m")){
+			return playerUnitMove.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("drop")){
+			return playerUnitDrop.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("camp") | subCommand.equalsIgnoreCase("c")){
+			return playerUnitCamp.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("disband")){
+			return playerUnitDisband.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("listmy") | subCommand.equalsIgnoreCase("lm")){
+			return playerListMy.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("cast")){
+			return playerCast.execute(sender, args);
 		}
 		
 		return false;

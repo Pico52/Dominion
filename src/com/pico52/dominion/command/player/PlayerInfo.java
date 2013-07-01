@@ -59,7 +59,7 @@ public class PlayerInfo extends PlayerSubCommand{
 		String allData = "§a======" + settlement + "======§r\n";
 		try {
 			if(results.next()){
-				allData += "§aLord: §f" + plugin.getDBHandler().getPlayerName(results.getInt("lord_id")) 		+ "\n";
+				allData += "§aLord: §f" + plugin.getDBHandler().getPlayerName(results.getInt("owner_id")) 		+ "\n";
 				allData += "§aKingdom: §f" + plugin.getDBHandler().getKingdomName(results.getInt("kingdom_id")) + "\n";
 				allData += "§aBiome: §f" + results.getString("biome") 	+ "\n";
 				allData += "§aClass: §f" + results.getString("class") + "\n";

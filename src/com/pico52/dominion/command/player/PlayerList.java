@@ -71,8 +71,30 @@ public class PlayerList extends PlayerSubCommand{
 					if(classification != null){
 						middleData += "§aClass: §f" + classification;
 						columnCount++;
+						if(plugin.getUnitManager().isUnit(classification)){
+							middleData += "§aHealth: §f" + results.getDouble("health") + "  ";
+							middleData += "§aX: §f" + results.getDouble("xcoord") + "  ";
+							middleData += "§aZ: §f" + results.getDouble("zcoord") + "  ";
+							columnCount += 3;
+						}
 					}
 				}catch (SQLException ex){}
+				try{
+					int duration = results.getInt("duration");
+					middleData += "§aDuration: §f" + duration;
+					columnCount++;
+				} catch (SQLException ex){}
+				try{
+					String command = results.getString("command");
+					int afflictId = results.getInt("afflict_id");
+					double xCoord = results.getDouble("xcoord");
+					double zCoord = results.getDouble("zCoord");
+					middleData += "§aCommand: §f" + command + "  ";
+					middleData += "§aAfflict Id: §f" + afflictId + "  ";
+					middleData += "§aX: §f" + xCoord + "  ";
+					middleData += "§aZ: §f" + zCoord + "  ";
+					columnCount += 4;
+				} catch (SQLException ex){}
 				middleData += "\n";
 			}
 			results.getStatement().close();

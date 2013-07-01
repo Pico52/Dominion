@@ -310,6 +310,38 @@ public class SettlementManager {
 	}
 	
 	/** 
+	 * <b>setBiome</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean setBiome(int settlementId, {@link String} biome)
+	 * <br>
+	 * <br>
+	 * @param settlement - The name of the settlement.
+	 * @param biome - The name of the biome.
+	 * @return True if the biome was properly set.  False if it was not.
+	 */
+	public boolean setBiome(String settlement, String biome){
+		return setBiome(plugin.getDBHandler().getSettlementId(settlement), biome);
+	}
+	
+	/** 
+	 * <b>setBiome</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean setBiome(int settlementId, {@link String} biome)
+	 * <br>
+	 * <br>
+	 * @param settlementId - The id of the settlement.
+	 * @return True if the biome was properly set.  False if it was not.
+	 */
+	public boolean setBiome(int settlementId, String biome){
+		biome = biome.toLowerCase();
+		if(!plugin.getBiomeData().isBiome(biome))
+			return false;
+		if(plugin.getDBHandler().update("settlement", "biome", biome, "settlement_id", settlementId))
+			return true;
+		return false;
+	}
+	
+	/** 
 	 * <b>getIncomeTax</b><br>
 	 * <br>
 	 * &nbsp;&nbsp;public double getIncomeTax({@link String} settlement)
@@ -395,16 +427,24 @@ public class SettlementManager {
 	 */
 	public double getFoodConsumption(int settlement_id){
 		double foodConsumption = 0, population = 0;
-		ResultSet settlementData = plugin.getDBHandler().getSettlementData(settlement_id, "population");
+		String biome ="";
+		ResultSet settlementData = plugin.getDBHandler().getSettlementData(settlement_id, "*");
 		try{
 			settlementData.next();
 			population = settlementData.getDouble("population");
+			biome = settlementData.getString("biome");
 			settlementData.getStatement().close();
 		} catch (SQLException ex){
 			ex.printStackTrace();
 		}
-		if(population > 0)
-			foodConsumption = population * baseFoodConsumption;
+		if(population > 0){
+			double biomeMultiplier = 1;
+			if(biome.equalsIgnoreCase("forest"))
+				biomeMultiplier += BiomeData.forestFoodConsumptionPenalty;
+			else if (biome.equalsIgnoreCase("jungle"))
+				biomeMultiplier -= BiomeData.jungleFoodConsumptionBonus;
+			foodConsumption = population * baseFoodConsumption * biomeMultiplier;
+		}
 		return foodConsumption;
 	}
 	
@@ -457,7 +497,7 @@ public class SettlementManager {
 			double storage = multiplier * Granary.capacity;
 			double availableToDecay = currentFood - getFoodConsumption(settlement_id) - storage;
 			if(availableToDecay > 0)
-				foodDecay = availableToDecay * baseStealingRate;
+				foodDecay = availableToDecay * baseFoodDecay;
 			
 			return foodDecay;
 		} catch (SQLException ex){
@@ -653,6 +693,32 @@ public class SettlementManager {
 		} catch (SQLException ex){
 			ex.printStackTrace();
 			return -1;
+		}
+	}
+	
+	/** 
+	 * <b>getMaterial</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public double getMaterial(int settlement_id, {@link String} material)
+	 * <br>
+	 * <br>
+	 * @param settlement_id - The id of the settlement.
+	 * @param material - The name of the material.
+	 * @return The amount of the specified material the settlement currently has.
+	 */
+	public double getMaterial(int settlement_id, String material){
+		material = material.toLowerCase();
+		String query = "SELECT " + material + " FROM settlement WHERE settlement_id=" + settlement_id;
+		ResultSet materialData = plugin.getDBHandler().querySelect(query);
+		double value = 0;
+		try{
+			materialData.next();
+			value = materialData.getDouble(material);
+			materialData.getStatement().close();
+			return value;
+		} catch (SQLException ex){
+			ex.printStackTrace();
+			return 0;
 		}
 	}
 

@@ -35,7 +35,7 @@ public class Woodshop extends Building{
 		consumeBase = true;
 		baseConsumptionResource = "coal";
 		baseConsumption = 8; // - 1 coal per 8.
-		sellingBonus = .05;  // - % increase to gold value from trading with sand-based resources.
+		sellingBonus = .05;  // - % increase to gold value from trading with wood-based resources.
 		charcoalRate = 1;
 		dirtRate = 4;
 		woodToCharcoalConsumption = 1;

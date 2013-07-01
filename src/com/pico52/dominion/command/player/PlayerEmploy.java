@@ -48,13 +48,27 @@ public class PlayerEmploy extends PlayerSubCommand{
 			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
 			return true;
 		}
-		int employ = Integer.parseInt(args[0]);
+		int employ = 0;
+		try{
+			employ = Integer.parseInt(args[0]);
+		} catch (NumberFormatException ex){
+			sender.sendMessage(plugin.getLogPrefix() + "Incorrect input.  \"" + args[0] + "\" is not a number.");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			return true;
+		}
 		if(args.length == 1){
 			sender.sendMessage(plugin.getLogPrefix() + "You must specify the building id.");
 			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
 			return true;
 		}
-		int building = Integer.parseInt(args[1]);
+		int building = 0;
+		try{
+			building = Integer.parseInt(args[1]);
+		} catch (NumberFormatException ex){
+			sender.sendMessage(plugin.getLogPrefix() + "Incorrect input.  " + args[1] + " is not a number.");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			return true;
+		}
 		int ownerId = plugin.getDBHandler().getOwnerId("building", building);
 		if(ownerId != plugin.getDBHandler().getPlayerId(sender.getName())){
 			sender.sendMessage(plugin.getLogPrefix() + "You are not the owner of that building.");

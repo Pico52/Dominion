@@ -15,7 +15,8 @@ import com.pico52.dominion.command.admin.AdminCreate;
 import com.pico52.dominion.command.admin.AdminForce;
 import com.pico52.dominion.command.admin.AdminManualUpdate;
 import com.pico52.dominion.command.admin.AdminRemove;
-import com.pico52.dominion.command.admin.AdminSet;
+import com.pico52.dominion.command.admin.AdminSetBiome;
+import com.pico52.dominion.command.admin.AdminSetMaterial;
 import com.pico52.dominion.command.admin.AdminSubtract;
 import com.pico52.dominion.command.admin.AdminUpdate;
 
@@ -30,7 +31,7 @@ import com.pico52.dominion.command.admin.AdminUpdate;
 public class AdminCommand implements CommandExecutor{
 	
 	private static Dominion plugin;
-	private static AdminSet adminSet;
+	private static AdminSetMaterial adminSet;
 	private static AdminAdd adminAdd;
 	private static AdminSubtract adminSubtract;
 	private static AdminBuild adminBuild;
@@ -39,6 +40,7 @@ public class AdminCommand implements CommandExecutor{
 	private static AdminForce adminForce;
 	private static AdminUpdate adminUpdate;
 	private static AdminManualUpdate adminManualUpdate;
+	private static AdminSetBiome adminSetBiome;
 	
 	/** 
 	 * <b>AdminCommand</b><br>
@@ -53,7 +55,7 @@ public class AdminCommand implements CommandExecutor{
 		plugin = instance;
 		
 		//--- Sub-command executors ---//
-		adminSet 		= new AdminSet(plugin);
+		adminSet 		= new AdminSetMaterial(plugin);
 		adminAdd 		= new AdminAdd(plugin);
 		adminSubtract = new AdminSubtract(plugin);
 		adminBuild 		= new AdminBuild(plugin);
@@ -62,6 +64,7 @@ public class AdminCommand implements CommandExecutor{
 		adminForce 	= new AdminForce(plugin);
 		adminUpdate	= new AdminUpdate(plugin);
 		adminManualUpdate = new AdminManualUpdate(plugin);
+		adminSetBiome = new AdminSetBiome(plugin);
 	}
 
 	@Override
@@ -72,7 +75,7 @@ public class AdminCommand implements CommandExecutor{
 		}
 		if(args.length == 0){
 			sender.sendMessage("The primary controller for all administrator commands.");
-			sender.sendMessage("Usage:  /admindominion [set / add / subtract / build / create / remove / force / update / manualupdate]");
+			sender.sendMessage("Usage:  /admindominion [set / add / subtract / build / create / remove / force / setbiome / update / manualupdate]");
 			return true;
 		}
 		String subCommand = args[0];
@@ -82,7 +85,7 @@ public class AdminCommand implements CommandExecutor{
 		args = arguments.toArray(new String[arguments.size()]);
 		
 		//--- SUB-COMMAND EXECUTORS ---//
-		if (subCommand.equalsIgnoreCase("set")){
+		if (subCommand.equalsIgnoreCase("set") | subCommand.equalsIgnoreCase("setmaterial") | subCommand.equalsIgnoreCase("sm")){
 			return adminSet.execute(sender,  args);
 		}
 		if (subCommand.equalsIgnoreCase("add") | subCommand.equalsIgnoreCase("give") | subCommand.equalsIgnoreCase("grant")){
@@ -100,7 +103,7 @@ public class AdminCommand implements CommandExecutor{
 		if(subCommand.equalsIgnoreCase("remove") | subCommand.equalsIgnoreCase("delete") | subCommand.equalsIgnoreCase("destroy")){
 			return adminRemove.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("force") | subCommand.equalsIgnoreCase("owner")){
+		if(subCommand.equalsIgnoreCase("force") | subCommand.equalsIgnoreCase("owner") | subCommand.equalsIgnoreCase("setowner")){
 			return adminForce.execute(sender, args);
 		}
 		if(subCommand.equalsIgnoreCase("update") | subCommand.equalsIgnoreCase("change")){
@@ -108,6 +111,9 @@ public class AdminCommand implements CommandExecutor{
 		}
 		if(subCommand.equalsIgnoreCase("manualupdate") | subCommand.equalsIgnoreCase("mu")){
 			return adminManualUpdate.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("setbiome") | subCommand.equalsIgnoreCase("sb")){
+			return adminSetBiome.execute(sender, args);
 		}
 		
 		return false;
