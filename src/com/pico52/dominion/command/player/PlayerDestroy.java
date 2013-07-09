@@ -43,13 +43,13 @@ public class PlayerDestroy extends PlayerSubCommand{
 	public boolean execute(CommandSender sender, String[] args) {
 		Player player = (Player) sender;
 		if(!player.isOnline()){  // - The player must be online for this to work.
-			sender.sendMessage(plugin.getLogPrefix() + "You must be online in order to perform this command.  If you are an admin using the system console, " +
+			sender.sendMessage(logPrefix + "You must be online in order to perform this command.  If you are an admin using the system console, " +
 					"try using the \"/ad remove\" command instead.");
 			return true;
 		}
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Destroys a building so long as you are the owner of it.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Destroys a building so long as you are the owner of it.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		// - There should be an argument by this point.  Hopefully it's a building Id.
@@ -57,24 +57,24 @@ public class PlayerDestroy extends PlayerSubCommand{
 		try{
 			building = Integer.parseInt(args[0]);
 		} catch (NumberFormatException ex){
-			sender.sendMessage(plugin.getLogPrefix() + "Incorrect input.  " + args[0] + " is not a number.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Incorrect input.  " + args[0] + " is not a number.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		int playerId;
-		if((playerId = plugin.getDBHandler().getPlayerId(player.getName())) == -1){
-			sender.sendMessage(plugin.getLogPrefix() + "Could not find your player Id!");
+		if((playerId = db.getPlayerId(player.getName())) == -1){
+			sender.sendMessage(logPrefix + "Could not find your player Id!");
 			return true;
 		}
-		if(plugin.getDBHandler().getOwnerId("building", building) != playerId){
-			sender.sendMessage(plugin.getLogPrefix() + "You are not the owner of this building!");
+		if(db.getOwnerId("building", building) != playerId){
+			sender.sendMessage(logPrefix + "You are not the owner of this building!");
 			return true;
 		}
-		if(plugin.getDBHandler().remove("building", building)){
-			sender.sendMessage(plugin.getLogPrefix() + "Successfully destroyed the building!");
+		if(db.remove("building", building)){
+			sender.sendMessage(logPrefix + "Successfully destroyed the building!");
 			plugin.getLogger().info("Successfully removed a building.");
 		} else {
-			sender.sendMessage(plugin.getLogPrefix() + "Failed to destroy the building.");
+			sender.sendMessage(logPrefix + "Failed to destroy the building.");
 			plugin.getLogger().info("Failed to remove a building.");
 		}
 		return true;

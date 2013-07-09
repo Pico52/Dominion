@@ -45,21 +45,21 @@ public class PlayerDeposit extends PlayerSubCommand{
 	public boolean execute(CommandSender sender, String[] args) {
 		Player player = (Player) sender;
 		if(!player.isOnline()){  // - The player must be online for this to work.
-			sender.sendMessage(plugin.getLogPrefix() + "You must be online in order to deposit anything.");
+			sender.sendMessage(logPrefix + "You must be online in order to deposit anything.");
 			return true;
 		}
 		if(args.length == 0 ){	// - They only specified "deposit" but gave no settlement.  Tell them how to use the command.
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(args.length == 1){  // - They may have specified the settlement, but they didn't say what to deposit or how much.
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
-			sender.sendMessage(plugin.getLogPrefix() + "Please issue the command again specifying the material and amount to be deposited.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
+			sender.sendMessage(logPrefix + "Please issue the command again specifying the material and amount to be deposited.");
 			return true;
 		}
 		if (args.length == 2){ // - They may have forgotten to put the amount to deposit.
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
-			sender.sendMessage(plugin.getLogPrefix() + "Please issue the command again specifying the amount to be deposited.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
+			sender.sendMessage(logPrefix + "Please issue the command again specifying the amount to be deposited.");
 			return true;
 		}
 		// - Setting names to the arguments for easy readability.
@@ -69,18 +69,18 @@ public class PlayerDeposit extends PlayerSubCommand{
 		try{
 			depositAmount = Integer.parseInt(args[2]);
 		} catch (NumberFormatException ex){
-			sender.sendMessage(plugin.getLogPrefix() + "Incorrect input.  " + args[2] + " is not a number.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Incorrect input.  " + args[2] + " is not a number.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		// - Make sure the settlement is legitimate
-		if(!plugin.getDBHandler().settlementExists(settlement)){
-			sender.sendMessage(plugin.getLogPrefix() + "Settlement: \"" + settlement + "\" does not exist.  (Case-sensitive)");
+		if(!db.settlementExists(settlement)){
+			sender.sendMessage(logPrefix + "Settlement: \"" + settlement + "\" does not exist.  (Case-sensitive)");
 			return true;
 		}
 		// - Make sure the material type is legitimate.
 		if(Material.matchMaterial(material) == null){
-			sender.sendMessage(plugin.getLogPrefix() + "The material \"" + material + "\" is not a material.");
+			sender.sendMessage(logPrefix + "The material \"" + material + "\" is not a material.");
 			return true;
 		}
 		// - Remove the materials from the player's inventory.
@@ -97,10 +97,10 @@ public class PlayerDeposit extends PlayerSubCommand{
 		int notDeposited = depositAmount - actualCount;
 		depositAmount = actualCount;
 		// - Add the material to the database.
-		if(plugin.getDBHandler().addMaterial(settlement, material, depositAmount))
-			sender.sendMessage(plugin.getLogPrefix() + "Successfully deposited " + depositAmount + " " + material + " with " + notDeposited + " not deposited.");
+		if(db.addMaterial(settlement, material, depositAmount))
+			sender.sendMessage(logPrefix + "Successfully deposited " + depositAmount + " " + material + " with " + notDeposited + " not deposited.");
 		else
-			sender.sendMessage(plugin.getLogPrefix() + "Failed to deposit.");
+			sender.sendMessage(logPrefix + "Failed to deposit.");
 		
 		return true;
 	}

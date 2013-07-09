@@ -41,22 +41,29 @@ public class AdminRemove extends AdminSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Removes an entity.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Removes an entity.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(args.length == 1){
-			sender.sendMessage(plugin.getLogPrefix() + "You need to provide the id number of the object you want to remove.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "You need to provide the id number of the object you want to remove.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		String entity = args[0];
-		int id = Integer.parseInt(args[1]);
+		int id = 0;
+		try{
+			id = Integer.parseInt(args[1]);
+		} catch (NumberFormatException ex){
+			sender.sendMessage(logPrefix + "Incorrect input. \"" + args[1] + "\" is not a number.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
+			return true;
+		}
 		if(plugin.getDBHandler().remove(entity, id)){
-			sender.sendMessage(plugin.getLogPrefix() + "Successfully removed the " + entity + "!");
+			sender.sendMessage(logPrefix + "Successfully removed the " + entity + "!");
 			plugin.getLogger().info("Successfully removed a " + entity + ".");
 		} else {
-			sender.sendMessage(plugin.getLogPrefix() + "Failed to destroy the " + entity + "!");
+			sender.sendMessage(logPrefix + "Failed to destroy the " + entity + "!");
 			plugin.getLogger().info("Failed to remove a " + entity + ".");
 		}
 		return true;

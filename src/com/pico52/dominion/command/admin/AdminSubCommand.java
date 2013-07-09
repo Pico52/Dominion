@@ -3,6 +3,7 @@ package com.pico52.dominion.command.admin;
 import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.db.DominionDatabaseHandler;
 
 /** 
  * <b>AdminSubCommand</b><br>
@@ -15,7 +16,8 @@ import com.pico52.dominion.Dominion;
 public abstract class AdminSubCommand {
 	
 	protected static Dominion plugin;
-	private String usageMessage;
+	protected DominionDatabaseHandler db;
+	protected String usage, logPrefix;
 	
 	/** 
 	 * <b>AdminSubCommand</b><br>
@@ -28,7 +30,9 @@ public abstract class AdminSubCommand {
 	 */
 	protected AdminSubCommand(Dominion instance, String usage){
 		plugin = instance;
-		usageMessage = usage;
+		db = plugin.getDBHandler();
+		this.usage = usage;
+		logPrefix = plugin.getLogPrefix();
 	}
 	
 	/** 
@@ -53,6 +57,6 @@ public abstract class AdminSubCommand {
 	 * @return The usage of the command.
 	 */
 	public String getUsage(){
-		return usageMessage;
+		return usage;
 	}
 }

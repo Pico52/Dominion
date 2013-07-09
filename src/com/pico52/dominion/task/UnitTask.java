@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.DominionSettings;
 import com.pico52.dominion.object.UnitManager;
 
 /** 
@@ -35,6 +36,8 @@ public class UnitTask extends DominionTimerTask{
 		db = plugin.getDBHandler();  // - Just in case these change for any reason.
 		unitManager = plugin.getUnitManager(); //
 		log.info("Unit tick..");
+		if(DominionSettings.broadcastUnitTick)
+			plugin.getServer().broadcastMessage(plugin.getLogPrefix() + "Unit tick..");
 		advanceProductions();
 		feedUnits();
 		payUnits();
@@ -45,7 +48,7 @@ public class UnitTask extends DominionTimerTask{
 	}
 	
 	private void advanceProductions(){
-		ResultSet productions = db.getAllTableData("production", "*");
+		ResultSet productions = db.getTableData("production", "*");
 		int productionId, duration;
 		try{
 			while(productions.next()){
@@ -64,7 +67,7 @@ public class UnitTask extends DominionTimerTask{
 	}
 	
 	private void feedUnits(){
-		ResultSet units = db.getAllTableData("unit", "*");
+		ResultSet units = db.getTableData("unit", "*");
 		int unitId, settlementId, consumption;
 		double food;
 		String classType;
@@ -94,7 +97,7 @@ public class UnitTask extends DominionTimerTask{
 	}
 	
 	private void payUnits(){
-		ResultSet units = db.getAllTableData("unit", "*");
+		ResultSet units = db.getTableData("unit", "*");
 		int unitId, settlementId, consumption;
 		double wealth;
 		String classType;
@@ -124,7 +127,7 @@ public class UnitTask extends DominionTimerTask{
 	}
 	
 	private void createNewUnits(){
-		ResultSet productions = db.getAllTableData("production", "*", "duration<1");
+		ResultSet productions = db.getTableData("production", "*", "duration<1");
 		int productionId, ownerId, settlementId;
 		String classification;
 		try{
@@ -145,7 +148,7 @@ public class UnitTask extends DominionTimerTask{
 	}
 	
 	private void moveUnits(){
-		ResultSet commands = db.getAllTableData("command", "*");
+		ResultSet commands = db.getTableData("command", "*");
 		int unitId = 0;
 		double toXCoord = 0, toZCoord = 0;
 		String command = "";
@@ -173,7 +176,7 @@ public class UnitTask extends DominionTimerTask{
 	}
 	
 	private void dealDamage(){
-		ResultSet commands = db.getAllTableData("command", "*", "command=\"attack\"");
+		ResultSet commands = db.getTableData("command", "*", "command=\"attack\"");
 		int unitId=0, targetId=0;
 		try{
 			while(commands.next()){
@@ -192,7 +195,7 @@ public class UnitTask extends DominionTimerTask{
 	}
 	
 	private void removeDeadUnits(){
-		ResultSet units = db.getAllTableData("unit", "*", "health<=0");
+		ResultSet units = db.getTableData("unit", "*", "health<=0");
 		int unitId;
 		double health;
 		try{
@@ -211,7 +214,7 @@ public class UnitTask extends DominionTimerTask{
 	}
 	
 	private void healCampedUnits(){
-		ResultSet commands = plugin.getDBHandler().getAllTableData("command", "*", "command=\"camp\"");
+		ResultSet commands = plugin.getDBHandler().getTableData("command", "*", "command=\"camp\"");
 		int unitId;
 		double maxHealth, difference;
 		String classType;

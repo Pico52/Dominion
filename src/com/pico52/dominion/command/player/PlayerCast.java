@@ -41,44 +41,44 @@ public class PlayerCast extends PlayerSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Commands a settlement to cast a spell on a target.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Commands a settlement to cast a spell on a target.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		String settlement = args[0];
-		if(!plugin.getDBHandler().settlementExists(settlement)){
-			sender.sendMessage(plugin.getLogPrefix() + "No such settlement \"" + settlement + "\".");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+		if(!db.settlementExists(settlement)){
+			sender.sendMessage(logPrefix + "No such settlement \"" + settlement + "\".");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(args.length == 1){
-			sender.sendMessage(plugin.getLogPrefix() + "You must specify a spell and its target id.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "You must specify a spell and its target id.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		String spell = args[1];
 		if(!plugin.getSpellManager().isSpell(spell)){
-			sender.sendMessage(plugin.getLogPrefix() + "\"" + spell + "\" is not a spell.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "\"" + spell + "\" is not a spell.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(args.length == 2){
-			sender.sendMessage(plugin.getLogPrefix() + "You must specify a target id.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "You must specify a target id.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		int targetId = 0;
 		try{
 			targetId = Integer.parseInt(args[2]);
 		} catch (NumberFormatException ex){
-			sender.sendMessage(plugin.getLogPrefix() + "\"" + args[2] + "\" is not a number.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "\"" + args[2] + "\" is not a number.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		int settlementId = plugin.getDBHandler().getSettlementId(settlement);
-		int casterId = plugin.getDBHandler().getPlayerId(sender.getName());
+		int settlementId = db.getSettlementId(settlement);
+		int casterId = db.getPlayerId(sender.getName());
 		if(!plugin.getSpellManager().castSpell(settlementId, casterId, spell, targetId))
-			sender.sendMessage(plugin.getLogPrefix() + "Failed to cast the spell.");
+			sender.sendMessage(logPrefix + "Failed to cast the spell.");
 		
 		return true;
 	}

@@ -45,25 +45,27 @@ public class PlayerInfo extends PlayerSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){	// - They only specified "info" but gave no settlement.
-			sender.sendMessage(plugin.getLogPrefix() + "Outputs general information about a settlement.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Outputs general information about a settlement.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		// - There will at least be an argument here, hopefully a settlement name.
 		String settlement = args[0];
-		if(!plugin.getDBHandler().settlementExists(settlement)){
-			sender.sendMessage(plugin.getLogPrefix() + "No such settlement \"" + settlement + "\".");
+		if(!db.settlementExists(settlement)){
+			sender.sendMessage(logPrefix + "No such settlement \"" + settlement + "\".");
 			return true;
 		}
-		ResultSet results = plugin.getDBHandler().getSettlementData(settlement, "*");
+		ResultSet results = db.getSettlementData(settlement, "*");
 		String allData = "§a======" + settlement + "======§r\n";
 		try {
 			if(results.next()){
-				allData += "§aLord: §f" + plugin.getDBHandler().getPlayerName(results.getInt("owner_id")) 		+ "\n";
-				allData += "§aKingdom: §f" + plugin.getDBHandler().getKingdomName(results.getInt("kingdom_id")) + "\n";
+				int settlementId = results.getInt("settlement_id");
+				allData += "§aLord: §f" + db.getPlayerName(results.getInt("owner_id")) 		+ "\n";
+				allData += "§aKingdom: §f" + db.getKingdomName(results.getInt("kingdom_id")) + "\n";
 				allData += "§aBiome: §f" + results.getString("biome") 	+ "\n";
 				allData += "§aClass: §f" + results.getString("class") + "\n";
-				allData += "§aBase Defense: §f" + (int) results.getDouble("wall") + "\n";
+				allData += "§aWalls: §f" + (int) results.getDouble("wall") + "\n";
+				allData += "§aDefense: §f" + (int) plugin.getSettlementManager().getDefense(settlementId) + "\n";
 				allData += "§aX-coord: §f" + results.getDouble("xcoord") + "  ";
 				allData += "§aZ-coord: §f" + results.getDouble("zcoord") + "\n";
 				allData += "§aMana: §f" + (int) results.getDouble("mana") + "/" + plugin.getSettlementManager().getMaxMana(settlement) + "\n";

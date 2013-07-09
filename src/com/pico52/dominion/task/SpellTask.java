@@ -1,6 +1,7 @@
 package com.pico52.dominion.task;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.DominionSettings;
 
 /** 
  * <b>SpellTask</b><br>
@@ -28,5 +29,7 @@ public class SpellTask extends DominionTimerTask{
 	@Override
 	public void run() {
 		plugin.getLogger().info("Spells tick..");
+		if(DominionSettings.broadcastSpellTick)
+			plugin.getServer().broadcastMessage(plugin.getLogPrefix() + "Spell tick..");
 	}
 }

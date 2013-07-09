@@ -41,28 +41,28 @@ public class AdminUpdate extends AdminSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Updates a column in a table at a specified row.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Updates a column in a table at a specified row.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(args.length == 1){
-			sender.sendMessage(plugin.getLogPrefix() + "You must provide a column, value, column to identify by, and an identifier.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "You must provide a column, value, column to identify by, and an identifier.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(args.length == 2){
-			sender.sendMessage(plugin.getLogPrefix() + "You must provide a value, column to identify by, and an identifier.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "You must provide a value, column to identify by, and an identifier.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(args.length == 3){
-			sender.sendMessage(plugin.getLogPrefix() + "You must provide a column to identify by and an identifier.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "You must provide a column to identify by and an identifier.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(args.length == 4){
-			sender.sendMessage(plugin.getLogPrefix() + "You must provide an identifier.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "You must provide an identifier.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		// - Setting names to the arguments for easy readability.
@@ -72,11 +72,11 @@ public class AdminUpdate extends AdminSubCommand{
 		String identifyBy = args[3];
 		String identifier = args[4];
 		
-		if(plugin.getDBHandler().update(table, column, value, identifyBy, identifier)){
-			sender.sendMessage(plugin.getLogPrefix() + "Successfully updated the " + column + " column in the " + table+ " table to " + value + " where " + identifyBy + "=" + identifier);
+		if(db.update(table, column, value, identifyBy, identifier)){
+			sender.sendMessage(logPrefix + "Successfully updated the " + column + " column in the " + table+ " table to " + value + " where " + identifyBy + "=" + identifier);
 			plugin.getLogger().info("Successfully updated the " + column + " column in the " + table+ " table to " + value + " where " + identifyBy + "=" + identifier);
 		}else{
-			sender.sendMessage(plugin.getLogPrefix() + "Failed to update the " + column + " column in the " + table+ " table to " + value + " where " + identifyBy + "=" + identifier);
+			sender.sendMessage(logPrefix + "Failed to update the " + column + " column in the " + table+ " table to " + value + " where " + identifyBy + "=" + identifier);
 			plugin.getLogger().info("Failed to update the " + column + " column in the " + table+ " table to " + value + " where " + identifyBy + "=" + identifier);
 		}
 		return true;

@@ -13,27 +13,27 @@ public class PlayerUnitDisband extends PlayerSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Disbands a unit.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Disbands a unit.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		int unitId = 0;
 		try{
 			unitId = Integer.parseInt(args[0]);
 		} catch (NumberFormatException ex){
-			sender.sendMessage(plugin.getLogPrefix() + "Incorrect input.  \"" + args[0] + "\" is not a number.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Incorrect input.  \"" + args[0] + "\" is not a number.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		int ownerId = plugin.getDBHandler().getOwnerId("unit", unitId);
-		int playerId = plugin.getDBHandler().getPlayerId(sender.getName());
+		int ownerId = db.getOwnerId("unit", unitId);
+		int playerId = db.getPlayerId(sender.getName());
 		if(ownerId != playerId){
-			sender.sendMessage(plugin.getLogPrefix() + "You must be the owner of this unit in order to disband it.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "You must be the owner of this unit in order to disband it.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(!plugin.getUnitManager().kill(unitId, "disband")){
-			sender.sendMessage(plugin.getLogPrefix() + "Failed to disband the unit.");
+			sender.sendMessage(logPrefix + "Failed to disband the unit.");
 		}
 		
 		return true;

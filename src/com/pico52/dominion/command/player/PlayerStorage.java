@@ -45,16 +45,16 @@ public class PlayerStorage extends PlayerSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){	// - They only specified "mats" but gave no settlement.
-			sender.sendMessage(plugin.getLogPrefix() + "Outputs materials inventory of a settlement.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Outputs materials inventory of a settlement.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		// There will at least be an argument here, hopefully a settlement name.
 		String settlement = args[0];
-		ResultSet results = plugin.getDBHandler().getSettlementData(settlement, "*");
+		ResultSet results = db.getSettlementData(settlement, "*");
 		try {
-			if(!plugin.getDBHandler().settlementExists(settlement)){
-				sender.sendMessage(plugin.getLogPrefix() + "No such kingdom \"" + settlement + "\".");
+			if(!db.settlementExists(settlement)){
+				sender.sendMessage(logPrefix + "No such kingdom \"" + settlement + "\".");
 				return true;
 			}
 			String allData = "§a======" + settlement + "======§f\n";

@@ -43,13 +43,13 @@ public class PlayerProduction extends PlayerSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Outputs materials production of a settlement.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Outputs materials production of a settlement.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		String settlement = args[0];
-		if(!plugin.getDBHandler().settlementExists(settlement)){
-			sender.sendMessage(plugin.getLogPrefix() + "No such settlement \"" + settlement + "\".");
+		if(!db.settlementExists(settlement)){
+			sender.sendMessage(logPrefix + "No such settlement \"" + settlement + "\".");
 			return true;
 		}
 		ProductionSheet results = plugin.getBuildingManager().getProductions(settlement);

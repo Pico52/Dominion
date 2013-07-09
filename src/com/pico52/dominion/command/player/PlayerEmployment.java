@@ -44,25 +44,25 @@ public class PlayerEmployment extends PlayerSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){	// - They only specified "employment" but gave no settlement.
-			sender.sendMessage(plugin.getLogPrefix() + "Outputs employment information about a settlement.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Outputs employment information about a settlement.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		// - There will at least be an argument here, hopefully a settlement name.
 		String settlement = args[0];
-		if(!plugin.getDBHandler().settlementExists(settlement)){
-			sender.sendMessage(plugin.getLogPrefix() + "The settlement \"" + settlement + "\" does not exist.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+		if(!db.settlementExists(settlement)){
+			sender.sendMessage(logPrefix + "The settlement \"" + settlement + "\" does not exist.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		int settlementId = plugin.getDBHandler().getSettlementId(settlement);
-		int ownerId = plugin.getDBHandler().getOwnerId("settlement", settlementId);
-		if(ownerId != plugin.getDBHandler().getPlayerId(sender.getName())){
-			sender.sendMessage(plugin.getLogPrefix() + "You are not the owner of " + settlement + ".");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+		int settlementId = db.getSettlementId(settlement);
+		int ownerId = db.getOwnerId("settlement", settlementId);
+		if(ownerId != db.getPlayerId(sender.getName())){
+			sender.sendMessage(logPrefix + "You are not the owner of " + settlement + ".");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		ResultSet results = plugin.getDBHandler().getAllTableData("building", "*", "settlement_id=" + settlementId);
+		ResultSet results = db.getTableData("building", "*", "settlement_id=" + settlementId);
 		int totalEmployed = 0, workers = 0, employed = 0;
 		String allData = "§a======" + settlement + "======§r\n";
 		try {

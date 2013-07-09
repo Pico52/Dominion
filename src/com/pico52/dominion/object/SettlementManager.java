@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.DominionSettings;
 import com.pico52.dominion.datasheet.BiomeData;
 import com.pico52.dominion.datasheet.ProductionSheet;
 import com.pico52.dominion.object.building.Bank;
@@ -50,7 +51,7 @@ public class SettlementManager {
 	 * @return True if all of the settlements have been successfully updated.  False if they have not.
 	 */
 	public boolean updateAll(){
-		ResultSet settlements = plugin.getDBHandler().getAllTableData("settlement", "settlement_id");
+		ResultSet settlements = plugin.getDBHandler().getTableData("settlement", "settlement_id");
 		boolean success = true;
 		try{
 			while(settlements.next()){
@@ -561,6 +562,46 @@ public class SettlementManager {
 	}
 	
 	/** 
+	 * <b>addMaterial</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean addMaterial(int settlementId, {@link String} material, double quantity)
+	 * <br>
+	 * <br>
+	 * @param settlementId - The id of the settlement.
+	 * @param material - The material or type of the item.
+	 * @param quantity - The amount of the material to add.
+	 * @return True if the material was successfully added.  False if it was not.
+	 */
+	public boolean addMaterial(int settlementId, String material, double quantity){
+		String owner = plugin.getDBHandler().getOwnerName("settlement", settlementId);
+		if(!plugin.getDBHandler().addMaterial(settlementId, material, quantity))
+			return false;
+		if(plugin.isPlayerOnline(owner))
+			plugin.getServer().getPlayer(owner).sendMessage(plugin.getLogPrefix() + quantity + " " + material + " has been added to " + plugin.getDBHandler().getSettlementName(settlementId) + ".");
+		return true;
+	}
+	
+	/** 
+	 * <b>subtractMaterial</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean subtractMaterial(int settlementId, {@link String} material, double quantity)
+	 * <br>
+	 * <br>
+	 * @param settlementId - The id of the settlement.
+	 * @param material - The material or type of the item.
+	 * @param quantity - The amount of the material to subtract.
+	 * @return True if the material was successfully subtracted.  False if it was not.
+	 */
+	public boolean subtractMaterial(int settlementId, String material, double quantity){
+		String owner = plugin.getDBHandler().getOwnerName("settlement", settlementId);
+		if(!plugin.getDBHandler().subtractMaterial(settlementId, material, quantity))
+			return false;
+		if(plugin.isPlayerOnline(owner))
+			plugin.getServer().getPlayer(owner).sendMessage(plugin.getLogPrefix() + quantity + " " + material + " has been subtracted from " + plugin.getDBHandler().getSettlementName(settlementId) + ".");
+		return true;
+	}
+	
+	/** 
 	 * <b>getMaxMana</b><br>
 	 * <br>
 	 * &nbsp;&nbsp;public double getMaxMana({@link String} settlement)
@@ -659,6 +700,84 @@ public class SettlementManager {
 	}
 	
 	/** 
+	 * <b>getX</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public double getX(int settlementId)
+	 * <br>
+	 * <br>
+	 * @param settlementId - The id of the settlement.
+	 * @return The x-coordinate of the settlement.
+	 */
+	public double getX(int settlementId){
+		ResultSet settlement = plugin.getDBHandler().getSettlementData(settlementId, "xcoord");
+		double xCoord = 0;
+		try{
+			if(settlement.next())
+				xCoord = settlement.getDouble("xcoord");
+			settlement.getStatement().close();
+		} catch (SQLException ex){
+			ex.printStackTrace();
+		}
+		return xCoord;
+	}
+	
+	/** 
+	 * <b>getZ</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public double getZ(int settlementId)
+	 * <br>
+	 * <br>
+	 * @param settlementId - The id of the settlement.
+	 * @return The z-coordinate of the settlement.
+	 */
+	public double getZ(int settlementId){
+		ResultSet settlement = plugin.getDBHandler().getSettlementData(settlementId, "zcoord");
+		double zCoord = 0;
+		try{
+			if(settlement.next())
+				zCoord = settlement.getDouble("zcoord");
+			settlement.getStatement().close();
+		} catch (SQLException ex){
+			ex.printStackTrace();
+		}
+		return zCoord;
+	}
+	
+	/** 
+	 * <b>getDefense</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public double getDefense(int settlementId)
+	 * <br>
+	 * <br>
+	 * @param settlementId - The id of the settlement.
+	 * @return The defense of the city.
+	 */
+	public double getDefense(int settlementId){
+		ResultSet settlement = plugin.getDBHandler().getSettlementData(settlementId, "*");
+		String type="";
+		double walls=0, baseDefense=0, defense=0;
+		try{
+			if(settlement.next()){
+				type = settlement.getString("class");
+				walls = settlement.getDouble("wall");
+			}
+			settlement.getStatement().close();
+		} catch (SQLException ex){
+			ex.printStackTrace();
+		}
+		if(type.equalsIgnoreCase("town"))
+			baseDefense = DominionSettings.townDefense;
+		else if (type.equalsIgnoreCase("city"))
+			baseDefense = DominionSettings.cityDefense;
+		else if (type.equalsIgnoreCase("fortress"))
+			baseDefense = DominionSettings.fortressDefense;
+		else
+			baseDefense = 0;
+		defense += walls + baseDefense;
+		return defense;
+	}
+	
+	/** 
 	 * <b>getCurrentlyEmployed</b><br>
 	 * <br>
 	 * &nbsp;&nbsp;public int getCurrentlyEmployed({@link String} settlement)
@@ -712,14 +831,101 @@ public class SettlementManager {
 		ResultSet materialData = plugin.getDBHandler().querySelect(query);
 		double value = 0;
 		try{
-			materialData.next();
-			value = materialData.getDouble(material);
+			if(materialData.next())
+				value = materialData.getDouble(material);
 			materialData.getStatement().close();
-			return value;
 		} catch (SQLException ex){
 			ex.printStackTrace();
 			return 0;
 		}
+		return value;
+	}
+	
+	/** 
+	 * <b>hasMaterial</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean hasMaterial({@link String} settlement, {@link String} material, double quantity)
+	 * <br>
+	 * <br>
+	 * @param settlement - The name of the settlement.
+	 * @param material - The type of material.
+	 * @param quantity - The amount of the material.
+	 * @return True if the settlement has at least that much material; false if it does not.
+	 */
+	public boolean hasMaterial(String settlement, String material, double quantity){
+		return hasMaterial(plugin.getDBHandler().getSettlementId(settlement), material, quantity);
+	}
+	
+	/** 
+	 * <b>hasMaterial</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean hasMaterial(int settlementId, {@link String} material, double quantity)
+	 * <br>
+	 * <br>
+	 * @param settlementId - The id of the settlement.
+	 * @param material - The type of material.
+	 * @param quantity - The amount of the material.
+	 * @return True if the settlement has at least that much material; false if it does not.
+	 */
+	public boolean hasMaterial(int settlementId, String material, double quantity){
+		double currentAmount = getMaterial(settlementId, material);
+		return currentAmount >= quantity;
+	}
+	
+	/** 
+	 * <b>isOwner</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean isOwner({@link String} player, {@link String} settlement)
+	 * <br>
+	 * <br>
+	 * @param player - The name of the player.
+	 * @param settlement - The name of the settlement.
+	 * @return True if the player is the owner of the settlement; false if they are not.
+	 */
+	public boolean isOwner(String player, String settlement){
+		return isOwner(plugin.getDBHandler().getPlayerId(player), plugin.getDBHandler().getSettlementId(settlement));
+	}
+	
+	/** 
+	 * <b>isOwner</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean isOwner(int playerId, {@link String} settlement)
+	 * <br>
+	 * <br>
+	 * @param playerId - The id of the player.
+	 * @param settlement - The name of the settlement.
+	 * @return True if the player is the owner of the settlement; false if they are not.
+	 */
+	public boolean isOwner(int playerId, String settlement){
+		return isOwner(playerId, plugin.getDBHandler().getSettlementId(settlement));
+	}
+	
+	/** 
+	 * <b>isOwner</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean isOwner({@link String} player, int settlementId)
+	 * <br>
+	 * <br>
+	 * @param player - The name of the player.
+	 * @param settlementId - The id of the settlement.
+	 * @return True if the player is the owner of the settlement; false if they are not.
+	 */
+	public boolean isOwner(String player, int settlementId){
+		return isOwner(plugin.getDBHandler().getPlayerId(player), settlementId);
+	}
+	
+	/** 
+	 * <b>isOwner</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean isOwner(int playerId, int settlementId)
+	 * <br>
+	 * <br>
+	 * @param playerId - The id of the player.
+	 * @param settlementId - The id of the settlement.
+	 * @return True if the player is the owner of the settlement; false if they are not.
+	 */
+	public boolean isOwner(int playerId, int settlementId){
+		return plugin.getDBHandler().getOwnerId("settlement", settlementId) == playerId;
 	}
 
 	//---ACCESSORS---//

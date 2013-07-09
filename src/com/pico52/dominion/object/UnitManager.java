@@ -2,8 +2,10 @@ package com.pico52.dominion.object;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.DominionSettings;
 import com.pico52.dominion.object.unit.Unit;
 import com.pico52.dominion.object.unit.land.Archer;
 import com.pico52.dominion.object.unit.land.DreadKnight;
@@ -132,6 +134,8 @@ public class UnitManager extends DominionObjectManager{
 			newHealth = maxHealth;
 		}
 		if(plugin.getDBHandler().update("unit", "health", newHealth, "unit_id", unit_id)){
+			if(amount == 0)
+				return true;
 			if(plugin.isPlayerOnline(ownerName))
 				plugin.getServer().getPlayer(ownerName).sendMessage(classType + " unit #" + unit_id + " has been healed by " + amount + " health points.");
 			plugin.getLogger().info(classType + " unit #" + unit_id + " owned by " + ownerName + " has been healed by " + amount + " health points.");
@@ -188,16 +192,15 @@ public class UnitManager extends DominionObjectManager{
 	}
 	
 	public boolean kill(int unitId){
-		return kill(unitId,"None");
+		return kill(unitId,"none");
 	}
 	
-	public boolean kill(int unit_id, String reason){
-		ResultSet unit = plugin.getDBHandler().getUnitData(unit_id, "*");
-		int unitId=0, ownerId=0;
+	public boolean kill(int unitId, String reason){
+		ResultSet unit = plugin.getDBHandler().getUnitData(unitId, "*");
+		int ownerId=0;
 		String classType="", playerName="";
 		try{
 			if(unit.next()){
-				unitId = unit.getInt("unit_id");
 				classType = unit.getString("class");
 				ownerId = unit.getInt("owner_id");
 				playerName = plugin.getDBHandler().getPlayerName(ownerId);
@@ -207,9 +210,13 @@ public class UnitManager extends DominionObjectManager{
 			plugin.getLogger().info("Failed to remove a unit.");
 			ex.printStackTrace();
 		}
-		
-		if(plugin.getDBHandler().remove("unit",  unit_id)){
-			removeCurrentCommand(unit_id);
+		if(classType.equalsIgnoreCase("wagon")){
+			if(!plugin.getItemManager().destroyAllItemsOnUnit(unitId))
+				return false;
+		} else if(!plugin.getItemManager().dropAllItems(unitId))
+			return false;
+		if(plugin.getDBHandler().remove("unit",  unitId)){
+			removeCurrentCommand(unitId);
 			if(reason.equalsIgnoreCase("none")){
 				if(plugin.isPlayerOnline(playerName))
 					plugin.getServer().getPlayer(playerName).sendMessage(plugin.getLogPrefix() + "Your " + classType + " unit #" + unitId + " has been slain!");
@@ -226,6 +233,10 @@ public class UnitManager extends DominionObjectManager{
 				if(plugin.isPlayerOnline(playerName))
 					plugin.getServer().getPlayer(playerName).sendMessage(plugin.getLogPrefix() + "Your " + classType + " unit #" + unitId + " has left due to not being paid!");
 				plugin.getLogger().info(classType + " owned by " + playerName + " has left due to not being paid.");
+			} else if (reason.equalsIgnoreCase("admin")){
+				if(plugin.isPlayerOnline(playerName))
+					plugin.getServer().getPlayer(playerName).sendMessage(plugin.getLogPrefix() + "Your " + classType + " unit #" + unitId + " has been killed by an administrator!");
+				plugin.getLogger().info(classType + " owned by " + playerName + " has been killed by an administrator.");
 			}
 			return true;
 		}else{
@@ -255,7 +266,7 @@ public class UnitManager extends DominionObjectManager{
 		plugin.getDBHandler().createUnit(settlementId, classification, ownerId, xcoord, zcoord, health, 0);
 		newId = plugin.getDBHandler().getNewestId("unit");
 		String playerName = plugin.getDBHandler().getPlayerName(ownerId);
-		if(plugin.isPlayerOnline(playerName))
+		if(playerName != null & plugin.isPlayerOnline(playerName))
 			plugin.getServer().getPlayer(playerName).sendMessage(plugin.getLogPrefix() + "Your " + classification + " unit has been created and has been assigned as unit #" + newId);
 		
 		return newId;
@@ -283,7 +294,7 @@ public class UnitManager extends DominionObjectManager{
 	}
 	
 	public int getCurrentCommandId(int unitId){
-		ResultSet command = plugin.getDBHandler().getAllTableData("command", "command_id", "unit_id=" + unitId);
+		ResultSet command = plugin.getDBHandler().getTableData("command", "command_id", "unit_id=" + unitId);
 		int id = -1;
 		try{
 			if(command.next())
@@ -367,6 +378,156 @@ public class UnitManager extends DominionObjectManager{
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean dropItem(int unitId, int itemId){
+		double quantity = plugin.getItemManager().getItemQuantity(itemId);
+		return dropItem(unitId, itemId, quantity);
+	}
+	
+	public boolean dropItem(int unitId, int itemId, double quantity){
+		int settlementId = getClosestSettlement(unitId);
+		if(getDistanceFromSettlement(unitId, settlementId) <= DominionSettings.unitDropOffInSettlementRange)
+			return plugin.getItemManager().giveItemToSettlement(settlementId, itemId, quantity);
+		else
+			return plugin.getItemManager().dropItem(itemId, quantity);
+	}
+	
+	public boolean pickUpItem(int unitId, String material){
+		int[] items = getItemsWithinRange(unitId, DominionSettings.unitPickUpRange);
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		String itemMat="", unitClass="";
+		int holderId = 0;
+		double quantity = 0;
+		for(int item: items){
+			itemMat = plugin.getItemManager().getItemType(item);
+			holderId = plugin.getItemManager().getHolderId(item);
+			unitClass = getClass(holderId);
+			if(itemMat.equalsIgnoreCase(material) & holderId != unitId & unitClass.equalsIgnoreCase("wagon")){
+				list.add(new Integer(item));
+				quantity += plugin.getItemManager().getItemQuantity(item);
+			}
+		}
+		int[] sendItems = new int[list.size()];
+		int i = 0;
+	    for (Integer n : list) {
+	        sendItems[i++] = n;
+	    }
+	    return pickUpItem(unitId, sendItems, quantity);
+	}
+	
+	public boolean pickUpItem(int unitId, String material, double quantity){
+		int[] items = getItemsWithinRange(unitId, DominionSettings.unitPickUpRange);
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		String itemMat="", unitClass="";
+		int holderId=0;
+		for(int item: items){
+			itemMat = plugin.getItemManager().getItemType(item);
+			holderId = plugin.getItemManager().getHolderId(item);
+			unitClass = getClass(holderId);
+			if(itemMat.equalsIgnoreCase(material) & holderId != unitId & unitClass.equalsIgnoreCase("wagon"))
+				list.add(new Integer(item));
+		}
+		int[] sendItems = new int[list.size()];
+		int i = 0;
+	    for (Integer n : list) {
+	        sendItems[i++] = n;
+	    }
+	    return pickUpItem(unitId, sendItems, quantity);
+	}
+	
+	public boolean pickUpItem(int unitId, int[] itemIds, double quantity){
+		double thisQuantity = 0;
+		double count = quantity;
+		boolean success = true;
+		for(int item: itemIds){
+			if(count <= 0)
+				break;
+			thisQuantity = plugin.getItemManager().getItemQuantity(item);
+			if(count <= thisQuantity){
+				if(pickUpItem(unitId, item, count))
+					count -= count;
+				else
+					success = false;
+			} else {
+				if(pickUpItem(unitId, item, thisQuantity))
+					count -= thisQuantity;
+				else
+					success = false;
+			}
+		}
+		return success;
+	}
+	
+	public boolean pickUpItem(int unitId, int itemId){
+		double quantity = plugin.getItemManager().getItemQuantity(itemId);
+		return pickUpItem(unitId, itemId, quantity);
+	}
+	
+	public boolean pickUpItem(int unitId, int itemId, double quantity){
+		if(getDistanceFromItem(unitId, itemId) > DominionSettings.unitPickUpRange)
+			return false;
+		int holderId = plugin.getItemManager().getHolderId(itemId);
+		if(!getClass(holderId).equalsIgnoreCase("wagon"))
+			return false;
+		return plugin.getItemManager().giveItemToUnit(itemId, unitId, quantity);
+	}
+	
+	public int[] getItemsWithinRange(int unitId, double range){
+		int[] items = db.getAllIds("item");
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		for(int item: items){
+			if(getDistanceFromItem(unitId, item) <= range)
+				list.add(new Integer(item));
+		}
+		int[] sendItems = new int[list.size()];
+		int i = 0;
+	    for (Integer n : list) {
+	        sendItems[i++] = n;
+	    }
+		return sendItems;
+	}
+	
+	public double getDistanceFromItem(int unitId, int itemId){
+		int holderId = plugin.getItemManager().getHolderId(itemId);
+		double itemX = getUnitX(holderId);
+		double itemZ = getUnitZ(holderId);
+		double unitX = getUnitX(unitId);
+		double unitZ = getUnitZ(unitId);
+		double xDifference = Math.abs(itemX - unitX);
+		double zDifference = Math.abs(itemZ - unitZ);
+		if(xDifference > zDifference)
+			return xDifference;
+		else
+			return zDifference;
+	}
+	
+	public int getClosestSettlement(int unitId){
+		int settlementId = 0;
+		double distance = 0, closest = -1;
+		for(int sid: db.getAllIds("settlement")){
+			distance = getDistanceFromSettlement(unitId, sid);
+			if(closest == -1)
+				closest = distance;
+			if(distance <= closest){
+				closest = distance;
+				settlementId = sid;
+			}
+		}
+		return settlementId;
+	}
+	
+	public double getDistanceFromSettlement(int unitId, int settlementId){
+		double settlementX = plugin.getSettlementManager().getX(settlementId);
+		double settlementZ = plugin.getSettlementManager().getZ(settlementId);
+		double unitX = getUnitX(unitId);
+		double unitZ = getUnitZ(unitId);
+		double xDifference = Math.abs(settlementX - unitX);
+		double zDifference = Math.abs(settlementZ - unitZ);
+		if(xDifference > zDifference)
+			return xDifference;
+		else
+			return zDifference;
 	}
 	
 	public boolean setCommandX(int commandId, double xCoord){

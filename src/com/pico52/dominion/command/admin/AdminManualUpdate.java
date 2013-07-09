@@ -3,6 +3,8 @@ package com.pico52.dominion.command.admin;
 import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.task.SpellTask;
+import com.pico52.dominion.task.UnitTask;
 
 /** 
  * <b>AdminManualUpdate</b><br>
@@ -24,7 +26,7 @@ public class AdminManualUpdate extends AdminSubCommand{
 	 * @param instance - The {@link Dominion} plugin this command executor will be running on.
 	 */
 	public AdminManualUpdate(Dominion instance) {
-		super(instance, "/ad manualupdate");
+		super(instance, "/ad manualupdate [settlement / spell / unit]");
 	}
 
 	/** 
@@ -40,12 +42,28 @@ public class AdminManualUpdate extends AdminSubCommand{
 	 */
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		if(plugin.getSettlementManager().updateAll()){
-			sender.sendMessage("Successfully updated all settlements.");
-		} else {
-			sender.sendMessage("At least one of the settlements has not been updated.");
+		if(args.length == 0){
+			sender.sendMessage(logPrefix + "Advances the timer tick for all settlements, units, or spells.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
+			return true;
 		}
-		return true;
+		String task = args[0];
+		if(task.equalsIgnoreCase("settlement") | task.equalsIgnoreCase("settlements")){
+			if(plugin.getSettlementManager().updateAll()){
+				sender.sendMessage(logPrefix + "Successfully updated all settlements.");
+			} else {
+				sender.sendMessage(logPrefix + "At least one of the settlements has not been updated.");
+			}
+			return true;
+		} else if (task.equalsIgnoreCase("unit") | task.equalsIgnoreCase("units")){
+			new UnitTask(plugin).run();
+			return true;
+		} else if (task.equalsIgnoreCase("spell") | task.equalsIgnoreCase("spells")){
+			new SpellTask(plugin).run();
+			return true;
+		} else {
+			sender.sendMessage(logPrefix + "Usage: " + usage);
+			return true;
+		}
 	}
-
 }

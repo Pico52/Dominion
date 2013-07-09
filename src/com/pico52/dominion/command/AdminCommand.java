@@ -12,7 +12,8 @@ import com.pico52.dominion.Dominion;
 import com.pico52.dominion.command.admin.AdminAdd;
 import com.pico52.dominion.command.admin.AdminBuild;
 import com.pico52.dominion.command.admin.AdminCreate;
-import com.pico52.dominion.command.admin.AdminForce;
+import com.pico52.dominion.command.admin.AdminKill;
+import com.pico52.dominion.command.admin.AdminSetOwner;
 import com.pico52.dominion.command.admin.AdminManualUpdate;
 import com.pico52.dominion.command.admin.AdminRemove;
 import com.pico52.dominion.command.admin.AdminSetBiome;
@@ -37,10 +38,11 @@ public class AdminCommand implements CommandExecutor{
 	private static AdminBuild adminBuild;
 	private static AdminCreate adminCreate;
 	private static AdminRemove adminRemove;
-	private static AdminForce adminForce;
+	private static AdminSetOwner adminSetOwner;
 	private static AdminUpdate adminUpdate;
 	private static AdminManualUpdate adminManualUpdate;
 	private static AdminSetBiome adminSetBiome;
+	private static AdminKill adminKill;
 	
 	/** 
 	 * <b>AdminCommand</b><br>
@@ -61,10 +63,11 @@ public class AdminCommand implements CommandExecutor{
 		adminBuild 		= new AdminBuild(plugin);
 		adminCreate 	= new AdminCreate(plugin);
 		adminRemove	= new AdminRemove(plugin);
-		adminForce 	= new AdminForce(plugin);
+		adminSetOwner 	= new AdminSetOwner(plugin);
 		adminUpdate	= new AdminUpdate(plugin);
 		adminManualUpdate = new AdminManualUpdate(plugin);
 		adminSetBiome = new AdminSetBiome(plugin);
+		adminKill = new AdminKill(plugin);
 	}
 
 	@Override
@@ -75,7 +78,7 @@ public class AdminCommand implements CommandExecutor{
 		}
 		if(args.length == 0){
 			sender.sendMessage("The primary controller for all administrator commands.");
-			sender.sendMessage("Usage:  /admindominion [set / add / subtract / build / create / remove / force / setbiome / update / manualupdate]");
+			sender.sendMessage("Usage:  /admindominion [setmaterial / add / subtract / build / create / kill / remove / setowner / setbiome / update / manualupdate]");
 			return true;
 		}
 		String subCommand = args[0];
@@ -103,8 +106,8 @@ public class AdminCommand implements CommandExecutor{
 		if(subCommand.equalsIgnoreCase("remove") | subCommand.equalsIgnoreCase("delete") | subCommand.equalsIgnoreCase("destroy")){
 			return adminRemove.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("force") | subCommand.equalsIgnoreCase("owner") | subCommand.equalsIgnoreCase("setowner")){
-			return adminForce.execute(sender, args);
+		if(subCommand.equalsIgnoreCase("setowner") | subCommand.equalsIgnoreCase("owner")){
+			return adminSetOwner.execute(sender, args);
 		}
 		if(subCommand.equalsIgnoreCase("update") | subCommand.equalsIgnoreCase("change")){
 			return adminUpdate.execute(sender, args);
@@ -114,6 +117,9 @@ public class AdminCommand implements CommandExecutor{
 		}
 		if(subCommand.equalsIgnoreCase("setbiome") | subCommand.equalsIgnoreCase("sb")){
 			return adminSetBiome.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("kill")){
+			return adminKill.execute(sender, args);
 		}
 		
 		return false;

@@ -41,28 +41,28 @@ public class AdminBuild extends AdminSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){	// - They only specified "build" but gave no other arguments.
-			sender.sendMessage(plugin.getLogPrefix() + "Constructs a new building at your location.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Constructs a new building at your location.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(args.length == 1){
-			sender.sendMessage(plugin.getLogPrefix() + "You must provide a class type for this building.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "You must provide a class type for this building.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		String settlement = args[0];
 		String classification = args[1];
-		if(!plugin.getDBHandler().settlementExists(settlement)){
-			sender.sendMessage(plugin.getLogPrefix() + settlement + " is not a valid settlement.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+		if(!db.settlementExists(settlement)){
+			sender.sendMessage(logPrefix + settlement + " is not a valid settlement.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		if(plugin.getDBHandler().createBuilding(settlement, classification)){
-			int newBuildingId = plugin.getDBHandler().getNewestId("building");
-			sender.sendMessage(plugin.getLogPrefix() + "Successfully created a " + classification + " id#: " + newBuildingId + " for " + settlement + "!");
+		if(db.createBuilding(settlement, classification)){
+			int newBuildingId = db.getNewestId("building");
+			sender.sendMessage(logPrefix + "Successfully created a " + classification + " id#: " + newBuildingId + " for " + settlement + "!");
 			plugin.getLogger().info("Successfully created a " + classification + " for " + settlement + "!");
 		} else {
-			sender.sendMessage(plugin.getLogPrefix() + "Failed to create the " + classification + " for " + settlement + ".");
+			sender.sendMessage(logPrefix + "Failed to create the " + classification + " for " + settlement + ".");
 			plugin.getLogger().info("Failed to create the " + classification + " for " + settlement + ".");
 		}
 		

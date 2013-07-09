@@ -41,31 +41,31 @@ public class AdminSetBiome extends AdminSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Updates a settlement biome.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Updates a settlement biome.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(args.length == 1){
-			sender.sendMessage(plugin.getLogPrefix() + "You must specify the biome.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "You must specify the biome.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		String settlement = args[0];
 		String biome = args[1].toLowerCase();
-		if(!plugin.getDBHandler().settlementExists(settlement)){
-			sender.sendMessage(plugin.getLogPrefix() + "Settlement: \"" + settlement + "\" does not exist.  (Case-sensitive)");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+		if(!db.settlementExists(settlement)){
+			sender.sendMessage(logPrefix + "Settlement: \"" + settlement + "\" does not exist.  (Case-sensitive)");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(!plugin.getBiomeData().isBiome(biome)){
-			sender.sendMessage(plugin.getLogPrefix() + "The input \"" + biome + "\" is not a biome.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "The input \"" + biome + "\" is not a biome.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(plugin.getSettlementManager().setBiome(settlement, biome))
-			sender.sendMessage(plugin.getLogPrefix() + "Successfully set the biome to " + biome + " in " + settlement + ".");
+			sender.sendMessage(logPrefix + "Successfully set the biome to " + biome + " in " + settlement + ".");
 		else
-			sender.sendMessage(plugin.getLogPrefix() + "Failed to set the biome to " + biome + " in " + settlement + ".");
+			sender.sendMessage(logPrefix + "Failed to set the biome to " + biome + " in " + settlement + ".");
 		
 		return true;
 	}

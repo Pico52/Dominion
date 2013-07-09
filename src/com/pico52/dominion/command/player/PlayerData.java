@@ -41,8 +41,8 @@ public class PlayerData extends PlayerSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){	// - They only specified "data" but gave no indication of what data they want.
-			sender.sendMessage(plugin.getLogPrefix() + "Outputs general information about the current game.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Outputs general information about the current game.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		String entity = args[0].toLowerCase();

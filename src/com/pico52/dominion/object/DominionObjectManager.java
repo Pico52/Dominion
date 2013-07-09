@@ -1,6 +1,7 @@
 package com.pico52.dominion.object;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.db.DominionDatabaseHandler;
 
 /** 
  * <b>DominionObjectManager</b><br>
@@ -12,8 +13,10 @@ import com.pico52.dominion.Dominion;
  */
 public abstract class DominionObjectManager {
 	protected Dominion plugin;
+	protected DominionDatabaseHandler db;
 	
 	public DominionObjectManager(Dominion plugin){
 		this.plugin = plugin;
+		db = plugin.getDBHandler();
 	}
 }

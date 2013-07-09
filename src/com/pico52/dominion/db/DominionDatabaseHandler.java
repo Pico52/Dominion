@@ -3,6 +3,7 @@ package com.pico52.dominion.db;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import com.pico52.dominion.Dominion;
@@ -246,6 +247,9 @@ public class DominionDatabaseHandler extends SQLite{
 			return queryWithResult(query);
 		} catch (SQLException ex){
 			writeError(ex.getMessage(), true);
+		} catch (NullPointerException ex){
+			plugin.getLogger().info("Null pointer exception while performing an operation with material.");
+			ex.printStackTrace();
 		}
 		
 		return false;
@@ -756,6 +760,27 @@ public class DominionDatabaseHandler extends SQLite{
 		}
 		return false;
 	}
+	
+	/** 
+	 * <b>createItem</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createItem(int unitId, {@link String} type, double quantity)
+	 * <br>
+	 * <br>
+	 * Creates a production in the database with specified values.
+	 * @param unitId - The id of the unit this item will reside upon.
+	 * @param type - The type of the item.
+	 * @param quantity - The quantity of this item.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createItem(int unitId, String type, double quantity){
+		String query = "INSERT INTO item(unit_id, type, quantity) VALUES (" + unitId + ", \'" + type + "\', " + quantity + ")";
+		if(queryWithResult(query)){
+			plugin.getLogger().info("A new " + type + " x(" + quantity + ") item has been created on unit #" + unitId + ".");
+			return true;
+		}
+		return false;
+	}
 //--- CHECK EXISTENCE OF OBJECT ---//
 	/** 
 	 * <b>playerExists</b><br>
@@ -802,7 +827,7 @@ public class DominionDatabaseHandler extends SQLite{
 	/** 
 	 * <b>thingExists</b><br>
 	 * <br>
-	 * &nbsp;&nbsp;public boolean thingExists(String name, String table)
+	 * &nbsp;&nbsp;private boolean thingExists({@link String} name, {@link String} table)
 	 * <br>
 	 * <br>
 	 * Checks to see if a thing exists in a table using its name to identify it.
@@ -829,6 +854,32 @@ public class DominionDatabaseHandler extends SQLite{
 			writeError(ex.getMessage(), true);
 		}
 		return false;
+	}
+	
+	/** 
+	 * <b>thingExists</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean thingExists(int id, {@link String} table)
+	 * <br>
+	 * <br>
+	 * Checks to see if a thing exists in a table using its name to identify it.
+	 * @param name - The name of the thing.
+	 * @param table - The name of the database table to check.
+	 * @return True if the thing exists; false if it does not.
+	 */
+	public boolean thingExists(int id, String table){
+		boolean success = false;
+		String identifier = table + "_id";
+		ResultSet entity = getTableData(table, identifier, identifier + "=" + id);
+		try{
+			if(entity.next())
+				success = true;
+			entity.getStatement().close();
+		} catch (SQLException ex){
+			plugin.getLogger().info("Error while attempting to check if a " + table + " existed.");
+			ex.printStackTrace();
+		}
+		return success;
 	}
 
 //--- ACCESSORS ---//
@@ -990,9 +1041,9 @@ public class DominionDatabaseHandler extends SQLite{
 	}
 	
 	/** 
-	 * <b>getAllTableData</b><br>
+	 * <b>getTableData</b><br>
 	 * <br>
-	 * &nbsp;&nbsp;public {@link ResultSet} getAllTableData({@link String} table, {@link String} column)
+	 * &nbsp;&nbsp;public {@link ResultSet} getTableData({@link String} table, {@link String} column)
 	 * <br>
 	 * <br>
 	 * Gets the column data from a table.  Use "*" to retrieve all data.  Make sure to issue 
@@ -1002,15 +1053,15 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @param column - The column to reference.
 	 * @return The results if there are any.  Null if there are not.
 	 */
-	public ResultSet getAllTableData(String table, String column){
+	public ResultSet getTableData(String table, String column){
 		String query = "SELECT " + column + " FROM " + table;
 		return  querySelect(query);
 	}
 	
 	/** 
-	 * <b>getAllTableData</b><br>
+	 * <b>getTableData</b><br>
 	 * <br>
-	 * &nbsp;&nbsp;public {@link ResultSet} getAllTableData({@link String} table, {@link String} column, {@link String} where)
+	 * &nbsp;&nbsp;public {@link ResultSet} getTableData({@link String} table, {@link String} column, {@link String} where)
 	 * <br>
 	 * <br>
 	 * Gets the column data from a table.  Use "*" to retrieve all data.  Make sure to issue 
@@ -1021,9 +1072,39 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @param where - The exact SQL where clause without the "where" part.  "settlement_id=1" for example.
 	 * @return The results if there are any.  Null if there are not.
 	 */
-	public ResultSet getAllTableData(String table, String column, String where){
+	public ResultSet getTableData(String table, String column, String where){
 		String query = "SELECT " + column + " FROM " + table + " WHERE " + where;
 		return  querySelect(query);
+	}
+	
+	/** 
+	 * <b>getAllIds</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public int[] getAllIds({@link String} table)
+	 * <br>
+	 * <br>
+	 * @param table - The name of the table to reference.
+	 * @return The ids if there are any.  Null if there are not.
+	 */
+	public int[] getAllIds(String table){
+		String identifier = table + "_id";
+		ResultSet entity = getTableData(table, identifier);
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		try{
+			while(entity.next()){
+				list.add(new Integer(entity.getInt(identifier)));
+			}
+			entity.getStatement().close();
+		} catch (SQLException ex){
+			ex.printStackTrace();
+		}
+		int[] ids = new int[list.size()];
+		int i = 0;
+	    for (Integer n : list) {
+	        ids[i++] = n;
+	    }
+		
+		return ids;
 	}
 	
 //--- Getting names from an id ---//

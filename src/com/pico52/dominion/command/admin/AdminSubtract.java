@@ -43,44 +43,44 @@ public class AdminSubtract extends AdminSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0 ){	// - They only specified "subtract" but gave no settlement.  Tell them how to use the command.
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(args.length == 1){  // - They may have specified the settlement, but they didn't say what to subtract or how much.
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
-			sender.sendMessage(plugin.getLogPrefix() + "Please issue the command again specifying the material and amount to be subtracted.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
+			sender.sendMessage(logPrefix + "Please issue the command again specifying the material and amount to be subtracted.");
 			return true;
 		}
 		if (args.length == 2){ // - They may have forgotten to put the amount to withdraw.
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
-			sender.sendMessage(plugin.getLogPrefix() + "Please issue the command again specifying the amount to subtract.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
+			sender.sendMessage(logPrefix + "Please issue the command again specifying the amount to subtract.");
 			return true;
 		}
 		// - Setting names to the arguments for easy readability.
 		String settlement = args[0];
 		String material = args[1].toLowerCase();
 		int amount = Integer.parseInt(args[2]);
-		if(!plugin.getDBHandler().settlementExists(settlement)){ // - Make sure this settlement is legitimate.
-			sender.sendMessage(plugin.getLogPrefix() + "Settlement: " + settlement + " does not exist.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+		if(!db.settlementExists(settlement)){ // - Make sure this settlement is legitimate.
+			sender.sendMessage(logPrefix + "Settlement: " + settlement + " does not exist.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		// - Make sure the material type is legitimate.
 		if(Material.matchMaterial(material) == null){
-			sender.sendMessage(plugin.getLogPrefix() + "The material \"" + material + "\" is not a material.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "The material \"" + material + "\" is not a material.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		// - Remember, admins don't need to be the lord to issue this command, so we will continue.
 		// - Admins can also subtract the resource to make a negative value, so we will still continue.
 		// - Subtract the material from the database.
-		if(plugin.getDBHandler().subtractMaterial(settlement, material, amount)){
-			sender.sendMessage(plugin.getLogPrefix() + "Successfully subtracted " + amount + " " + material + " from " + settlement + "!");
-			plugin.getLogger().info(plugin.getLogPrefix() + "Successful subtraction for command sender: " + sender.getName());
+		if(db.subtractMaterial(settlement, material, amount)){
+			sender.sendMessage(logPrefix + "Successfully subtracted " + amount + " " + material + " from " + settlement + "!");
+			plugin.getLogger().info(logPrefix + "Successful subtraction for command sender: " + sender.getName());
 			return true;
 		}else{
-			sender.sendMessage(plugin.getLogPrefix() + "Failed to subtract " + amount + " " + material + " from " + settlement + ".");
-			plugin.getLogger().info(plugin.getLogPrefix() + "Failed to subtract resources from the settlement.");
+			sender.sendMessage(logPrefix + "Failed to subtract " + amount + " " + material + " from " + settlement + ".");
+			plugin.getLogger().info(logPrefix + "Failed to subtract resources from the settlement.");
 			return true;
 		}
 	}

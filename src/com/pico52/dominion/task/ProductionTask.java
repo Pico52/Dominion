@@ -1,6 +1,7 @@
 package com.pico52.dominion.task;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.DominionSettings;
 
 /** 
  * <b>ProductionTask</b><br>
@@ -28,6 +29,8 @@ public class ProductionTask extends DominionTimerTask{
 	@Override
 	public void run() {
 		plugin.getLogger().info("Production tick..");
+		if(DominionSettings.broadcastProductionTick)
+			plugin.getServer().broadcastMessage(plugin.getLogPrefix() + "Production tick..");
 		plugin.getSettlementManager().updateAll();
 	}
 }

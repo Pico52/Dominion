@@ -44,18 +44,18 @@ public class PlayerList extends PlayerSubCommand{
 	 */
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		if(args.length == 0){	// - They only specified "list" but gave nothing to list.
-			sender.sendMessage(plugin.getLogPrefix() + "Outputs all ids and names of a set of objects.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+		if(args.length == 0){
+			sender.sendMessage(logPrefix + "Outputs all ids and names of a set of objects.");
+			sender.sendMessage(logPrefix + "Usage: " + getUsage());
 			return true;
 		}
-		// - There will at least be an argument here.  Hopefully a table name.
 		String entity = args[0];
-		ResultSet results = plugin.getDBHandler().getAllTableData(entity, "*");
+		ResultSet results = db.getTableData(entity, "*");
 		String allData = "";
 		String middleData = "";
 		String entity_id = entity + "_id";
 		int columnCount = 1;
+		boolean isUnit = false, isCommand = false, isItem = false, hasName = false, hasDuration = false, hasClass = false, hasType = false;
 		try{
 			while(results.next()){
 				middleData += "§aId#: §f" + results.getInt(entity_id) + "  ";
@@ -63,37 +63,51 @@ public class PlayerList extends PlayerSubCommand{
 					String name = results.getString("name");
 					if(name != null){
 						middleData += "§aName: §f" + name + "  ";
-						columnCount++;
+						hasName = true;
 					}
 				}catch (SQLException ex){}
 				try{
+					String type = results.getString("type");
+					middleData += "§aType: §f" + type + "  ";
+					hasType = true;
+				} catch (SQLException ex){}
+				try{
 					String classification = results.getString("class");
 					if(classification != null){
-						middleData += "§aClass: §f" + classification;
-						columnCount++;
+						middleData += "§aClass: §f" + classification + "  ";
+						hasClass = true;
 						if(plugin.getUnitManager().isUnit(classification)){
 							middleData += "§aHealth: §f" + results.getDouble("health") + "  ";
 							middleData += "§aX: §f" + results.getDouble("xcoord") + "  ";
 							middleData += "§aZ: §f" + results.getDouble("zcoord") + "  ";
-							columnCount += 3;
+							isUnit = true;
 						}
 					}
 				}catch (SQLException ex){}
 				try{
 					int duration = results.getInt("duration");
 					middleData += "§aDuration: §f" + duration;
-					columnCount++;
+					hasDuration = true;
 				} catch (SQLException ex){}
 				try{
 					String command = results.getString("command");
+					int unitId = results.getInt("unit_id");
 					int afflictId = results.getInt("afflict_id");
 					double xCoord = results.getDouble("xcoord");
-					double zCoord = results.getDouble("zCoord");
+					double zCoord = results.getDouble("zcoord");
 					middleData += "§aCommand: §f" + command + "  ";
+					middleData += "§aUnit #: §f" + unitId + "  ";
 					middleData += "§aAfflict Id: §f" + afflictId + "  ";
 					middleData += "§aX: §f" + xCoord + "  ";
 					middleData += "§aZ: §f" + zCoord + "  ";
-					columnCount += 4;
+					isCommand = true;
+				} catch (SQLException ex){}
+				try{
+					int unitId = results.getInt("unit_id");
+					double quantity = results.getDouble("quantity");
+					middleData += "§aUnit Id: §f" + unitId + "  ";
+					middleData += "§aQuantity: §f" + quantity + "  ";
+					isItem = true;
 				} catch (SQLException ex){}
 				middleData += "\n";
 			}
@@ -105,6 +119,20 @@ public class PlayerList extends PlayerSubCommand{
 		}
 		allData = "§a";
 		String containment = "=";
+		if(isUnit)
+			columnCount += 3;
+		if(isCommand)
+			columnCount += 4;
+		if(isItem)
+			columnCount += 2;
+		if(hasName)
+			columnCount++;
+		if(hasDuration)
+			columnCount++;
+		if(hasClass)
+			columnCount++;
+		if(hasType)
+			columnCount++;
 		for(int i=0; i<columnCount;i++)
 			containment += "===";
 		allData += containment + entity.toUpperCase() + containment + "§r\n";

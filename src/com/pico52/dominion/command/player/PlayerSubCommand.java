@@ -3,6 +3,7 @@ package com.pico52.dominion.command.player;
 import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.db.DominionDatabaseHandler;
 
 /** 
  * <b>PlayerSubCommand</b><br>
@@ -15,7 +16,8 @@ import com.pico52.dominion.Dominion;
 public abstract class PlayerSubCommand {
 	
 	protected static Dominion plugin;
-	private String usageMessage;
+	protected DominionDatabaseHandler db;
+	protected String usage, logPrefix;
 	
 	/** 
 	 * <b>PlayerSubCommand</b><br>
@@ -28,7 +30,9 @@ public abstract class PlayerSubCommand {
 	 */
 	protected PlayerSubCommand(Dominion instance, String usage){
 		plugin = instance;
-		usageMessage = usage;
+		db = plugin.getDBHandler();
+		this.usage = usage;
+		logPrefix = plugin.getLogPrefix();
 	}
 	
 	/** 
@@ -54,6 +58,6 @@ public abstract class PlayerSubCommand {
 	 * @return The usage of the command.
 	 */
 	public String getUsage(){
-		return usageMessage;
+		return usage;
 	}
 }

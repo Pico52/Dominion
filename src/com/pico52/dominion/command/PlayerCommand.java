@@ -15,6 +15,8 @@ import com.pico52.dominion.command.player.PlayerDeposit;
 import com.pico52.dominion.command.player.PlayerDestroy;
 import com.pico52.dominion.command.player.PlayerEmploy;
 import com.pico52.dominion.command.player.PlayerEmployment;
+import com.pico52.dominion.command.player.PlayerGiveToUnit;
+import com.pico52.dominion.command.player.PlayerHolding;
 import com.pico52.dominion.command.player.PlayerInfo;
 import com.pico52.dominion.command.player.PlayerList;
 import com.pico52.dominion.command.player.PlayerListMy;
@@ -26,6 +28,7 @@ import com.pico52.dominion.command.player.PlayerUnitCamp;
 import com.pico52.dominion.command.player.PlayerUnitDisband;
 import com.pico52.dominion.command.player.PlayerUnitDrop;
 import com.pico52.dominion.command.player.PlayerUnitMove;
+import com.pico52.dominion.command.player.PlayerUnitPickUp;
 import com.pico52.dominion.command.player.PlayerWithdraw;
 
 /** 
@@ -57,6 +60,9 @@ public class PlayerCommand implements CommandExecutor{
 	private static PlayerUnitDisband playerUnitDisband;
 	private static PlayerListMy playerListMy;
 	private static PlayerCast playerCast;
+	private static PlayerGiveToUnit playerGiveToUnit;
+	private static PlayerHolding playerHolding;
+	private static PlayerUnitPickUp playerUnitPickUp;
 	
 	/** 
 	 * <b>PlayerCommand</b><br>
@@ -88,6 +94,9 @@ public class PlayerCommand implements CommandExecutor{
 		playerUnitDisband = new PlayerUnitDisband(plugin);
 		playerListMy = new PlayerListMy(plugin);
 		playerCast = new PlayerCast(plugin);
+		playerGiveToUnit = new PlayerGiveToUnit(plugin);
+		playerHolding = new PlayerHolding(plugin);
+		playerUnitPickUp = new PlayerUnitPickUp(plugin);
 	}
 
 	@Override
@@ -96,7 +105,7 @@ public class PlayerCommand implements CommandExecutor{
 		 * View the information of the default settlement.
 		 */
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Usage:  /dominion [info / storage / withdraw / deposit / list / listmy / destroy / employ / employment / data / production / train / attack / move / camp / disband]");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage:  /dominion [info / storage / withdraw / deposit / list / listmy / destroy / employ / employment / data / production / train / attack / move / camp / drop / pickup / holding / disband]");
 			return true;
 		}
 		String subCommand = args[0];
@@ -160,6 +169,15 @@ public class PlayerCommand implements CommandExecutor{
 		}
 		if(subCommand.equalsIgnoreCase("cast")){
 			return playerCast.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("give") | subCommand.equalsIgnoreCase("givetounit") | subCommand.equalsIgnoreCase("gtu")){
+			return playerGiveToUnit.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("holding") | subCommand.equalsIgnoreCase("carrying")){
+			return playerHolding.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("pickup") | subCommand.equalsIgnoreCase("take") | subCommand.equalsIgnoreCase("grab") | subCommand.equalsIgnoreCase("pu")){
+			return playerUnitPickUp.execute(sender, args);
 		}
 		
 		return false;

@@ -13,6 +13,7 @@ import com.pico52.dominion.datasheet.BiomeData;
 import com.pico52.dominion.db.DominionDatabaseHandler;
 import com.pico52.dominion.event.DominionPlayerListener;
 import com.pico52.dominion.object.BuildingManager;
+import com.pico52.dominion.object.ItemManager;
 import com.pico52.dominion.object.SettlementManager;
 import com.pico52.dominion.object.SpellManager;
 import com.pico52.dominion.object.UnitManager;
@@ -44,6 +45,7 @@ public final class Dominion extends JavaPlugin{
 	private BiomeData biomeData;
 	private TaskManager taskManager;
 	private SpellManager spellManager;
+	private ItemManager itemManager;
 	
 	@Override
 	public void onEnable(){
@@ -56,6 +58,7 @@ public final class Dominion extends JavaPlugin{
 		settlementManager = new SettlementManager(this);
 		unitManager = new UnitManager(this);
 		spellManager = new SpellManager(this);
+		itemManager = new ItemManager(this);
 		biomeData = new BiomeData();
 		
 		playerEvent = new DominionPlayerListener(this);
@@ -85,6 +88,13 @@ public final class Dominion extends JavaPlugin{
 	 * @return True if the player is online.  False if they are not.
 	 */
 	public boolean isPlayerOnline(String player){
+		try{
+			if(player == null)
+				return false;
+		} catch (NullPointerException ex){
+			// - This just means it's not a player but is most likely a sort of NPC controller.
+			return false;
+		}
 		for(Player players: getServer().getOnlinePlayers()){
 			if(player.equalsIgnoreCase(players.getName()))
 				return true;
@@ -187,6 +197,18 @@ public final class Dominion extends JavaPlugin{
 	 */
 	public SpellManager getSpellManager(){
 		return spellManager;
+	}
+	
+	/** 
+	 * <b>getItemManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link ItemManager} getItemManager()
+	 * <br>
+	 * <br>
+	 * @return The manager controlling items.
+	 */
+	public ItemManager getItemManager(){
+		return itemManager;
 	}
 	
 	/** 

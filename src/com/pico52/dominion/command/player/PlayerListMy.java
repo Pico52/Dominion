@@ -45,25 +45,26 @@ public class PlayerListMy extends PlayerSubCommand{
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Outputs all ids and names of a set of objects that you own.");
-			sender.sendMessage(plugin.getLogPrefix() + "Usage: " + getUsage());
+			sender.sendMessage(logPrefix + "Outputs all ids and names of a set of objects that you own.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		String entity = args[0];
-		int ownerId = plugin.getDBHandler().getPlayerId(sender.getName());
+		int ownerId = db.getPlayerId(sender.getName());
 		ResultSet results;
 		if(entity.equalsIgnoreCase("trade")){
 			// - To do:  Make it find only the trades that the player is a part of.
-			results = plugin.getDBHandler().getAllTableData(entity, "*");
+			results = db.getTableData(entity, "*");
 		} else if (entity.equalsIgnoreCase("command")){
 			// - To do:  Make it find only the commands for units that are owned by this player.
-			results = plugin.getDBHandler().getAllTableData(entity, "*");
+			results = db.getTableData(entity, "*");
 		} else 
-			results = plugin.getDBHandler().getAllTableData(entity, "*", "owner_id=" + ownerId);
+			results = db.getTableData(entity, "*", "owner_id=" + ownerId);
 		String allData = "";
 		String middleData = "";
 		String entity_id = entity + "_id";
 		int columnCount = 1;
+		boolean isUnit = false, isCommand = false, isItem = false, hasName = false, hasDuration = false, hasClass = false, hasType = false;
 		try{
 			while(results.next()){
 				middleData += "§aId#: §f" + results.getInt(entity_id) + "  ";
@@ -71,37 +72,51 @@ public class PlayerListMy extends PlayerSubCommand{
 					String name = results.getString("name");
 					if(name != null){
 						middleData += "§aName: §f" + name + "  ";
-						columnCount++;
+						hasName = true;
 					}
 				}catch (SQLException ex){}
+				try{
+					String type = results.getString("type");
+					middleData += "§aType: §f" + type + "  ";
+					hasType = true;
+				} catch (SQLException ex){}
 				try{
 					String classification = results.getString("class");
 					if(classification != null){
 						middleData += "§aClass: §f" + classification + "  ";
-						columnCount++;
+						hasClass = true;
 						if(plugin.getUnitManager().isUnit(classification)){
 							middleData += "§aHealth: §f" + results.getDouble("health") + "  ";
 							middleData += "§aX: §f" + results.getDouble("xcoord") + "  ";
 							middleData += "§aZ: §f" + results.getDouble("zcoord") + "  ";
-							columnCount += 3;
+							isUnit = true;
 						}
 					}
 				}catch (SQLException ex){}
 				try{
 					int duration = results.getInt("duration");
 					middleData += "§aDuration: §f" + duration;
-					columnCount++;
+					hasDuration = true;
 				} catch (SQLException ex){}
 				try{
 					String command = results.getString("command");
+					int unitId = results.getInt("unit_id");
 					int afflictId = results.getInt("target_id");
 					double xCoord = results.getDouble("xcoord");
-					double zCoord = results.getDouble("zCoord");
+					double zCoord = results.getDouble("zcoord");
 					middleData += "§aCommand: §f" + command + "  ";
+					middleData += "§aUnit #: §f" + unitId + "  ";
 					middleData += "§aTarget Id: §f" + afflictId + "  ";
 					middleData += "§aX: §f" + xCoord + "  ";
 					middleData += "§aZ: §f" + zCoord + "  ";
-					columnCount += 4;
+					isCommand = true;
+				} catch (SQLException ex){}
+				try{
+					int unitId = results.getInt("unit_id");
+					double quantity = results.getDouble("quantity");
+					middleData += "§aUnit Id: §f" + unitId + "  ";
+					middleData += "§aQuantity: §f" + quantity + "  ";
+					isItem = true;
 				} catch (SQLException ex){}
 				middleData += "\n";
 			}
@@ -113,6 +128,20 @@ public class PlayerListMy extends PlayerSubCommand{
 		}
 		allData = "§a";
 		String containment = "=";
+		if(isUnit)
+			columnCount += 3;
+		if(isCommand)
+			columnCount += 4;
+		if(isItem)
+			columnCount += 2;
+		if(hasName)
+			columnCount++;
+		if(hasDuration)
+			columnCount++;
+		if(hasClass)
+			columnCount++;
+		if(hasType)
+			columnCount++;
 		for(int i=0; i<columnCount;i++)
 			containment += "===";
 		allData += containment + entity.toUpperCase() + containment + "§r\n";
