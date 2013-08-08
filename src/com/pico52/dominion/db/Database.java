@@ -210,26 +210,28 @@ public abstract class Database {
 	/**
 	 * <b>createTable</b><br>
 	 * <br>
-	 * &nbsp;&nbsp;Creates a table in the database based on a specified query.
-	 * <br>
-	 * <br>
-	 * @param query - the SQL query for creating a table.
-	 * @return the success of the method.
-	 */
-	abstract boolean createTable(String query);
-	
-	/**
-	 * <b>createTable</b><br>
-	 * <br>
 	 * &nbsp;&nbsp;Creates a table in the database based on the information provided.
 	 * <br>
 	 * <br>
-	 * @param tableName - the name of the table.
+	 * @param table - the name of the table.
 	 * @param columns - the column names.
 	 * @param dims - the dimensions for each column.
 	 * @return the success of the method.
 	 */
-	abstract boolean createTable(String tableName, String[] columns, String[] dims);
+	abstract boolean createTable(String table, String[] columns, String[] dims);
+	
+	/**
+	 * <b>createColumn</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;Creates a column in a table based on the information provided.
+	 * <br>
+	 * <br>
+	 * @param table - the name of the table.
+	 * @param column - the column name.
+	 * @param dim - the dimensions for the column.
+	 * @return the success of the method.
+	 */
+	abstract boolean createColumn(String table, String column, String dim);
 	
 	/**
 	 * <b>checkTable</b><br>
@@ -241,6 +243,18 @@ public abstract class Database {
 	 * @return success of the method.
 	 */
 	abstract boolean checkTable(String table);
+	
+	/**
+	 * <b>checkColumn</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;Checks a column in a table within database based on the table and column's name.
+	 * <br>
+	 * <br>
+	 * @param table - name of the table the column resides within.
+	 * @param column - name of the column.
+	 * @return success of the method.
+	 */
+	abstract boolean checkColumn(String table, String column);
 	
 	/**
 	 * <b>wipeTable</b><br>

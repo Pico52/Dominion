@@ -24,7 +24,7 @@ public class PlayerCast extends PlayerSubCommand{
 	 * @param instance - The {@link Dominion} plugin this command executor will be running on.
 	 */
 	public PlayerCast(Dominion instance) {
-		super(instance, "/d cast [settlement name] [spell name] [target]");
+		super(instance, "/d cast [settlement name] [spell name] [target id]");
 	}
 
 	/** 
@@ -75,9 +75,12 @@ public class PlayerCast extends PlayerSubCommand{
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
+		String arg = "";
+		if(args.length > 3)
+			arg = args[3];
 		int settlementId = db.getSettlementId(settlement);
 		int casterId = db.getPlayerId(sender.getName());
-		if(!plugin.getSpellManager().castSpell(settlementId, casterId, spell, targetId))
+		if(!plugin.getSpellManager().castSpell(settlementId, casterId, spell, targetId, arg))
 			sender.sendMessage(logPrefix + "Failed to cast the spell.");
 		
 		return true;

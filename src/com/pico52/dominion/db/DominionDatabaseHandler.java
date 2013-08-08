@@ -37,14 +37,16 @@ public class DominionDatabaseHandler extends SQLite{
 	private static String[] kingdomDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT UNIQUE", "TEXT", "TEXT", "TEXT"};
 	private static String[] playerColumns = {"player_id", "name", "owner_id"};
 	private static String[] playerDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT UNIQUE", "INT DEFAULT 0"};
-	private static String[] unitColumns = {"unit_id", "owner_id", "settlement_id", "class", "xcoord", "zcoord", "health", "experience"};
-	private static String[] unitDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "INT DEFAULT 0"};
+	private static String[] unitColumns = {"unit_id", "owner_id", "settlement_id", "class", "xcoord", "zcoord", "health", "experience", "real"};
+	private static String[] unitDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "INT DEFAULT 0", 
+		"INT DEFAULT 1"};
 	private static String[] commandColumns = {"command_id", "unit_id", "command", "target_id", "xcoord", "zcoord"};
 	private static String[] commandDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "TEXT", "INT DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0"};
 	private static String[] itemColumns = {"item_id", "unit_id", "type", "quantity"};
 	private static String[] itemDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "TEXT", "DOUBLE DEFAULT 0"};
-	private static String[] spellColumns = {"spell_id", "settlement_id", "owner_id", "object_id", "object", "class", "power", "duration"};
-	private static String[] spellDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "TEXT", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0"};
+	private static String[] spellColumns = {"spell_id", "settlement_id", "owner_id", "object_id", "object", "class", "power", "duration", "area_of_effect", "xcoord", "zcoord"};
+	private static String[] spellDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "TEXT", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", 
+		"DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0"};
 	private static String[] productionColumns = {"production_id", "settlement_id", "owner_id", "class", "duration"};
 	private static String[] productionDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "INT DEFAULT 0"};
 	private static String[] permissionColumns = {"permission_id", "owner_id", "grantee_id", "node", "refer_id"};
@@ -125,8 +127,100 @@ public class DominionDatabaseHandler extends SQLite{
 		// - All tables should now exist.
 		if(checkTable("settlement") & checkTable("building") & checkTable("trade") & checkTable("kingdom") & checkTable("player") & 
 			checkTable("unit") & checkTable("command") & checkTable("spell") & checkTable("item") & checkTable("production") & checkTable("permission"))
-			return true;
+			return setDefaultColumns();
 		return false;
+	}
+	
+	/** 
+	 * <b>setDefaultColumns</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean setDefaultColumns()
+	 * <br>
+	 * <br>
+	 * Checks to ensure all default columns exist within their respective tables.  If they do not, they will be created.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean setDefaultColumns(){
+		String column = "";
+		for(int i=0; i < settlementColumns.length;i++){
+			column = settlementColumns[i];
+			if(!checkColumn("settlement", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("settlement", column, settlementDims[i]);
+			}
+		}
+		for(int i=0; i < buildingColumns.length;i++){
+			column = buildingColumns[i];
+			if(!checkColumn("building", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("building", column, buildingDims[i]);
+			}
+		}
+		for(int i=0; i < tradeColumns.length;i++){
+			column = tradeColumns[i];
+			if(!checkColumn("trade", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("trade", column, tradeDims[i]);
+			}
+		}
+		for(int i=0; i < kingdomColumns.length;i++){
+			column = kingdomColumns[i];
+			if(!checkColumn("kingdom", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("kingdom", column, kingdomDims[i]);
+			}
+		}
+		for(int i=0; i < playerColumns.length;i++){
+			column = playerColumns[i];
+			if(!checkColumn("player", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("player", column, playerDims[i]);
+			}
+		}
+		for(int i=0; i < unitColumns.length;i++){
+			column = unitColumns[i];
+			if(!checkColumn("unit", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("unit", column, unitDims[i]);
+			}
+		}
+		for(int i=0; i < commandColumns.length;i++){
+			column = commandColumns[i];
+			if(!checkColumn("command", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("command", column, commandDims[i]);
+			}
+		}
+		for(int i=0; i < itemColumns.length;i++){
+			column = itemColumns[i];
+			if(!checkColumn("item", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("item", column, itemDims[i]);
+			}
+		}
+		for(int i=0; i < spellColumns.length;i++){
+			column = spellColumns[i];
+			if(!checkColumn("spell", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("spell", column, spellDims[i]);
+			}
+		}
+		for(int i=0; i < productionColumns.length;i++){
+			column = productionColumns[i];
+			if(!checkColumn("production", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("production", column, productionDims[i]);
+			}
+		}
+		for(int i=0; i < permissionColumns.length;i++){
+			column = permissionColumns[i];
+			if(!checkColumn("permission", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("permission", column, permissionDims[i]);
+			}
+		}
+		
+		return true;
 	}
 
 //--- FUNCTIONALITY ---///
@@ -237,7 +331,7 @@ public class DominionDatabaseHandler extends SQLite{
 		ResultSet settlementData = getSettlementData(settlement_id, material);
 		try{
 			settlementData.next();
-			int currentMat = settlementData.getInt(material);
+			double currentMat = settlementData.getDouble(material);
 			settlementData.getStatement().close();
 			String query = "";
 			if(operator.equalsIgnoreCase("add"))
@@ -418,8 +512,7 @@ public class DominionDatabaseHandler extends SQLite{
 		String query = "DELETE FROM " + entity + " WHERE " + entity + "_id" + "=" + id;
 		return queryWithResult(query);
 	}
-	
-//--- CREATE A KINGDOM ---//
+
 	/** 
 	 * <b>createKingdom</b><br>
 	 * <br>
@@ -452,8 +545,7 @@ public class DominionDatabaseHandler extends SQLite{
 		String query = "INSERT INTO kingdom(name,owner_id,primarycolor,secondarycolor) VALUES (\'" + name + "\'," + monarch + ",\'" + primaryColor + "\',\'" + secondaryColor + "\')";
 		return queryWithResult(query);
 	}
-	
-//--- CREATE A SETTLEMENT ---//
+
 	/** 
 	 * <b>createSettlement</b><br>
 	 * <br>
@@ -470,8 +562,7 @@ public class DominionDatabaseHandler extends SQLite{
 		String query = "INSERT INTO settlement(name,biome,class) VALUES (\'" + name + "\',\'none\',\'town\')";
 		return queryWithResult(query);
 	}
-	
-//--- CREATE A PLAYER ---//
+
 	/** 
 	 * <b>createPlayer</b><br>
 	 * <br>
@@ -520,7 +611,11 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @return The sucess of the execution of this command.
 	 */
 	public boolean createBuilding(String settlement, String classification){
-		return createBuilding(settlement, 0,classification, 0, 0);
+		int settlementId = getSettlementId(settlement), 
+				ownerId = getOwnerId("settlement", settlementId);
+		double xCoord = plugin.getSettlementManager().getX(settlementId), 
+				zCoord = plugin.getSettlementManager().getZ(settlementId);
+		return createBuilding(settlement, ownerId,classification, xCoord, zCoord);
 	}
 	
 	/** 
@@ -537,7 +632,9 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @return The sucess of the execution of this command.
 	 */
 	public boolean createBuilding(String settlement, String classification, double xcoord, double zcoord){
-		return createBuilding(settlement, 0,classification, xcoord, zcoord);
+		int settlementId = getSettlementId(settlement), 
+				ownerId = getOwnerId("settlement", settlementId);
+		return createBuilding(settlement, ownerId,classification, xcoord, zcoord);
 	}
 	
 	/** 
@@ -553,7 +650,10 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @return The sucess of the execution of this command.
 	 */
 	public boolean createBuilding(String settlement, String owner, String classification){
-		return createBuilding(settlement, getPlayerId(owner),classification, 0, 0);
+		int settlementId = getSettlementId(settlement);
+		double xCoord = plugin.getSettlementManager().getX(settlementId), 
+				zCoord = plugin.getSettlementManager().getZ(settlementId);
+		return createBuilding(settlement, getPlayerId(owner),classification, xCoord, zCoord);
 	}
 	
 	/** 
@@ -572,7 +672,7 @@ public class DominionDatabaseHandler extends SQLite{
 	 */
 	public boolean createBuilding(String settlement, int owner, String classification, double xcoord, double zcoord){
 		int settlementId = getSettlementId(settlement);
-		String query = "INSERT INTO building(settlement_id, owner_id, class, xcoord, zcoord) VALUES (" + settlementId + "," + owner + ",\'" + classification + "\'," + xcoord +"," + zcoord +")";
+		String query = "INSERT INTO building(settlement_id, owner_id, class, level, xcoord, zcoord) VALUES (" + settlementId + "," + owner + ",\'" + classification + "\',1," + xcoord +"," + zcoord +")";
 		if(queryWithResult(query)){
 			plugin.getLogger().info("A new " + classification + " building has been created in " + settlement + " at x-" + xcoord + " z-" + zcoord + ".");
 			return true;
@@ -729,11 +829,12 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @param zcoord - The z coordinate the unit will be placed upon.
 	 * @param health - The starting health this unit will have.
 	 * @param experience - The starting experience this unit will have.
+	 * @param real - True if the unit is real; false if it is not.
 	 * @return The sucess of the execution of this command.
 	 */
-	public boolean createUnit(String settlement, String classification, int ownerId, double xcoord, double zcoord, double health, int experience){
+	public boolean createUnit(String settlement, String classification, int ownerId, double xcoord, double zcoord, double health, int experience, boolean real){
 		int settlementId = getSettlementId(settlement);
-		return createUnit(settlementId, classification, ownerId, xcoord, zcoord, health, experience);
+		return createUnit(settlementId, classification, ownerId, xcoord, zcoord, health, experience, real);
 	}
 	
 	/** 
@@ -750,12 +851,17 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @param zcoord - The z coordinate the unit will be placed upon.
 	 * @param health - The starting health this unit will have.
 	 * @param experience - The starting experience this unit will have.
+	 * @param real - True if the unit is real; false if it is not.
 	 * @return The sucess of the execution of this command.
 	 */
-	public boolean createUnit(int settlementId, String classification, int ownerId, double xcoord, double zcoord, double health, int experience){
-		String query = "INSERT INTO unit(owner_id, settlement_id, class, xcoord, zcoord, health, experience) VALUES (" + ownerId + "," + settlementId + ",\'" + classification + "\'," + xcoord + "," + zcoord + "," + health + "," + experience + ")";
+	public boolean createUnit(int settlementId, String classification, int ownerId, double xcoord, double zcoord, double health, int experience, boolean real){
+		int isReal = 1;
+		if(!real)
+			isReal = 0;
+		String query = "INSERT INTO unit(owner_id, settlement_id, class, xcoord, zcoord, health, experience, real) VALUES (" + ownerId + "," + settlementId + ",\'" + 
+	classification + "\'," + xcoord + "," + zcoord + "," + health + "," + experience + ", " + isReal + ")";
 		if(queryWithResult(query)){
-			plugin.getLogger().info("A new " + classification + " has been completed.");
+			plugin.getLogger().info("A new " + classification + " owned by " + getPlayerName(ownerId) + " has been created at x:" + xcoord + " z:" + zcoord + " with " + health + " health.");
 			return true;
 		}
 		return false;
@@ -777,6 +883,60 @@ public class DominionDatabaseHandler extends SQLite{
 		String query = "INSERT INTO item(unit_id, type, quantity) VALUES (" + unitId + ", \'" + type + "\', " + quantity + ")";
 		if(queryWithResult(query)){
 			plugin.getLogger().info("A new " + type + " x(" + quantity + ") item has been created on unit #" + unitId + ".");
+			return true;
+		}
+		return false;
+	}
+	
+	/** 
+	 * <b>createSpell</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createSpell(int settlementId, int casterId, int targetId, {@link String} object, {@link String} effect, double power, double duration)
+	 * <br>
+	 * <br>
+	 * Creates a spell in the database with specified values and default values for area of effect, xcoord, and zcoord.
+	 * @param settlementId - The id of the settlement casting the spell.
+	 * @param casterid - The player id casting the spell.
+	 * @param targetId - The id of the target entity for the spell to affect.
+	 * @param object - The type of entity (kingdom, settlement, building, player, unit, etc.)
+	 * @param effect - The type of spell effect this is.
+	 * @param duration - The number of spell ticks this spell will last.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createSpell(int settlementId, int casterId, int targetId, String object, String effect, double power, double duration){
+		return createSpell(settlementId, casterId, targetId, object, effect, power, duration, 0, 0, 0);
+	}
+	
+	/** 
+	 * <b>createSpell</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createSpell(int settlementId, int casterId, int targetId, {@link String} object, {@link String} effect, double power, double duration)
+	 * <br>
+	 * <br>
+	 * Creates a spell in the database with specified values.
+	 * @param settlementId - The id of the settlement casting the spell.
+	 * @param casterid - The player id casting the spell.
+	 * @param targetId - The id of the target entity for the spell to affect.
+	 * @param object - The type of entity (kingdom, settlement, building, player, unit, etc.)
+	 * @param effect - The type of spell effect this is.
+	 * @param duration - The number of spell ticks this spell will last.
+	 * @param areaOfEffect - The radius distance this spell's range will affect from its target location.
+	 * @param xCoord - The x-coordinate the spell will be cast upon.
+	 * @param zCoord - The z-coordinate the spell will be cast upon.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createSpell(int settlementId, int casterId, int targetId, String object, String effect, double power, double duration, double areaOfEffect, double xCoord, double zCoord) {
+		String query = "INSERT INTO spell(settlement_id, owner_id, object_id, object, class, power, duration, area_of_effect, xcoord, zcoord) VALUES (" + settlementId + ", " + casterId + ", " + targetId + 
+				", \'" + object + "\', \'" + effect + "\', " + power + ", "+ duration + ", " + areaOfEffect +", " + xCoord + ", " + zCoord + ")";
+		if(queryWithResult(query)){
+			String target = object + " #" + targetId;
+			if(object.equalsIgnoreCase("settlement"))
+				target = getSettlementName(targetId);
+			else if (object.equalsIgnoreCase("player"))
+				target = getPlayerName(targetId);
+			else if (object.equalsIgnoreCase("kingdom"))
+				target = getKingdomName(targetId);
+			plugin.getLogger().info(getPlayerName(casterId) + " has cast a new " + effect + " spell from " + getSettlementName(settlementId) + ", lasting " + duration + " ticks and targeting " + target + ".");
 			return true;
 		}
 		return false;

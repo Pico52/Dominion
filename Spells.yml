@@ -1,0 +1,388 @@
+##########################################################################################
+description: >
+  Describes the attributes of all spells.
+  name: The string to display when referencing the spell.
+  type: buff, curse, or utility.  Buffs for positive, friendly effects.  Curse for malicious 
+  effects.  Utility for neutral, useful effects.
+  strength:  The base power of the spell.  Higher means it has a stronger influence 
+  on its effects.  Overall strength is spell power * strength.
+  duration: The number of spell ticks the spell will last. 0 for instant.
+  wealth_cost: The wealth consumed.
+  redstone_cost: The redstone consumed.
+  material_cost:
+   type: The type of material consumed.
+   quantity: The quantity of the material consumed.
+  effects:  The effects that this spell creates. Possible effects are as follows: 
+  defense_bonus, mining_bonus, trade_bonus, farm_bonus, herding_grounds_bonus, masonry_bonus, 
+  sandworks_bonus, birth_rate_bonus, spell_power_penalty, kill_peasants, production_penalty, 
+  aoe_unit_damage, destroy_building, aoe_unit_slow, sea_unit_damage, create_resource, clear_weather,
+  rain_weather, create_fake_unit, aoe_reveal_invisible_units, aoe_reveal_fake_units, 
+  unit_invisibility.
+  
+warning:
+  -  Do NOT remove effects.
+  -  Do NOT use negative costs.
+##########################################################################################
+
+#  All effects are per 1 unit of spell strength.
+effects:
+  # Percentage bonus of defense.
+  defense_bonus: .01
+  # Percentage bonus to mining.
+  mining_bonus: .01
+  # Percentage bonus to passive trade.
+  trade_bonus: .01
+  # Percentage bonus to farms.
+  farm_bonus: .01
+  # Percentage bonus to herding grounds.
+  herding_grounds_bonus: .01
+  # Percentage bonus to masonries.
+  masonry_bonus: .01
+  # Percentage bonus to sandworks.
+  sandworks_bonus: .01
+  # Percentage bonus to birth rates.
+  birth_rate_bonus: .01
+  # Quantity of spell power reduced.
+  spell_power_penalty: .01
+  # Quantity of peasants killed.
+  kill_peasants: 1
+  # Percentage of reduced production of all resources.
+  production_penalty: .0005
+  # Attack power.
+  aoe_unit_damage: 1.0
+  destroy_building:
+    # Liklihood of success regardless of spell power.
+    base_chance: 0.0
+    # Liklihood of success per spell power.
+    chance: .005
+    # How many ticks the building is useless regardless of spell power.
+    base_duration: 0.0
+    # How many ticks the building is useless per spell power.
+    duration: 0.0
+  # Percentage of speed lost.
+  aoe_unit_slow: .001
+  # Attack power.  Affects sea_unit_damage.
+  unit_damage: 1.0
+  # Number of material produced.
+  create_resource:
+    wood: .8
+    cobblestone: .8
+    stone: .75
+    sand: .8
+    gravel: .9
+    dirt: 1.0
+    iron_ingot: .025
+    iron_ore: .05
+    emerald: .01
+    emerald_ore: .02
+    gold_ingot: .01
+    gold_ore: .02
+    flint: .25
+    feather: 1.0
+    lapis_ore: .02
+    diamond: .01
+    obsidian: .03
+    netherrack: .9
+    nether_brick: .5
+    redstone: 1
+    brick: .5
+    glowstone: .2
+    clay: 2.0
+    coal: .3
+    wool: .5
+    leather: .3
+    arrow: 2.0
+    string: .1
+    armor: .003
+    weapon: .01
+    snow: 1.0
+  # Spell strength required to use.
+  clear_weather: 100.0
+  # Spell strength required to use.
+  rain_weather: 100.0
+  # Additional duration of the casted fake unit.
+  create_fake_unit_duration: .01
+  # Area revealed.
+  aoe_reveal_invisible_units: 1.0
+  # Area revealed.
+  aoe_reveal_fake_units: 5.0
+  unit_invisibility:
+    # Additional duration of the effect.
+    duration: .01
+    # Spell strength required per attack power of the unit.
+    strength_required: 10.0
+
+spells:
+  magic_shield:
+    name: Magic_Shield
+    type: buff
+    strength: 1.0
+    duration: 12.0
+    cost:
+      mana: 60.0
+      wealth: 10.0
+      redstone: 20.0
+      material:
+        type: none
+        quantity: 0.0
+    effects:
+      - defense_bonus
+  mining:
+    name: Power_Tools
+    type: buff
+    strength: 1.0
+    duration: 12.0
+    cost:
+      mana: 30.0
+      wealth: 0.0
+      redstone: 16.0
+      material:
+        type: iron_ingot
+        quantity: 5.0
+    effects:
+      - mining_bonus
+  wealth:
+    name: 'Wealth'
+    type: buff
+    strength: 1.0
+    duration: 12.0
+    cost:
+      mana: 30.0
+      wealth: 0.0
+      redstone: 10.0
+      material:
+        type: gold_ingot
+        quantity: 10.0
+    effects:
+      - trade_bonus
+  perfect_weather:
+    name: Perfect_Weather
+    type: buff
+    strength: 1.0
+    duration: 12.0
+    cost:
+      mana: 30.0
+      wealth: 0.0
+      redstone: 10.0
+      material:
+        type: none
+        quantity: 0.0
+    effects:
+      - farm_bonus
+  breeding:
+    name: Breeding
+    type: buff
+    strength: 1.0
+    duration: 12.0
+    cost:
+      mana: 30.0
+      wealth: 0.0
+      redstone: 10.0
+      material:
+        type: food
+        quantity: 50.0
+    effects:
+      - herding_grounds_bonus
+  hot_fires:
+    name: Hot_Fires
+    type: buff
+    strength: 1.0
+    duration: 12.0
+    cost:
+      mana: 30.0
+      wealth: 20.0
+      redstone: 10.0
+      material:
+        type: coal
+        quantity: 100.0
+    effects:
+      - masonry_bonus
+      - sandworks_bonus
+  love:
+    name: Love
+    type: buff
+    strength: 1.0
+    duration: 12.0
+    cost:
+      mana: 30.0
+      wealth: 0.0
+      redstone: 10.0
+      material:
+        type: food
+        quantity: 100.0
+    effects:
+      - birth_rate_bonus
+  lightning_bolt:
+    name: Lightning_Bolt
+    type: curse
+    strength: 1.0
+    duration: 12.0
+    cost:
+      mana: 40.0
+      wealth: 0.0
+      redstone: 20.0
+      material:
+        type: none
+        quantity: 0.0
+    effects:
+      - spell_power_penalty
+  fireball:
+    name: Fireball
+    type: curse
+    strength: 1.0
+    duration: 0.0
+    cost:
+      mana: 100.0
+      wealth: 0.0
+      redstone: 10.0
+      material:
+        type: netherrack
+        quantity: 5.0
+    effects:
+      - kill_peasants
+  blizzard:
+    name: Blizzard
+    type: curse
+    strength: 1
+    duration: 6.0
+    area_of_effect: 100.0
+    cost:
+      mana: 300.0
+      wealth: 100.0
+      redstone: 40.0
+      material:
+        type: snow
+        quantity: 1000.0
+    effects:
+      - production_penalty
+  tornado:
+    name: Tornado
+    type: curse
+    strength: 1.0
+    duration: 0.0
+    area_of_effect: 20.0
+    cost:
+      mana: 50.0
+      wealth: 0.0
+      redstone: 20.0
+      material:
+        type: none
+        quantity: 0.0
+    effects:
+      - aoe_unit_damage
+  meteor_strike:
+    name: Meteor_Strike
+    type: curse
+    strength: 1.0
+    duration: 6.0
+    cost:
+      mana: 120.0
+      wealth: 0.0
+      redstone: 40.0
+      material:
+        type: netherrack
+        quantity: 50.0
+    effects:
+      - destroy_building
+  storms:
+    name: Storms
+    type: curse
+    strength: 1.0
+    duration: 12.0
+    area_of_effect: 50.0
+    cost:
+      mana: 10.0
+      wealth: 0.0
+      redstone: 16.0
+      material:
+        type: none
+        quantity: 0.0
+    effects:
+      - aoe_unit_slow
+      - sea_unit_damage
+  fabricate:
+    name: Fabricate
+    type: utility
+    strength: 10.0
+    duration: 0.0
+    cost:
+      mana: 15.0
+      wealth: 10.0
+      redstone: 25.0
+      material:
+        type: none
+        quantity: 0.0
+    effects:
+      - create_resource
+  clear_skies:
+    name: Clear_Skies
+    type: utility
+    strength: 10.0
+    duration: 0.0
+    cost:
+      mana: 10.0
+      wealth: 0.0
+      redstone: 10.0
+      material:
+        type: none
+        quantity: 0.0
+    effects:
+      - clear_weather
+  rain:
+    name: Rain
+    type: utility
+    strength: 10.0
+    duration: 0.0
+    cost:
+      mana: 10.0
+      wealth: 0.0
+      redstone: 10.0
+      material:
+        type: none
+        quantity: 0.0
+    effects:
+      - rain_weather
+  astral_projection:
+    name: Astral_Projection
+    type: utility
+    strength: 1.0
+    duration: 6.0
+    cost:
+      mana: 30.0
+      wealth: 0.0
+      redstone: 30.0
+      material:
+        type: prisoner
+        quantity: 1.0
+    effects:
+      - create_fake_unit
+  clairvoyance:
+    name: Clairvoyance
+    type: utility
+    strength: 1.0
+    duration: 12.0
+    area_of_effect: 50.0
+    cost:
+      mana: 25.0
+      wealth: 10.0
+      redstone: 15.0
+      material:
+        type: none
+        quantity: 0.0
+    effects:
+      - aoe_reveal_invisible_units
+      - aoe_reveal_fake_units
+  invisibility:
+    name: Invisibility
+    type: utility
+    strength: 1.0
+    duration: 12.0
+    cost:
+      mana: 30.0
+      wealth: 0.0
+      redstone: 16.0
+      material:
+        type: none
+        quantity: 0.0
+    effects:
+      - unit_invisibility

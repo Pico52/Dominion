@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Sandworks</b><br>
  * <br>
@@ -9,19 +13,20 @@ package com.pico52.dominion.object.building;
  * The object controller for all sandworks.
  */
 public class Sandworks extends Building{
-	public static double baseRate;
-	public static double baseConsumption;
-	public static double sellingBonus;
-	public static double glassRate;
-	public static double sandstoneRate;
-	public static double gravelRate;
-	public static double dirtRate;
-	public static double sandToGlassConsumption;
-	public static double sandToSandstoneConsumption;
-	public static double sandstoneToGravelConsumption;
-	public static double gravelToDirtConsumption;
-	public static String baseConsumptionResource;
-	public static boolean consumeBase;
+	public static double 
+	smeltingRate, 
+	fuelOutput, 
+	sellingBonus, 
+	glassRate, 
+	sandstoneRate, 
+	gravelRate, 
+	dirtRate, 
+	sandToGlassConsumption, 
+	sandToSandstoneConsumption, 
+	sandstoneToGravelConsumption, 
+	gravelToDirtConsumption;
+	public static String fuelResource;
+	public static boolean consumeFuel;
 	
 	/** 
 	 * <b>Sandworks</b><br>
@@ -31,21 +36,25 @@ public class Sandworks extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Sandworks} class.
 	 */
-	public Sandworks(){  // The constructor will be used in the future for loading the custom configurations.
-		super(5, 5);
-		baseRate = 64;  // - 64 items per level can be smelted here.
-		consumeBase = true; // - Whether or not the Sandworks will always consume the base resource.
-		baseConsumptionResource = "coal";
-		baseConsumption = 8; // - 1 coal per 8.
-		sellingBonus = .1;  // - % increase to gold value from trading with sand-based resources.
-		glassRate = 1;
-		sandstoneRate = 1;
-		gravelRate = 3;
-		dirtRate = 2;
-		sandToGlassConsumption = 1;
-		sandToSandstoneConsumption = 4;
-		sandstoneToGravelConsumption = 1;
-		gravelToDirtConsumption = 1;
+	public Sandworks(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.sandworks.defense.value");
+		defenseBase = config.getBoolean("buildings.sandworks.defense.base");
+		workers = config.getInt("buildings.sandworks.workers");
+		structure = config.getBoolean("buildings.sandworks.structure");
+		sellingBonus = config.getDouble("buildings.sandworks.selling_bonus");
+		smeltingRate = config.getDouble("buildings.sandworks.smelting_rate");
+		consumeFuel = config.getBoolean("buildings.sandworks.consume_fuel");
+		fuelResource = config.getString("buildings.sandworks.fuel_source");
+		fuelOutput = config.getDouble("buildings.sandworks.fuel_output");
+		glassRate = config.getDouble("buildings.sandworks.production.glass");
+		sandstoneRate = config.getDouble("buildings.sandworks.production.sandstone");
+		gravelRate = config.getDouble("buildings.sandworks.production.gravel");
+		dirtRate = config.getDouble("buildings.sandworks.production.dirt");
+		sandToGlassConsumption = config.getDouble("buildings.sandworks.consumption.sand_to_glass");
+		sandToSandstoneConsumption = config.getDouble("buildings.sandworks.consumption.sand_to_sandstone");
+		sandstoneToGravelConsumption = config.getDouble("buildings.sandworks.consumption.sandstone_to_gravel");
+		gravelToDirtConsumption = config.getDouble("buildings.sandworks.consumption.gravel_to_dirt");
 	}
 	
 	/** 
@@ -59,14 +68,16 @@ public class Sandworks extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("glass") | resource.equalsIgnoreCase("sandtoglass"))
-			return glassRate * baseRate;
+			return glassRate * smeltingRate;
 		if(resource.equalsIgnoreCase("sandstone") | resource.equalsIgnoreCase("sandtosandstone"))
-			return sandstoneRate * baseRate;
+			return sandstoneRate * smeltingRate;
 		if(resource.equalsIgnoreCase("gravel") | resource.equalsIgnoreCase("sandstonetogravel"))
-			return gravelRate * baseRate;
+			return gravelRate * smeltingRate;
 		if(resource.equalsIgnoreCase("dirt") | resource.equalsIgnoreCase("graveltodirt"))
-			return dirtRate * baseRate;
+			return dirtRate * smeltingRate;
 		
 		return 0;
 	}
@@ -81,6 +92,8 @@ public class Sandworks extends Building{
 	 * @return The name of the resource being consumed.  Null if no resource is found.
 	 */
 	public String getConsumptionResource(String resource) {
+		if(resource == null)
+			return null;
 		if(resource.equalsIgnoreCase("glass") | resource.equalsIgnoreCase("sandtoglass"))
 			return "sand";
 		if(resource.equalsIgnoreCase("sandstone") | resource.equalsIgnoreCase("sandtosandstone"))
@@ -103,14 +116,16 @@ public class Sandworks extends Building{
 	 * @return The number of a resource being consumed.
 	 */
 	public double getConsumption(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("glass") | resource.equalsIgnoreCase("sandtoglass"))
-			return sandToGlassConsumption * baseRate;
+			return sandToGlassConsumption * smeltingRate;
 		if(resource.equalsIgnoreCase("sandstone") | resource.equalsIgnoreCase("sandtosandstone"))
-			return sandToSandstoneConsumption * baseRate;
+			return sandToSandstoneConsumption * smeltingRate;
 		if(resource.equalsIgnoreCase("gravel") | resource.equalsIgnoreCase("sandstonetogravel"))
-			return sandstoneToGravelConsumption * baseRate;
+			return sandstoneToGravelConsumption * smeltingRate;
 		if(resource.equalsIgnoreCase("dirt") | resource.equalsIgnoreCase("graveltodirt"))
-			return gravelToDirtConsumption * baseRate;
+			return gravelToDirtConsumption * smeltingRate;
 		
 		return 0;
 	}

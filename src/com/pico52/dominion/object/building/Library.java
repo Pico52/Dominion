@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Library</b><br>
  * <br>
@@ -21,11 +25,15 @@ public class Library extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Library} class.
 	 */
-	public Library(){  // The constructor will be used in the future for loading the custom configurations.
-		super(40, 1);
-		resource = "mana";
-		manaProduction = .1;
-		manaCapacity = 10;
+	public Library(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.library.defense.value");
+		defenseBase = config.getBoolean("buildings.library.defense.base");
+		workers = config.getInt("buildings.library.workers");
+		structure = config.getBoolean("buildings.library.structure");
+		resource = config.getString("buildings.library.resource");
+		manaProduction = config.getDouble("buildings.library.mana_production");
+		manaCapacity = config.getInt("buildings.library.mana_capacity");
 	}
 	
 	/** 
@@ -39,6 +47,8 @@ public class Library extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase(Library.resource))
 			return manaProduction;
 		else

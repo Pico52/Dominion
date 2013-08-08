@@ -80,15 +80,16 @@ public class PlayerEmploy extends PlayerSubCommand{
 		double population = 0;
 		ResultSet buildingData = db.getBuildingData(building, "*");
 		try{
-			buildingData.next();
-			classification = buildingData.getString("class");
-			settlementId = buildingData.getInt("settlement_id");
-			employed = buildingData.getInt("employed");
-			level = buildingData.getInt("level");
+			if(buildingData.next()){
+				classification = buildingData.getString("class");
+				settlementId = buildingData.getInt("settlement_id");
+				employed = buildingData.getInt("employed");
+				level = buildingData.getInt("level");
+			}
 			buildingData.getStatement().close();
 			ResultSet settlementData = db.getSettlementData(settlementId, "*");
-			settlementData.next();
-			population = settlementData.getDouble("population");
+			if(settlementData.next())
+				population = settlementData.getDouble("population");
 			settlementData.getStatement().close();
 		} catch (SQLException ex){
 			ex.printStackTrace();

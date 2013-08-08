@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>ChickenPen</b><br>
  * <br>
@@ -22,10 +26,14 @@ public class ChickenPen extends Building{
 	 * The constructor clause for the {@link ChickenPen} class.
 	 */
 	public ChickenPen() {
-		super(0, 1, true);
-		featherProduction = .25;
-		maxLevel = 30;
-		minimumRange = 100;
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.chicken_pen.defense.value");
+		defenseBase = config.getBoolean("buildings.chicken_pen.defense.base");
+		workers = config.getInt("buildings.chicken_pen.workers");
+		structure = config.getBoolean("buildings.chicken_pen.structure");
+		featherProduction = config.getDouble("buildings.chicken_pen.feather_production");
+		maxLevel = config.getInt("buildings.chicken_pen.maximum_level");
+		minimumRange = config.getInt("buildings.chicken_pen.minimum_range");
 	}
 
 	/** 
@@ -39,6 +47,8 @@ public class ChickenPen extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("feather"))
 			return featherProduction;
 		return 0;

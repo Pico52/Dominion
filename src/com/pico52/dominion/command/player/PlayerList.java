@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.object.SpellManager;
 
 /** 
  * <b>PlayerList</b><br>
@@ -51,14 +52,14 @@ public class PlayerList extends PlayerSubCommand{
 		}
 		String entity = args[0];
 		ResultSet results = db.getTableData(entity, "*");
-		String allData = "";
-		String middleData = "";
-		String entity_id = entity + "_id";
-		int columnCount = 1;
+		String allData = "", middleData = "", entity_id = entity + "_id";
+		int columnCount = 1, entityId = 0, casterId = db.getPlayerId(sender.getName());
 		boolean isUnit = false, isCommand = false, isItem = false, hasName = false, hasDuration = false, hasClass = false, hasType = false;
 		try{
 			while(results.next()){
-				middleData += "§aId#: §f" + results.getInt(entity_id) + "  ";
+				// - For the future, make this whole section flow better.
+				entityId = results.getInt(entity_id);
+				middleData += "§aId#: §f" + entityId + "  ";
 				try{
 					String name = results.getString("name");
 					if(name != null){
@@ -77,9 +78,26 @@ public class PlayerList extends PlayerSubCommand{
 						middleData += "§aClass: §f" + classification + "  ";
 						hasClass = true;
 						if(plugin.getUnitManager().isUnit(classification)){
+							if(!plugin.getUnitManager().isVisible(entityId, casterId)){
+								middleData += "\n";
+								continue;
+							}
 							middleData += "§aHealth: §f" + results.getDouble("health") + "  ";
-							middleData += "§aX: §f" + results.getDouble("xcoord") + "  ";
-							middleData += "§aZ: §f" + results.getDouble("zcoord") + "  ";
+							double unitX = results.getDouble("xcoord"), unitZ = results.getDouble("zcoord");
+							middleData += "§aX: §f" + unitX + "  ";
+							middleData += "§aZ: §f" + unitZ + "  ";
+							if(!plugin.getUnitManager().isReal(entityId)){
+								if(casterId != db.getOwnerId("unit", entityId)){
+									SpellManager sm = plugin.getSpellManager();
+									for(int spell: sm.getAllSpells("aoe_reveal_fake_units")){
+										// - For the future - Make a "isFriendlySpell" method in spells so that friendly spells can give vision too.
+										if(sm.isWithinAreaOfEffect(unitX, unitZ, spell) & sm.getCasterId(spell) == casterId)
+											middleData += "§aFAKE§f  ";
+									}
+								} else {
+									middleData += "§aFAKE§f  ";
+								}
+							}
 							isUnit = true;
 						}
 					}

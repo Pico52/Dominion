@@ -163,4 +163,53 @@ public class ProductionSheet {
 		prisoner += mergeSheet.prisoner;
 		experience += mergeSheet.experience;
 	}
+	
+	/** 
+	 * <b>multiplier</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public void multiplier(double multiplier)
+	 * <br>
+	 * <br>
+	 * Multiplies all resources by (1 + multiplier).
+	 * @param multiplier - The percentage value to multiply all resources by.
+	 */
+	public void multiplier(double multiplier){
+		mana *= 1 + multiplier;
+		population *= 1 + multiplier;
+		wealth *= 1 + multiplier;
+		food *= 1 + multiplier;
+		wood *= 1 + multiplier;
+		cobblestone *= 1 + multiplier;
+		stone *= 1 + multiplier;
+		sand *= 1 + multiplier;
+		gravel *= 1 + multiplier;
+		dirt *= 1 + multiplier;
+		ironIngot *= 1 + multiplier;
+		ironOre *= 1 + multiplier;
+		emerald *= 1 + multiplier;
+		emeraldOre *= 1 + multiplier;
+		goldIngot *= 1 + multiplier;
+		goldOre *= 1 + multiplier;
+		flint *= 1 + multiplier;
+		feather *= 1 + multiplier;
+		lapisOre *= 1 + multiplier;
+		diamond *= 1 + multiplier;
+		obsidian *= 1 + multiplier;
+		netherrack *= 1 + multiplier;
+		netherBrick *= 1 + multiplier;
+		redstone *= 1 + multiplier;
+		brick *= 1 + multiplier;
+		glowstone *= 1 + multiplier;
+		clay *= 1 + multiplier;
+		coal *= 1 + multiplier;
+		wool *= 1 + multiplier;
+		leather *= 1 + multiplier;
+		arrow *= 1 + multiplier;
+		armor *= 1 + multiplier;
+		weapon *= 1 + multiplier;
+		snow *= 1 + multiplier;
+		recruit *= 1 + multiplier;
+		prisoner *= 1 + multiplier;
+		experience *= 1 + multiplier;
+	}
 }

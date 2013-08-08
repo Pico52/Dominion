@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>TrainingGrounds</b><br>
  * <br>
@@ -28,17 +32,22 @@ public class TrainingGrounds extends Building{
 	 * <br>
 	 * The constructor clause for the {@link TrainingGrounds} class.
 	 */
-	public TrainingGrounds(){  // The constructor will be used in the future for loading the custom configurations.
-		super(5, 1);
+	public TrainingGrounds(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.training_grounds.defense.value");
+		defenseBase = config.getBoolean("buildings.training_grounds.defense.base");
+		workers = config.getInt("buildings.training_grounds.workers");
+		structure = config.getBoolean("buildings.training_grounds.structure");
+		baseExperienceGain = config.getDouble("buildings.training_grounds.experience");
+		// - Everything below will be removed/modified at a later date.
 		recruitRate = .375;
-		meleeUnitRate = .05;  // - This will not be used until units are properly made.
+		meleeUnitRate = .05;
 		wealthConsumption = recruitRate * 10;
 		foodConsumption = recruitRate * 10;
 		populationConsumption = recruitRate;
 		armorConsumption = recruitRate;
 		weaponConsumption = recruitRate;
 		recruitConsumption = meleeUnitRate;
-		baseExperienceGain = 5;
 	}
 	
 	/** 
@@ -52,6 +61,8 @@ public class TrainingGrounds extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("recruit") | resource.equalsIgnoreCase("recruits"))
 			return recruitRate;
 		if(resource.equalsIgnoreCase("melee") | resource.equalsIgnoreCase("meleeUnit"))

@@ -1,5 +1,7 @@
 package com.pico52.dominion.datasheet;
 
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>BiomeData</b><br>
  * <br>
@@ -10,8 +12,6 @@ package com.pico52.dominion.datasheet;
  */
 public class BiomeData implements DataSheet{
 	public static double 
-	heavyBonus, normalBonus, lightBonus, 
-	harshPenalty, heavyPenalty, normalPenalty, lightPenalty, 
 	plainsFarmBonus, plainsHerdingGroundsBonus, 
 	plainsSpellPowerPenalty, plainsFishingPenalty, plainsDefensePenalty, 
 	forestWoodshopBonus, forestHuntingBonus, forestInnBonus, 
@@ -40,54 +40,48 @@ public class BiomeData implements DataSheet{
 	 * The constructor clause for the {@link BiomeData} class.
 	 */
 	public BiomeData(){
-		heavyBonus = 0.3;
-		normalBonus = 0.2;
-		lightBonus = 0.1;
-		harshPenalty = 0.4;
-		heavyPenalty = 0.3;
-		normalPenalty = 0.2;
-		lightPenalty = 0.1;
-		plainsFarmBonus = heavyBonus;
-		plainsHerdingGroundsBonus = normalBonus;
-		plainsSpellPowerPenalty = normalPenalty;
-		plainsFishingPenalty = lightPenalty;
-		plainsDefensePenalty = normalPenalty;
-		forestWoodshopBonus = normalBonus;
-		forestHuntingBonus = normalBonus;
-		forestInnBonus = normalBonus;
-		forestFoodConsumptionPenalty = heavyPenalty;
-		forestAttritionDamage = -.01;
-		mountainMasonryBonus = normalBonus;
-		mountainMiningBonus = normalBonus;
-		mountainDefenseBonus = normalBonus; 
-		mountainWheatPenalty = harshPenalty;
-		mountainTradePenalty = harshPenalty;
-		snowAttritionDamage = .01;
-		snowFoodDecompositionBonus = 0; // - Multiplier, so food simply does not decompose.
-		snowWheatPenalty = harshPenalty;
-		snowMelonPenalty = normalPenalty;
-		snowMushroomPenalty = harshPenalty;
-		jungleFoodConsumptionBonus = normalBonus;
-		jungleMelonBonus = heavyBonus;
-		jungleUnitFoodConsumptionPenalty = normalPenalty;
-		jungleUnitUpkeepPenalty = normalPenalty; 
-		swampManaCapacityBonus = heavyBonus;
-		swampManaRegenerationBonus = heavyBonus;
-		swampWheatPenalty = harshPenalty;
-		swampHerdingGroundsPenalty = heavyPenalty;
-		mushroomSpellPowerBonus = heavyBonus;
-		mushroomMushroomBonus = heavyBonus;
-		mushroomWheatPenalty = harshPenalty;
-		mushroomPumpkinPenalty = normalPenalty;
-		mushroomMelonPenalty = normalPenalty;
-		oceanFishingBonus = heavyBonus;
-		oceanTradeBonus = heavyBonus;
-		oceanManaRegenerationPenalty = normalPenalty;
-		oceanMiningPenalty = harshPenalty;
-		desertTrainingGroundsBonus = normalBonus;
-		desertSandworksBonus = heavyBonus;
-		desertFarmPenalty = normalPenalty;
-		desertHerdingGroundsPenalty = normalPenalty;
+		// - This data's here more for ease of access than anything else.
+		plainsFarmBonus = DominionSettings.plainsFarmBonus;
+		plainsHerdingGroundsBonus = DominionSettings.plainsHerdingGroundsBonus;
+		plainsSpellPowerPenalty = DominionSettings.plainsSpellPowerPenalty;
+		plainsFishingPenalty = DominionSettings.plainsFishingPenalty;
+		plainsDefensePenalty = DominionSettings.plainsDefensePenalty;
+		forestWoodshopBonus = DominionSettings.forestWoodshopBonus;
+		forestHuntingBonus = DominionSettings.forestHuntingBonus;
+		forestInnBonus = DominionSettings.forestInnBonus;
+		forestFoodConsumptionPenalty = DominionSettings.forestFoodConsumptionPenalty;
+		forestAttritionDamage = DominionSettings.forestAttritionDamage;
+		mountainMasonryBonus = DominionSettings.mountainMasonryBonus;
+		mountainMiningBonus = DominionSettings.mountainMiningBonus;
+		mountainDefenseBonus = DominionSettings.mountainDefenseBonus;
+		mountainWheatPenalty = DominionSettings.mountainWheatPenalty;
+		mountainTradePenalty = DominionSettings.mountainTradePenalty;
+		snowAttritionDamage = DominionSettings.snowAttritionDamage;
+		snowFoodDecompositionBonus = DominionSettings.snowFoodDecompositionBonus;
+		snowWheatPenalty = DominionSettings.snowWheatPenalty;
+		snowMelonPenalty = DominionSettings.snowMelonPenalty;
+		snowMushroomPenalty = DominionSettings.snowMushroomPenalty;
+		jungleFoodConsumptionBonus = DominionSettings.jungleFoodConsumptionBonus;
+		jungleMelonBonus = DominionSettings.jungleMelonBonus;
+		jungleUnitFoodConsumptionPenalty = DominionSettings.jungleUnitFoodConsumptionPenalty;
+		jungleUnitUpkeepPenalty = DominionSettings.jungleUnitUpkeepPenalty;
+		swampManaCapacityBonus = DominionSettings.swampManaCapacityBonus;
+		swampManaRegenerationBonus = DominionSettings.swampManaRegenerationBonus;
+		swampWheatPenalty = DominionSettings.swampWheatPenalty;
+		swampHerdingGroundsPenalty = DominionSettings.swampHerdingGroundsPenalty;
+		mushroomSpellPowerBonus = DominionSettings.mushroomSpellPowerBonus;
+		mushroomMushroomBonus = DominionSettings.mushroomMushroomBonus;
+		mushroomWheatPenalty = DominionSettings.mushroomWheatPenalty;
+		mushroomPumpkinPenalty = DominionSettings.mushroomPumpkinPenalty;
+		mushroomMelonPenalty = DominionSettings.mushroomMelonPenalty;
+		oceanFishingBonus = DominionSettings.oceanFishingBonus;
+		oceanTradeBonus = DominionSettings.oceanTradeBonus;
+		oceanManaRegenerationPenalty = DominionSettings.oceanManaRegenerationPenalty;
+		oceanMiningPenalty = DominionSettings.oceanMiningPenalty;
+		desertTrainingGroundsBonus = DominionSettings.desertTrainingGroundsBonus;
+		desertSandworksBonus = DominionSettings.desertSandworksBonus;
+		desertFarmPenalty = DominionSettings.desertFarmPenalty;
+		desertHerdingGroundsPenalty = DominionSettings.desertHerdingGroundsPenalty;
 	}
 
 	@Override

@@ -32,12 +32,12 @@ import com.pico52.dominion.task.TaskManager;
  * @author Pico52
  */
 public final class Dominion extends JavaPlugin{
-	//*****Class Variables*****//
+	
 	public Logger log = Logger.getLogger("Minecraft");
-	private  final static String logPrefix = "§a[Dominion]§r "; // Prefix to go in front of all log entries
-	private File pFolder = new File("plugins" + File.separator + "Dominion"); // Folder to store plugin settings file and database
-	private DominionDatabaseHandler dbHandler = null; // SQLite handler
-	private HashMap<String, Integer> commandUsers = new HashMap<String, Integer>(); //Stores info about people using commands	
+	private  final static String logPrefix = "§a[Dominion]§r ";
+	private File pFolder = new File("plugins" + File.separator + "Dominion");
+	private DominionDatabaseHandler dbHandler = null;
+	private HashMap<String, Integer> commandUsers = new HashMap<String, Integer>();
 	private DominionPlayerListener playerEvent;
 	private BuildingManager buildingManager;
 	private SettlementManager settlementManager;
@@ -49,11 +49,12 @@ public final class Dominion extends JavaPlugin{
 	
 	@Override
 	public void onEnable(){
-		log.info(logPrefix + "has been enabled!");	// - Letting the console know productions has started.
-		dbHandler = new DominionDatabaseHandler(this, log, logPrefix, "Dominion", pFolder.getPath());	// - Starting up the database connection.
-		dbHandler.getConnection();  // - Open up the connection.
+		log.info(logPrefix + "has been enabled!");
+		saveDefaultConfig();
+		DominionSettings.onEnable(this);
+		dbHandler = new DominionDatabaseHandler(this, log, logPrefix, "Dominion", pFolder.getPath());
+		dbHandler.getConnection();
 		dbHandler.setDefaultTables();
-		DominionSettings.setDefaults();
 		buildingManager = new BuildingManager(this);
 		settlementManager = new SettlementManager(this);
 		unitManager = new UnitManager(this);
@@ -76,6 +77,20 @@ public final class Dominion extends JavaPlugin{
 		dbHandler.close();	// Close the database connection.
 		taskManager.onDisable();
 		log.info(logPrefix + "has been disabled."); // Let the console know the plugin has been shut down.
+	}
+	
+	/** 
+	 * <b>sendMessage</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public void sendMessage({@link String} playerName, {@link String} message)
+	 * <br>
+	 * <br>
+	 * @param playerName - The name of the player.
+	 * @param message - The message to send.
+	 */
+	public void sendMessage(String playerName, String message){
+		if(isPlayerOnline(playerName))
+			getServer().getPlayer(playerName).sendMessage(message);
 	}
 	
 	/** 

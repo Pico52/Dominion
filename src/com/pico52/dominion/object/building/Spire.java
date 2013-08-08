@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Spire</b><br>
  * <br>
@@ -19,9 +23,13 @@ public class Spire extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Spire} class.
 	 */
-	public Spire(){  // The constructor will be used in the future for loading the custom configurations.
-		super(5, 5);
-		spellPower = 10;
+	public Spire(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.spire.defense.value");
+		defenseBase = config.getBoolean("buildings.spire.defense.base");
+		workers = config.getInt("buildings.spire.workers");
+		structure = config.getBoolean("buildings.spire.structure");
+		spellPower = config.getInt("buildings.spire.spell_power");
 	}
 	
 	/** 
@@ -41,13 +49,13 @@ public class Spire extends Building{
 	/** 
 	 * <b>getSpellPower</b><br>
 	 * <br>
-	 * &nbsp;&nbsp;public int getSpellPower(int level)
+	 * &nbsp;&nbsp;public static int getSpellPower(int level)
 	 * <br>
 	 * <br>
 	 * @param level - The level of the building.
 	 * @return The rate that this building produces the specified resource every building tick.
 	 */
-	public int getSpellPower(int level){
+	public static int getSpellPower(int level){
 		if(level <= 0)
 			return 0;
 		int total = 0;

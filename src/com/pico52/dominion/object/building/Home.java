@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Home</b><br>
  * <br>
@@ -11,8 +15,8 @@ package com.pico52.dominion.object.building;
 public class Home extends Building{
 	public static String resource;
 	public static double populationProduction;
-	public static double basePopulation; // - Number of peasants automatically added when a home is built.
-	public static int storage;
+	public static double basePopulation;
+	public static int capacity;
 	
 	/** 
 	 * <b>Home</b><br>
@@ -22,12 +26,16 @@ public class Home extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Home} class.
 	 */
-	public Home(){  // The constructor will be used in the future for loading the custom configurations.
-		super(0, 0);
-		resource = "population";
-		populationProduction = .2;  // - 4.8 population in 24 hours.
-		basePopulation = 3;
-		storage = 5;
+	public Home(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.home.defense.value");
+		defenseBase = config.getBoolean("buildings.home.defense.base");
+		workers = config.getInt("buildings.home.workers");
+		structure = config.getBoolean("buildings.home.structure");
+		resource = config.getString("buildings.home.resource");
+		populationProduction = config.getDouble("buildings.home.population_production");
+		basePopulation = config.getDouble("buildings.home.base_population");
+		capacity = config.getInt("buildings.home.capacity");
 	}
 	
 	/** 
@@ -41,6 +49,8 @@ public class Home extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase(Home.resource))
 			return populationProduction;
 		else

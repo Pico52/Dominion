@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Fletcher</b><br>
  * <br>
@@ -9,10 +13,8 @@ package com.pico52.dominion.object.building;
  * The object controller for all fletcheries.
  */
 public class Fletcher extends Building{
-	public static double arrowProduction;
-	public static double flintConsumption;
-	public static double woodConsumption;
-	public static double featherConsumption;
+	public static double 
+	arrowProduction, flintConsumption, woodConsumption, featherConsumption;
 	
 	/** 
 	 * <b>Fletcher</b><br>
@@ -22,12 +24,16 @@ public class Fletcher extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Fletcher} class.
 	 */
-	public Fletcher(){  // The constructor will be used in the future for loading the custom configurations.
-		super(40, 20);
-		arrowProduction = 20;
-		flintConsumption = 20;
-		woodConsumption = 2.5;
-		featherConsumption = 20;
+	public Fletcher(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.fletcher.defense.value");
+		defenseBase = config.getBoolean("buildings.fletcher.defense.base");
+		workers = config.getInt("buildings.fletcher.workers");
+		structure = config.getBoolean("buildings.fletcher.structure");
+		arrowProduction = config.getDouble("buildings.fletcher.arrow_production");
+		flintConsumption = config.getDouble("buildings.fletcher.costs.flint");
+		woodConsumption = config.getDouble("buildings.fletcher.costs.wood");
+		featherConsumption = config.getDouble("buildings.fletcher.costs.feather");
 	}
 	
 	/** 
@@ -41,6 +47,8 @@ public class Fletcher extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("arrow") | resource.equalsIgnoreCase("arrows"))
 			return arrowProduction;
 		return 0;

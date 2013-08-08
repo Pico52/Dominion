@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>ArcheryRange</b><br>
  * <br>
@@ -9,14 +13,7 @@ package com.pico52.dominion.object.building;
  * The object controller for all archery ranges.
  */
 public class ArcheryRange extends Building{
-	public static double archerUnitRate;
-	public static double wealthConsumption;
-	public static double foodConsumption;
-	public static double bowConsumption;
-	public static double leatherConsumption;
-	public static double arrowConsumption;
-	public static double recruitConsumption;
-	public static double baseExperienceGain;
+	public static double experienceGain;
 	
 	/** 
 	 * <b>ArcheryRange</b><br>
@@ -26,16 +23,13 @@ public class ArcheryRange extends Building{
 	 * <br>
 	 * The constructor clause for the {@link ArcheryRange} class.
 	 */
-	public ArcheryRange(){  // The constructor will be used in the future for loading the custom configurations.
-		super(5, 0);
-		archerUnitRate = .05;
-		wealthConsumption = archerUnitRate * 80;
-		foodConsumption = archerUnitRate * 20;
-		bowConsumption = archerUnitRate;
-		leatherConsumption = archerUnitRate * 7;
-		arrowConsumption = archerUnitRate * 200;
-		recruitConsumption = archerUnitRate;
-		baseExperienceGain = 5;
+	public ArcheryRange(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.archery_range.defense.value");
+		defenseBase = config.getBoolean("buildings.archery_range.defense.base");
+		workers = config.getInt("buildings.archery_range.workers");
+		structure = config.getBoolean("buildings.archery_range.structure");
+		experienceGain = config.getInt("buildings.archery_range.experience");
 	}
 	
 	/** 
@@ -49,8 +43,10 @@ public class ArcheryRange extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
-		if(resource.equalsIgnoreCase("archer"))
-			return archerUnitRate;
+		if(resource == null)
+			return 0;
+		if(resource.equalsIgnoreCase("experience"))
+			return experienceGain;
 		
 		return 0;
 	}

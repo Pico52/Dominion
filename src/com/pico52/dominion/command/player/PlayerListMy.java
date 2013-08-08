@@ -60,14 +60,13 @@ public class PlayerListMy extends PlayerSubCommand{
 			results = db.getTableData(entity, "*");
 		} else 
 			results = db.getTableData(entity, "*", "owner_id=" + ownerId);
-		String allData = "";
-		String middleData = "";
-		String entity_id = entity + "_id";
-		int columnCount = 1;
+		String allData = "", middleData = "", entity_id = entity + "_id";
+		int columnCount = 1, entityId = 0;
 		boolean isUnit = false, isCommand = false, isItem = false, hasName = false, hasDuration = false, hasClass = false, hasType = false;
 		try{
 			while(results.next()){
-				middleData += "§aId#: §f" + results.getInt(entity_id) + "  ";
+				entityId = results.getInt(entity_id);
+				middleData += "§aId#: §f" + entityId + "  ";
 				try{
 					String name = results.getString("name");
 					if(name != null){
@@ -89,6 +88,9 @@ public class PlayerListMy extends PlayerSubCommand{
 							middleData += "§aHealth: §f" + results.getDouble("health") + "  ";
 							middleData += "§aX: §f" + results.getDouble("xcoord") + "  ";
 							middleData += "§aZ: §f" + results.getDouble("zcoord") + "  ";
+							if(!plugin.getUnitManager().isReal(entityId)){
+								middleData += "§aFAKE§f  ";
+							}
 							isUnit = true;
 						}
 					}

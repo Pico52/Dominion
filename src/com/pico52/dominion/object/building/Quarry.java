@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Quarry</b><br>
  * <br>
@@ -21,12 +25,16 @@ public class Quarry extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Quarry} class.
 	 */
-	public Quarry(){  // The constructor will be used in the future for loading the custom configurations.
-		super(0, 5, true);
-		clayProduction = 4;
-		sandProduction = 3;
-		stoneProduction = 2;
-		maxLevel = 8;
+	public Quarry(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.quarry.defense.value");
+		defenseBase = config.getBoolean("buildings.quarry.defense.base");
+		workers = config.getInt("buildings.quarry.workers");
+		structure = config.getBoolean("buildings.quarry.structure");
+		maxLevel = config.getInt("buildings.quarry.maximum_level");
+		clayProduction = config.getDouble("buildings.quarry.production.clay");
+		sandProduction = config.getDouble("buildings.quarry.production.sand");
+		stoneProduction = config.getDouble("buildings.quarry.production.stone");
 	}
 	
 	/** 
@@ -40,6 +48,8 @@ public class Quarry extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("clay"))
 			return clayProduction;
 		if(resource.equalsIgnoreCase("sand"))

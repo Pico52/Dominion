@@ -11,6 +11,7 @@ import com.pico52.dominion.object.building.Bank;
 import com.pico52.dominion.object.building.Granary;
 import com.pico52.dominion.object.building.Home;
 import com.pico52.dominion.object.building.Library;
+import com.pico52.dominion.object.building.Spire;
 
 /** 
  * <b>SettlementManager</b><br>
@@ -35,10 +36,10 @@ public class SettlementManager {
 	 */
 	public SettlementManager(Dominion instance){
 		plugin = instance;
-		baseFoodDecay = .01;
-		baseFoodConsumption = .1;
-		baseStealingRate = .01;
-		baseIncomeTax = .1;
+		baseFoodDecay = DominionSettings.foodDecay;
+		baseFoodConsumption = DominionSettings.foodConsumption;
+		baseStealingRate = DominionSettings.stealingRate;
+		baseIncomeTax = DominionSettings.incomeTax;
 	}
 	
 	/** 
@@ -98,7 +99,7 @@ public class SettlementManager {
 		double maxMana, mana, maxPopulation, population, wealth, food, wood, cobblestone, stone, sand, gravel, 
 		dirt, ironIngot, ironOre, emerald, emeraldOre, goldIngot, goldOre, flint, feather, lapisOre, 
 		diamond, obsidian, netherrack, netherBrick, redstone, brick, glowstone, clay, coal, wool, 
-		leather, arrow, armor, weapon, snow, recruit, prisoner; //, experience;
+		leather, arrow, armor, weapon, snow, recruit, prisoner;
 		String name = "";
 		try{
 			settlementData.next();
@@ -139,13 +140,11 @@ public class SettlementManager {
 			snow = settlementData.getDouble("snow");
 			recruit = settlementData.getDouble("recruit");
 			prisoner = settlementData.getDouble("prisoner");
-			//experience = settlementData.getDouble("experience");
 			settlementData.getStatement().close();
 		}catch (SQLException ex){
 			ex.printStackTrace();
 			return false;
 		}
-		
 		// - Remember that the ProductionSheet "update" can hold negative values.
 		maxMana = getMaxMana(settlement_id);
 		if(mana + update.mana > maxMana)
@@ -155,7 +154,7 @@ public class SettlementManager {
 		maxPopulation = getMaxPopulation(settlement_id);
 		if(population + update.population > maxPopulation)
 			update.population = maxPopulation - population;
-		else if (mana + update.mana < 0)
+		else if (population + update.population < 0)
 			update.population = -population;
 		if(wealth + update.wealth < 0)
 			update.wealth = -wealth;
@@ -225,9 +224,8 @@ public class SettlementManager {
 			update.recruit = -recruit;
 		if(prisoner + update.prisoner < 0)
 			update.prisoner = -prisoner;
-		//if(experience + update.experience < 0)
-		//	update.experience = -experience;
 		
+		//---Add existing resources---//
 		update.mana += mana;
 		update.population += population;
 		update.wealth += wealth;
@@ -264,7 +262,6 @@ public class SettlementManager {
 		update.snow += snow;
 		update.recruit += recruit;
 		update.prisoner += prisoner;
-		//update.experience += experience;
 		
 		//---Update---//
 		String query = "UPDATE settlement SET mana=" + update.mana + ", population=" + update.population + ", wealth=" + update.wealth + ", food=" + update.food + ", wood=" + update.wood + 
@@ -300,7 +297,7 @@ public class SettlementManager {
 		update.food += food;
 		update.wealth += wealth;
 		
-		query = "UPDATE settlement SET food=" + update.food + ", population=" + update.population + " WHERE settlement_id=" + settlement_id;
+		query = "UPDATE settlement SET food=" + update.food + ", wealth=" + update.wealth + " WHERE settlement_id=" + settlement_id;
 		if(!plugin.getDBHandler().queryWithResult(query)){
 			plugin.getLogger().info("An error occured while trying to update the upkeep in " + name + ".");
 			return false;
@@ -369,6 +366,8 @@ public class SettlementManager {
 		double employed = getCurrentlyEmployed(settlement_id);
 		if(employed > 0)
 			incomeTax = employed * baseIncomeTax;
+		double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "trade");
+		incomeTax*= (incomeTax > 0) ? 1 + spellBonus : 1 - spellBonus;
 		return incomeTax;
 	}
 	
@@ -493,8 +492,9 @@ public class SettlementManager {
 			buildingData.getStatement().close();
 			
 			double multiplier = 0;
-			if(granaryLevels > 0)
-				multiplier = granaryLevels * (employed / (plugin.getBuildingManager().getGranary().workers * granaryLevels));
+			int workers = plugin.getBuildingManager().getGranary().workers;
+			if(granaryLevels > 0 & workers > 0)
+				multiplier = granaryLevels * (employed / (workers * granaryLevels));
 			double storage = multiplier * Granary.capacity;
 			double availableToDecay = currentFood - getFoodConsumption(settlement_id) - storage;
 			if(availableToDecay > 0)
@@ -530,25 +530,20 @@ public class SettlementManager {
 	 * @return The amount of wealth stolen each update tick.
 	 */
 	public double getWealthStolen(int settlement_id){
-		double stolenWealth = 0;
-		String settlementQuery = "SELECT * FROM settlement WHERE settlement_id=" + settlement_id;
-		ResultSet settlementData = plugin.getDBHandler().querySelect(settlementQuery);
+		double stolenWealth = 0, currentWealth = getMaterial(settlement_id, "wealth");
+		int bankLevels = 0, employed = 0;
+		String buildingQuery = "SELECT * FROM building WHERE settlement_id=" + settlement_id + " AND class=\'bank\'";
+		ResultSet buildingData = plugin.getDBHandler().querySelect(buildingQuery);	
 		try{
-			settlementData.next();
-			double currentWealth = settlementData.getDouble("wealth");
-			settlementData.getStatement().close();
-			
-			String buildingQuery = "SELECT * FROM building WHERE settlement_id=" + settlement_id + " AND class=\'bank\'";
-			ResultSet buildingData = plugin.getDBHandler().querySelect(buildingQuery);
-			int bankLevels = 0, employed = 0;
 			while(buildingData.next()){
 				bankLevels += buildingData.getInt("level");
 				employed += buildingData.getInt("employed");
 			}
 			buildingData.getStatement().close();
 			double multiplier = 0;
-			if(bankLevels > 0)
-				multiplier = bankLevels * (employed / (plugin.getBuildingManager().getBank().workers * bankLevels));
+			int workers = plugin.getBuildingManager().getBank().workers;
+			if(bankLevels > 0 && workers > 0)
+				multiplier = bankLevels * (employed / (workers * bankLevels));
 			double storage = multiplier * Bank.capacity;
 			double availableToSteal = currentWealth - storage;
 			if(availableToSteal > 0)
@@ -602,6 +597,38 @@ public class SettlementManager {
 	}
 	
 	/** 
+	 * <b>killPeasants</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean killPeasants(int settlementId, double quantity)
+	 * <br>
+	 * <br>
+	 * @param settlementId - The id of the settlement.
+	 * @param quantity - The number of peasants.
+	 * @return True if the peasants were successfully killed.  False if they were not.
+	 */
+	public boolean killPeasants(int settlementId, double quantity){
+		String owner = plugin.getDBHandler().getOwnerName("settlement", settlementId);
+		if(!hasMaterial(settlementId, "population", quantity))
+			quantity = this.getMaterial(settlementId, "population");
+		if(!plugin.getDBHandler().subtractMaterial(settlementId, "population", quantity))
+			return false;
+		if(plugin.isPlayerOnline(owner)){
+			String message = plugin.getLogPrefix() + " ";
+			String settlementName = plugin.getDBHandler().getSettlementName(settlementId);
+			if(quantity != 1)
+				message += quantity + " peasants have been killed in " + settlementName + ".";
+			else
+				message += "1 peasant has been killed in " + settlementName + ".";
+			plugin.getServer().getPlayer(owner).sendMessage(message);
+		}
+		
+		if(getCurrentlyEmployed(settlementId) > getMaterial(settlementId,  "population")){
+			// TO-DO: Remove employees from buildings.
+		}
+		return true;
+	}
+	
+	/** 
 	 * <b>getMaxMana</b><br>
 	 * <br>
 	 * &nbsp;&nbsp;public double getMaxMana({@link String} settlement)
@@ -629,7 +656,8 @@ public class SettlementManager {
 		double mana = 0;
 		String query = "SELECT * FROM building WHERE settlement_id=" + settlement_id + " AND class=\'library\'";
 		ResultSet buildingData = plugin.getDBHandler().querySelect(query);
-		int level = 0, employed = 0;
+		int level = 0, employed = 0, workers = 0;
+		double multiplier = 0;
 		String classType="";
 		ResultSet getBiome = plugin.getDBHandler().getSettlementData(settlement_id, "biome");
 		try{
@@ -641,7 +669,11 @@ public class SettlementManager {
 				if(classType.equalsIgnoreCase("library")){
 					level = buildingData.getInt("level");
 					employed = buildingData.getInt("employed");
-					double multiplier = level * (employed / plugin.getBuildingManager().getLibrary().workers);
+					workers = plugin.getBuildingManager().getLibrary().workers;
+					if(workers > 0)
+						multiplier = level * (employed / workers);
+					else
+						multiplier = 0;
 					if(biome.equalsIgnoreCase("swamp"))
 						multiplier *= (1 + BiomeData.swampManaCapacityBonus);
 					mana += multiplier * Library.manaCapacity;
@@ -654,6 +686,50 @@ public class SettlementManager {
 			ex.printStackTrace();
 			return 0;
 		}
+	}
+	
+	/** 
+	 * <b>getSpellPower</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public double getSpellPower(int settlementId)
+	 * <br>
+	 * <br>
+	 * @param settlementId - The id of the settlement.
+	 * @return The calculated spell power of the settlement.
+	 */
+	public double getSpellPower(int settlementId){
+		double spellPower = 0;
+		String biome = getBiome(settlementId);
+		ResultSet buildings = plugin.getDBHandler().getTableData("building", "*", "settlement_id=" + settlementId + " AND class=\'spire\'");
+		int level = 0, employed = 0, workers = 0;
+		double multiplier = 0;
+		String classType = "";
+		try{
+			while(buildings.next()){
+				classType = buildings.getString("class").toLowerCase();
+				if(classType.equalsIgnoreCase("spire")){
+					level = buildings.getInt("level");
+					employed = buildings.getInt("employed");
+					workers = plugin.getBuildingManager().getSpire().workers;
+					if(workers > 0)
+						multiplier = level * (employed / workers);
+					else
+						multiplier = 0;
+					if(biome.equalsIgnoreCase("mushroom"))
+						multiplier *= (1 + BiomeData.mushroomSpellPowerBonus);
+					if(biome.equalsIgnoreCase("plains"))
+						multiplier *= (1 - BiomeData.plainsSpellPowerPenalty);
+					spellPower += multiplier * Spire.getSpellPower(level);
+				}
+			}
+			buildings.getStatement().close();
+		} catch (SQLException ex){
+			plugin.getLogger().info("SQLException occured while trying to calculate spell power.");
+			ex.printStackTrace();
+		}
+		double spellBonus = plugin.getSpellManager().getPenalty(settlementId, "settlement", "spell_power");
+		spellPower *= (spellPower > 0) ? 1 - spellBonus : 1 + spellBonus;
+		return spellPower;
 	}
 	
 	/** 
@@ -688,7 +764,7 @@ public class SettlementManager {
 		try{
 			while(buildingData.next()){
 				level = buildingData.getInt("level");
-				maxPopulation += level * Home.storage;
+				maxPopulation += level * Home.capacity;
 			}
 			buildingData.getStatement().close();
 			return maxPopulation;
@@ -755,7 +831,7 @@ public class SettlementManager {
 	public double getDefense(int settlementId){
 		ResultSet settlement = plugin.getDBHandler().getSettlementData(settlementId, "*");
 		String type="";
-		double walls=0, baseDefense=0, defense=0;
+		double walls=0, baseDefense=0;
 		try{
 			if(settlement.next()){
 				type = settlement.getString("class");
@@ -773,7 +849,9 @@ public class SettlementManager {
 			baseDefense = DominionSettings.fortressDefense;
 		else
 			baseDefense = 0;
-		defense += walls + baseDefense;
+		double spellBonus = plugin.getSpellManager().getBonus(settlementId, "settlement", "defense");
+		double defense = walls + baseDefense;
+		defense *= (defense > 0) ? 1 + spellBonus : 1 - spellBonus;
 		return defense;
 	}
 	
@@ -827,18 +905,42 @@ public class SettlementManager {
 	 */
 	public double getMaterial(int settlement_id, String material){
 		material = material.toLowerCase();
-		String query = "SELECT " + material + " FROM settlement WHERE settlement_id=" + settlement_id;
-		ResultSet materialData = plugin.getDBHandler().querySelect(query);
+		if(material.isEmpty())
+			return 0;
+		ResultSet materialData = plugin.getDBHandler().getSettlementData(settlement_id, material);
 		double value = 0;
+		if(materialData == null)
+			return value;
 		try{
 			if(materialData.next())
 				value = materialData.getDouble(material);
 			materialData.getStatement().close();
 		} catch (SQLException ex){
 			ex.printStackTrace();
-			return 0;
-		}
+		} catch (NullPointerException ex){}
 		return value;
+	}
+	
+	/** 
+	 * <b>getBiome</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link String} getBiome(int settlementId)
+	 * <br>
+	 * <br>
+	 * @param settlement_id - The id of the settlement.
+	 * @return The biome of the settlement.
+	 */
+	public String getBiome(int settlementId){
+		String biome = "";
+		ResultSet data = plugin.getDBHandler().getSettlementData(settlementId, "biome");
+		try{
+			if(data.next())
+				biome = data.getString("biome");
+			data.getStatement().close();
+		} catch (SQLException ex){
+			ex.printStackTrace();
+		}
+		return biome;
 	}
 	
 	/** 

@@ -52,12 +52,13 @@ public class PlayerProduction extends PlayerSubCommand{
 			sender.sendMessage(logPrefix + "No such settlement \"" + settlement + "\".");
 			return true;
 		}
+		int settlementId = db.getSettlementId(settlement);
 		ProductionSheet results = plugin.getBuildingManager().getProductions(settlement);
 		String allData = "§a======" + settlement + "======§f\n";
 		allData += "§aMana: §f" + results.mana + "  ";
 		allData += "§aPopulation: §f" + results.population + "\n";
-		allData += "§aWealth: §f" + results.wealth + "  ";
-		allData += "§aFood: §f" + results.food + "\n";
+		allData += "§aWealth: §f" + (results.wealth + plugin.getSettlementManager().getIncomeTax(settlementId) - plugin.getSettlementManager().getWealthStolen(settlementId)) + "  ";
+		allData += "§aFood: §f" + (results.food - plugin.getSettlementManager().getFoodConsumption(settlementId) - plugin.getSettlementManager().getFoodDecay(settlementId)) + "\n";
 		allData += "§aWood: §f" + results.wood + "  ";
 		allData += "§aCobble: §f" + results.cobblestone + "\n";
 		allData += "§aStone: §f" + results.stone + "  ";

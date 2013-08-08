@@ -1,5 +1,11 @@
 package com.pico52.dominion.object.building;
 
+import java.util.List;
+
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Bank</b><br>
  * <br>
@@ -10,7 +16,7 @@ package com.pico52.dominion.object.building;
  */
 public class Bank extends Building{
 	public static int capacity;
-	public static String stores;
+	public static String[] stores;
 	
 	/** 
 	 * <b>Bank</b><br>
@@ -20,10 +26,15 @@ public class Bank extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Bank} class.
 	 */
-	public Bank(){  // The constructor will be used in the future for loading the custom configurations.
-		super(40, 1);  // This is 40 base - no extra benefit per level.
-		capacity = 3456;  // 54 spaces at 64 items each = 3456.
-		stores = "wealth";  // Does not store items or wealth.
+	public Bank(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.bank.defense.value");
+		defenseBase = config.getBoolean("buildings.bank.defense.base");
+		workers = config.getInt("buildings.bank.workers");
+		structure = config.getBoolean("buildings.bank.structure");
+		capacity = config.getInt("buildings.bank.capacity");
+		List<String> storage = config.getStringList("buildings.bank.stores");
+		stores = storage.toArray(new String[storage.size()]);
 	}
 	
 	/** 

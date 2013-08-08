@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Masonry</b><br>
  * <br>
@@ -9,23 +13,23 @@ package com.pico52.dominion.object.building;
  * The object controller for all masonries.
  */
 public class Masonry extends Building{
-	public static double baseRate;
-	public static double baseConsumption;
-	public static double sellingBonus;
-	public static double stoneRate;
-	public static double gravelRate;
-	public static double dirtRate;
-	public static double flintRate;
-	public static double ironRate;
-	public static double goldRate;
-	public static double cobbleToStoneConsumption;
-	public static double cobbleToGravelConsumption;
-	public static double gravelToDirtConsumption;
-	public static double gravelToFlintConsumption;
-	public static double ironOreToIronConsumption;
-	public static double goldOreToGoldConsumption;
-	public static String baseConsumptionResource;
-	public static boolean consumeBase;
+	public static double smeltingRate, 
+	fuelOutput, 
+	sellingBonus, 
+	stoneRate, 
+	gravelRate, 
+	dirtRate, 
+	flintRate, 
+	ironRate, 
+	goldRate, 
+	cobbleToStoneConsumption, 
+	cobbleToGravelConsumption, 
+	gravelToDirtConsumption, 
+	gravelToFlintConsumption, 
+	ironOreToIronConsumption, 
+	goldOreToGoldConsumption;
+	public static String fuelResource;
+	public static boolean consumeFuel;
 	
 	/** 
 	 * <b>Masonry</b><br>
@@ -35,25 +39,29 @@ public class Masonry extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Masonry} class.
 	 */
-	public Masonry(){  // The constructor will be used in the future for loading the custom configurations.
-		super(5, 5);
-		baseRate = 64;  // - 64 items per level can be smelted here.
-		consumeBase = true; // - Whether or not the Masonry will always consume the base resource.
-		baseConsumptionResource = "coal";
-		baseConsumption = 8; // - 1 coal per 8.
-		sellingBonus = .1;  // - % increase in gold value for trading stone-based resources.
-		stoneRate = 1;
-		gravelRate = 3;
-		dirtRate = 2;
-		flintRate = 1;
-		ironRate = 1;
-		goldRate = 1;
-		cobbleToStoneConsumption = 1;
-		cobbleToGravelConsumption = 1;
-		gravelToDirtConsumption = 1;
-		gravelToFlintConsumption = 2;
-		ironOreToIronConsumption = 1;
-		goldOreToGoldConsumption = 1;
+	public Masonry(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.masonry.defense.value");
+		defenseBase = config.getBoolean("buildings.masonry.defense.base");
+		workers = config.getInt("buildings.masonry.workers");
+		structure = config.getBoolean("buildings.masonry.structure");
+		sellingBonus = config.getDouble("buildings.masonry.selling_bonus");
+		smeltingRate = config.getDouble("buildings.masonry.smelting_rate");
+		consumeFuel = config.getBoolean("buildings.masonry.consume_fuel");
+		fuelResource = config.getString("buildings.masonry.fuel_source");
+		fuelOutput = config.getDouble("buildings.masonry.fuel_output");
+		stoneRate = config.getDouble("buildings.masonry.production.stone");
+		gravelRate = config.getDouble("buildings.masonry.production.gravel");
+		dirtRate = config.getDouble("buildings.masonry.production.dirt");
+		flintRate = config.getDouble("buildings.masonry.production.flint");
+		ironRate = config.getDouble("buildings.masonry.production.iron");
+		goldRate = config.getDouble("buildings.masonry.production.gold");
+		cobbleToStoneConsumption = config.getDouble("buildings.masonry.consumption.cobblestone_to_stone");
+		cobbleToGravelConsumption = config.getDouble("buildings.masonry.consumption.cobblestone_to_gravel");
+		gravelToDirtConsumption = config.getDouble("buildings.masonry.consumption.gravel_to_dirt");
+		gravelToFlintConsumption = config.getDouble("buildings.masonry.consumption.gravel_to_flint");
+		ironOreToIronConsumption = config.getDouble("buildings.masonry.consumption.iron_ore_to_iron");
+		goldOreToGoldConsumption = config.getDouble("buildings.masonry.consumption.gold_ore_to_gold");
 	}
 	
 	/** 
@@ -68,17 +76,17 @@ public class Masonry extends Building{
 	@Override
 	public double getProduction(String resource) {
 		if(resource.equalsIgnoreCase("stone") | resource.equalsIgnoreCase("cobbletostone"))
-			return stoneRate * baseRate;
+			return stoneRate * smeltingRate;
 		if(resource.equalsIgnoreCase("gravel") | resource.equalsIgnoreCase("cobbletogravel"))
-			return gravelRate * baseRate;
+			return gravelRate * smeltingRate;
 		if(resource.equalsIgnoreCase("dirt") | resource.equalsIgnoreCase("graveltodirt"))
-			return dirtRate * baseRate;
+			return dirtRate * smeltingRate;
 		if(resource.equalsIgnoreCase("flint")| resource.equalsIgnoreCase("graveltoflint"))
-			return flintRate * baseRate;
-		if(resource.equalsIgnoreCase("iron")| resource.equalsIgnoreCase("ironoretoiron"))
-			return ironRate * baseRate;
-		if(resource.equalsIgnoreCase("gold")| resource.equalsIgnoreCase("goldoretogold"))
-			return goldRate * baseRate;
+			return flintRate * smeltingRate;
+		if(resource.equalsIgnoreCase("iron_ingot")| resource.equalsIgnoreCase("iron") | resource.equalsIgnoreCase("ironoretoiron"))
+			return ironRate * smeltingRate;
+		if(resource.equalsIgnoreCase("gold_ingot")| resource.equalsIgnoreCase("gold") | resource.equalsIgnoreCase("goldoretogold"))
+			return goldRate * smeltingRate;
 		
 		return 0;
 	}
@@ -93,6 +101,8 @@ public class Masonry extends Building{
 	 * @return The name of the resource being consumed.  Null if no resource is found.
 	 */
 	public String getConsumptionResource(String resource) {
+		if(resource == null)
+			return null;
 		if(resource.equalsIgnoreCase("stone") | resource.equalsIgnoreCase("cobbletostone"))
 			return "cobblestone";
 		else if(resource.equalsIgnoreCase("gravel") | resource.equalsIgnoreCase("cobbletogravel"))
@@ -101,9 +111,9 @@ public class Masonry extends Building{
 			return "gravel";
 		else if(resource.equalsIgnoreCase("flint")| resource.equalsIgnoreCase("graveltoflint"))
 			return "gravel";
-		else if(resource.equalsIgnoreCase("iron")| resource.equalsIgnoreCase("ironoretoiron"))
+		else if(resource.equalsIgnoreCase("iron")| resource.equalsIgnoreCase("ironoretoiron") | resource.equalsIgnoreCase("iron_ingot"))
 			return "iron_ore";
-		else if(resource.equalsIgnoreCase("gold")| resource.equalsIgnoreCase("goldoretogold"))
+		else if(resource.equalsIgnoreCase("gold")| resource.equalsIgnoreCase("goldoretogold") | resource.equalsIgnoreCase("gold_ingot"))
 			return "gold_ore";
 		
 		return null;
@@ -119,18 +129,20 @@ public class Masonry extends Building{
 	 * @return The number of a resource being consumed.
 	 */
 	public double getConsumption(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("stone") | resource.equalsIgnoreCase("cobbletostone"))
-			return cobbleToStoneConsumption * baseRate;
+			return cobbleToStoneConsumption * smeltingRate;
 		else if(resource.equalsIgnoreCase("gravel") | resource.equalsIgnoreCase("cobbletogravel"))
-			return cobbleToGravelConsumption * baseRate;
+			return cobbleToGravelConsumption * smeltingRate;
 		else if(resource.equalsIgnoreCase("dirt") | resource.equalsIgnoreCase("graveltodirt"))
-			return gravelToDirtConsumption * baseRate;
-		else if(resource.equalsIgnoreCase("flint")| resource.equalsIgnoreCase("graveltoflint"))
-			return gravelToFlintConsumption * baseRate;
-		else if(resource.equalsIgnoreCase("iron")| resource.equalsIgnoreCase("ironoretoiron"))
-			return ironOreToIronConsumption * baseRate;
-		else if(resource.equalsIgnoreCase("gold")| resource.equalsIgnoreCase("goldoretogold"))
-			return goldOreToGoldConsumption * baseRate;
+			return gravelToDirtConsumption * smeltingRate;
+		else if(resource.equalsIgnoreCase("flint") | resource.equalsIgnoreCase("graveltoflint"))
+			return gravelToFlintConsumption * smeltingRate;
+		else if(resource.equalsIgnoreCase("iron_ingot") | resource.equalsIgnoreCase("iron")| resource.equalsIgnoreCase("ironoretoiron"))
+			return ironOreToIronConsumption * smeltingRate;
+		else if(resource.equalsIgnoreCase("gold_ingot") | resource.equalsIgnoreCase("gold") | resource.equalsIgnoreCase("goldoretogold"))
+			return goldOreToGoldConsumption * smeltingRate;
 		
 		return 0;
 	}

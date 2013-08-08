@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Market</b><br>
  * <br>
@@ -10,6 +14,7 @@ package com.pico52.dominion.object.building;
  */
 public class Market extends Building{
 	public static String resource;
+	public static int tradeRoutes;
 	public static double wealthProduction;
 	
 	/** 
@@ -20,10 +25,15 @@ public class Market extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Market} class.
 	 */
-	public Market(){  // The constructor will be used in the future for loading the custom configurations.
-		super(0, 5);
-		resource = "wealth";
-		wealthProduction = 1;
+	public Market(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.market.defense.value");
+		defenseBase = config.getBoolean("buildings.market.defense.base");
+		workers = config.getInt("buildings.market.workers");
+		structure = config.getBoolean("buildings.market.structure");
+		resource = config.getString("buildings.market.resource");
+		wealthProduction = config.getDouble("buildings.market.wealth_production");
+		tradeRoutes = config.getInt("buildings.market.trade_routes");
 	}
 	
 	/** 
@@ -37,6 +47,8 @@ public class Market extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase(Market.resource))
 			return wealthProduction;
 		else

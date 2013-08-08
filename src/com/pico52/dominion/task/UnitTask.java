@@ -33,8 +33,8 @@ public class UnitTask extends DominionTimerTask{
 	
 	@Override
 	public void run() {
-		db = plugin.getDBHandler();  // - Just in case these change for any reason.
-		unitManager = plugin.getUnitManager(); //
+		db = plugin.getDBHandler();
+		unitManager = plugin.getUnitManager();
 		log.info("Unit tick..");
 		if(DominionSettings.broadcastUnitTick)
 			plugin.getServer().broadcastMessage(plugin.getLogPrefix() + "Unit tick..");
@@ -64,6 +64,27 @@ public class UnitTask extends DominionTimerTask{
 		}
 			
 		createNewUnits();
+	}
+	
+	private void createNewUnits(){
+		ResultSet productions = db.getTableData("production", "*", "duration<1");
+		int productionId, ownerId, settlementId;
+		String classification;
+		try{
+			while(productions.next()){
+				productionId = productions.getInt("production_id");
+				settlementId = productions.getInt("settlement_id");
+				ownerId = productions.getInt("owner_id");
+				classification = productions.getString("class");
+				int newId = unitManager.createUnit(settlementId, ownerId, classification);
+				unitManager.commandToCamp(newId);
+				db.remove("production", productionId);
+			}
+			productions.getStatement().close();
+		} catch (SQLException ex){
+			log.info("Error while creating new units.");
+			ex.printStackTrace();
+		}
 	}
 	
 	private void feedUnits(){
@@ -122,27 +143,6 @@ public class UnitTask extends DominionTimerTask{
 			units.getStatement().close();
 		} catch (SQLException ex){
 			log.info("Error while trying to pay units");
-			ex.printStackTrace();
-		}
-	}
-	
-	private void createNewUnits(){
-		ResultSet productions = db.getTableData("production", "*", "duration<1");
-		int productionId, ownerId, settlementId;
-		String classification;
-		try{
-			while(productions.next()){
-				productionId = productions.getInt("production_id");
-				settlementId = productions.getInt("settlement_id");
-				ownerId = productions.getInt("owner_id");
-				classification = productions.getString("class");
-				int newId = unitManager.createUnit(settlementId, ownerId, classification);
-				unitManager.commandToCamp(newId);
-				db.remove("production", productionId);
-			}
-			productions.getStatement().close();
-		} catch (SQLException ex){
-			log.info("Error while creating new units.");
 			ex.printStackTrace();
 		}
 	}

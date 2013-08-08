@@ -1,0 +1,552 @@
+##########################################################################################
+description: >
+  Describes the attributes of all units.
+  name: The string to display when addressing the unit.
+  type:  land or sea - Determines what terrain the unit can navigate.
+  speed: Distance the unit can move in a single unit tick.
+  health: Amount of health the unit will have.
+  offense: Amount of base damage the unit can deal to another entity.
+  defense: Amount of base defense the unit can use to prevent being damaged.
+  range: Maximum distance the unit can attack from.
+  food_consumption: Food consumed each unit tick.
+  upkeep: Wealth consumed each unit tick.
+  build_cost: Wealth required to build.
+  training_time: Integer number of unit ticks it takes to build the unit.
+  capacity: Quantity of items that can be held.
+  size: none, small, medium, or large.  Only use size if it's a ship; otherwise use none.
+  civilian: true or false - For ships, determines if it is meant for trade or war.
+  material_1 type: Material required to produce the unit.  "none" if not required.
+  material_1 quantity: Quantity of material 1 type to produce the unit.  0 if not required.
+  material_2 type: Material required to produce the unit.  "none" if not required.
+  material_2 quantity: Quantity of material 2 type to produce the unit.  0 if not required.
+warning:
+  -  Do NOT remove units.
+  -  All numbers except for speed are integers (no decimal).
+##########################################################################################
+
+units:
+  archer:
+    name: Archer
+    type: land
+    speed: 11
+    health: 3
+    offense: 3
+    defense: 3
+    range: 50
+    food_consumption: 3
+    upkeep: 5
+    build_cost: 100
+    training_time: 24
+    capacity: 100
+    size: none
+    civilian: false
+    material_1:
+      type: bow
+      quantity: 1
+    material_2:
+      type: arrow
+      quantity: 8
+  caravel:
+    name: Caravel
+    type: sea
+    speed: 40
+    health: 500
+    offense: 30
+    defense: 500
+    range: 45
+    food_consumption: 5
+    upkeep: 5
+    build_cost: 500
+    training_time: 144
+    capacity: 1000
+    size: medium
+    civilian: true
+    material_1: 
+      type: wood
+      quantity: 1000
+    material_2: 
+      type: peasant
+      quantity: 80
+  carrack:
+    name: Carrack
+    type: sea
+    speed: 40
+    health: 850
+    offense: 60
+    defense: 850
+    range: 50
+    food_consumption: 15
+    upkeep: 15
+    build_cost: 1000
+    training_time: 228
+    capacity: 3000
+    size: large
+    civilian: true
+    material_1: 
+      type: wood
+      quantity: 3000
+    material_2: 
+      type: peasant
+      quantity: 200
+  cog:
+    name: Cog
+    type: sea
+    speed: 30
+    health: 350
+    offense: 15
+    defense: 350
+    range: 40
+    food_consumption: 5
+    upkeep: 5
+    build_cost: 400
+    training_time: 72
+    capacity: 300
+    size: small
+    civilian: true
+    material_1: 
+      type: wood
+      quantity: 300
+    material_2: 
+      type: peasant
+      quantity: 10
+  dread_knight:
+    name: 'Dread Knight'
+    type: land
+    speed: 28
+    health: 16
+    offense: 10
+    defense: 16
+    range: 10
+    food_consumption: 10
+    upkeep: 15
+    build_cost: 500
+    training_time: 192
+    capacity: 200
+    size: none
+    civilian: false
+    material_1: 
+      type: diamond
+      quantity: 8
+    material_2: 
+      type: gold_ingot
+      quantity: 16
+  fishing_boat:
+    name: 'Fishing Boat'
+    type: sea
+    speed: 30
+    health: 50
+    offense: 0
+    defense: 50
+    range: 10
+    food_consumption: 0
+    upkeep: 0
+    build_cost: 250
+    training_time: 60
+    capacity: 60
+    size: small
+    civilian: true
+    material_1: 
+      type: wood
+      quantity: 60
+    material_2: 
+      type: peasant
+      quantity: 5
+  foot_soldier:
+    name: 'Foot Soldier'
+    type: land
+    speed: 10
+    health: 5
+    offense: 3
+    defense: 5
+    range: 10
+    food_consumption: 3
+    upkeep: 6
+    build_cost: 120
+    training_time: 24
+    capacity: 100
+    size: none
+    civilian: false
+    material_1: 
+      type: weapon
+      quantity: 1
+    material_2: 
+      type: armor
+      quantity: 1
+  frigate_1st_rate:
+    name: 'Frigate 1st Rate'
+    type: sea
+    speed: 40
+    health: 1500
+    offense: 100
+    defense: 1500
+    range: 70
+    food_consumption: 40
+    upkeep: 40
+    build_cost: 3000
+    training_time: 360
+    capacity: 600
+    size: large
+    civilian: false
+    material_1: 
+      type: wood
+      quantity: 4500
+    material_2: 
+      type: iron_ingot
+      quantity: 350
+  frigate_2nd_rate:
+    name: 'Frigate 2nd Rate'
+    type: sea
+    speed: 45
+    health: 1250
+    offense: 90
+    defense: 1250
+    range: 60
+    food_consumption: 30
+    upkeep: 30
+    build_cost: 2000
+    training_time: 300
+    capacity: 500
+    size: large
+    civilian: false
+    material_1: 
+      type: wood
+      quantity: 4000
+    material_2: 
+      type: iron_ingot
+      quantity: 250
+  frigate_3rd_rate:
+    name: 'Frigate 3rd Rate'
+    type: sea
+    speed: 50
+    health: 1000
+    offense: 80
+    defense: 1000
+    range: 50
+    food_consumption: 20
+    upkeep: 20
+    build_cost: 1500
+    training_time: 240
+    capacity: 400
+    size: large
+    civilian: false
+    material_1: 
+      type: wood
+      quantity: 3250
+    material_2: 
+      type: iron_ingot
+      quantity: 150
+  galleon:
+    name: Galleon
+    type: sea
+    speed: 40
+    health: 1000
+    offense: 85
+    defense: 1000
+    range: 60
+    food_consumption: 20
+    upkeep: 20
+    build_cost: 1250
+    training_time: 288
+    capacity: 5000
+    size: large
+    civilian: true
+    material_1: 
+      type: wood
+      quantity: 5000
+    material_2: 
+      type: peasant
+      quantity: 300
+  galley:
+    name: Galley
+    type: sea
+    speed: 35
+    health: 450
+    offense: 60
+    defense: 450
+    range: 10
+    food_consumption: 5
+    upkeep: 5
+    build_cost: 400
+    training_time: 90
+    capacity: 350
+    size: small
+    civilian: false
+    material_1: 
+      type: wood
+      quantity: 750
+    material_2: 
+      type: peasant
+      quantity: 80
+  knight:
+    name: Knight
+    type: land
+    speed: 25
+    health: 14
+    offense: 8
+    defense: 14
+    range: 10
+    food_consumption: 8
+    upkeep: 12
+    build_cost: 400
+    training_time: 144
+    capacity: 175
+    size: none
+    civilian: false
+    material_1: 
+      type: iron_ingot
+      quantity: 20
+    material_2: 
+      type: gold_ingot
+      quantity: 20
+  man_at_arms:
+    name: 'Man at Arms'
+    type: land
+    speed: 30
+    health: 10
+    offense: 6
+    defense: 10
+    range: 10
+    food_consumption: 6
+    upkeep: 10
+    build_cost: 350
+    training_time: 96
+    capacity: 150
+    size: none
+    civilian: false
+    material_1: 
+      type: armor
+      quantity: 4
+    material_2: 
+      type: leather
+      quantity: 20
+  man_o_war:
+    name: 'Man O War'
+    type: sea
+    speed: 30
+    health: 1650
+    offense: 125
+    defense: 1650
+    range: 80
+    food_consumption: 50
+    upkeep: 50
+    build_cost: 4000
+    training_time: 432
+    capacity: 750
+    size: large
+    civilian: false
+    material_1: 
+      type: wood
+      quantity: 6000
+    material_2: 
+      type: iron_ingot
+      quantity: 400
+  marksman:
+    name: Marksman
+    type: land
+    speed: 11
+    health: 4
+    offense: 4
+    defense: 4
+    range: 60
+    food_consumption: 4
+    upkeep: 7
+    build_cost: 135
+    training_time: 48
+    capacity: 120
+    size: none
+    civilian: false
+    material_1: 
+      type: bow
+      quantity: 3
+    material_2: 
+      type: leather
+      quantity: 12
+  militia:
+    name: Militia
+    type: land
+    speed: 10
+    health: 3
+    offense: 2
+    defense: 3
+    range: 10
+    food_consumption: 1
+    upkeep: 4
+    build_cost: 100
+    training_time: 6
+    capacity: 100
+    size: none
+    civilian: false
+    material_1: 
+      type: weapon
+      quantity: 2
+    material_2: 
+      type: peasant
+      quantity: 2
+  recruit:
+    name: Recruit
+    type: land
+    speed: 10
+    health: 1
+    offense: 1
+    defense: 1
+    range: 10
+    food_consumption: 1
+    upkeep: 1
+    build_cost: 10
+    training_time: 2
+    capacity: 25
+    size: none
+    civilian: false
+    material_1: 
+      type: weapon
+      quantity: 1
+    material_2: 
+      type: peasant
+      quantity: 1
+  schooner:
+    name: Schooner
+    type: sea
+    speed: 50
+    health: 750
+    offense: 50
+    defense: 750
+    range: 10
+    food_consumption: 10
+    upkeep: 10
+    build_cost: 650
+    training_time: 192
+    capacity: 400
+    size: medium
+    civilian: false
+    material_1: 
+      type: wood
+      quantity: 750
+    material_2: 
+      type: iron_ingot
+      quantity: 20
+  scout:
+    name: Scout
+    type: land
+    speed: 15
+    health: 3
+    offense: 1
+    defense: 3
+    range: 10
+    food_consumption: 1
+    upkeep: 3
+    build_cost: 50
+    training_time: 6
+    capacity: 50
+    size: none
+    civilian: false
+    material_1: 
+      type: leather
+      quantity: 8
+    material_2: 
+      type: none
+      quantity: 0
+  skirmisher:
+    name: Skirmisher
+    type: land
+    speed: 11
+    health: 2
+    offense: 2
+    defense: 2
+    range: 40
+    food_consumption: 2
+    upkeep: 3
+    build_cost: 80
+    training_time: 6
+    capacity: 80
+    size: none
+    civilian: false
+    material_1: 
+      type: wood
+      quantity: 8
+    material_2: 
+      type: none
+      quantity: 0
+  sloop:
+    name: Sloop
+    type: sea
+    speed: 45
+    health: 400
+    offense: 40
+    defense: 400
+    range: 45
+    food_consumption: 8
+    upkeep: 8
+    build_cost: 450
+    training_time: 168
+    capacity: 450
+    size: medium
+    civilian: true
+    material_1: 
+      type: wood
+      quantity: 600
+    material_2: 
+      type: peasant
+      quantity: 120
+  swordsman:
+    name: Swordsman
+    type: land
+    speed: 10
+    health: 6
+    offense: 4
+    defense: 6
+    range: 10
+    food_consumption: 4
+    upkeep: 8
+    build_cost: 150
+    training_time: 48
+    capacity: 125
+    size: none
+    civilian: false
+    material_1: 
+      type: weapon
+      quantity: 3
+    material_2: 
+      type: armor
+      quantity: 5
+  trader:
+    name: Trader
+    type: land
+    speed: 12
+    health: 5
+    offense: 1
+    defense: 5
+    range: 10
+    food_consumption: 1
+    upkeep: 10
+    build_cost: 300
+    training_time: 36
+    capacity: 1000
+    size: none
+    civilian: true
+    material_1: 
+      type: peasant
+      quantity: 10
+    material_2: 
+      type: none
+      quantity: 0
+  wagon:
+    name: Wagon
+    type: land
+    speed: 12
+    health: 1
+    offense: 0
+    defense: 1
+    range: 0
+    food_consumption: 0
+    upkeep: 0
+    build_cost: 0
+    training_time: 0
+    capacity: 360
+    size: none
+    civilian: true
+    material_1: 
+      type: none
+      quantity: 0
+    material_2: 
+      type: none
+      quantity: 0

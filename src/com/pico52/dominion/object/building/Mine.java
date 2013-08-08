@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Mine</b><br>
  * <br>
@@ -22,20 +26,24 @@ public class Mine extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Mine} class.
 	 */
-	public Mine(){  // The constructor will be used in the future for loading the custom configurations.
-		super(0, 40, true);
-		passiveDirt = true;
-		passiveGravel = true;
-		gravelProduction = 2.6; // - 64 gravel per 24 hours.
-		dirtProduction = 2.6;
-		redstoneProduction = 15;
-		cobblestoneProduction = 15;
-		coalProduction = 6.5;
-		ironProduction = 1;
-		obsidianProduction = .875;
-		lapisProduction = .5;
-		goldProduction = .5;
-		diamondProduction = .25;
+	public Mine(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.mine.defense.value");
+		defenseBase = config.getBoolean("buildings.mine.defense.base");
+		workers = config.getInt("buildings.mine.workers");
+		structure = config.getBoolean("buildings.mine.structure");
+		passiveDirt = config.getBoolean("buildings.mine.passive_dirt");
+		passiveGravel = config.getBoolean("buildings.mine.passive_gravel");
+		gravelProduction = config.getDouble("buildings.mine.production.gravel");
+		dirtProduction = config.getDouble("buildings.mine.production.dirt");
+		redstoneProduction = config.getDouble("buildings.mine.production.redstone");
+		cobblestoneProduction = config.getDouble("buildings.mine.production.cobblestone");
+		coalProduction = config.getDouble("buildings.mine.production.coal");
+		ironProduction = config.getDouble("buildings.mine.production.iron_ore");
+		obsidianProduction = config.getDouble("buildings.mine.production.obsidian");
+		lapisProduction = config.getDouble("buildings.mine.production.lapis_lazuli");
+		goldProduction = config.getDouble("buildings.mine.production.gold_ore");
+		diamondProduction = config.getDouble("buildings.mine.production.diamond");
 	}
 	
 	/** 
@@ -49,6 +57,8 @@ public class Mine extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("gravel"))
 			return gravelProduction;
 		if(resource.equalsIgnoreCase("dirt"))

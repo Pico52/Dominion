@@ -1,5 +1,11 @@
 package com.pico52.dominion.object.building;
 
+import java.util.List;
+
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Granary</b><br>
  * <br>
@@ -10,7 +16,7 @@ package com.pico52.dominion.object.building;
  */
 public class Granary extends Building{
 	public static int capacity;
-	public static String stores;
+	public static String[] stores;
 	
 	/** 
 	 * <b>Granary</b><br>
@@ -20,10 +26,15 @@ public class Granary extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Granary} class.
 	 */
-	public Granary(){  // The constructor will be used in the future for loading the custom configurations.
-		super(40, 1);  // This is 40 base - no extra benefit per level.
-		capacity = 1792;  // This is the storage of food - the other spaces are used for snow.
-		stores = "food";  // Does not store items or wealth.
+	public Granary(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.granary.defense.value");
+		defenseBase = config.getBoolean("buildings.granary.defense.base");
+		workers = config.getInt("buildings.granary.workers");
+		structure = config.getBoolean("buildings.granary.structure");
+		capacity = config.getInt("buildings.granary.capacity");
+		List<String> storage = config.getStringList("buildings.granary.stores");
+		stores = storage.toArray(new String[storage.size()]);
 	}
 	
 	/** 
@@ -37,6 +48,8 @@ public class Granary extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("storage"))
 			return capacity;
 		else

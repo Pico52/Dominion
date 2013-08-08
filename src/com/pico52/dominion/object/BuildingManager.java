@@ -44,33 +44,33 @@ import com.pico52.dominion.object.building.Woodshop;
  */
 public class BuildingManager extends DominionObjectManager{
 	
-	private static ArcheryRange archeryRange;
-	private static Armory armory;
-	private static Bank bank;
-	private static Barracks barracks;
-	private static CattleRanch cattleRanch;
-	private static ChickenPen chickenPen;
-	private static Dockyard dockyard;
-	private static Farm farm;
-	private static Fletcher fletcher;
-	private static Granary granary;
-	private static Home home;
-	private static Inn inn;
-	private static Library library;
-	private static Lighthouse lighthouse;
-	private static Market market;
-	private static Masonry masonry;
-	private static Mine mine;
-	private static PigPen pigPen;
-	private static Quarry quarry;
-	private static Sandworks sandworks;
-	private static SheepRanch sheepRanch;
-	private static Shipyard shipyard;
-	private static Spire spire;
-	private static Tower tower;
-	private static TrainingGrounds trainingGrounds;
-	private static Warehouse warehouse;
-	private static Woodshop woodshop;
+	private ArcheryRange archeryRange;
+	private Armory armory;
+	private Bank bank;
+	private Barracks barracks;
+	private CattleRanch cattleRanch;
+	private ChickenPen chickenPen;
+	private Dockyard dockyard;
+	private Farm farm;
+	private Fletcher fletcher;
+	private Granary granary;
+	private Home home;
+	private Inn inn;
+	private Library library;
+	private Lighthouse lighthouse;
+	private Market market;
+	private Masonry masonry;
+	private Mine mine;
+	private PigPen pigPen;
+	private Quarry quarry;
+	private Sandworks sandworks;
+	private SheepRanch sheepRanch;
+	private Shipyard shipyard;
+	private Spire spire;
+	private Tower tower;
+	private TrainingGrounds trainingGrounds;
+	private Warehouse warehouse;
+	private Woodshop woodshop;
 	
 	/** 
 	 * <b>BuildingManager</b><br>
@@ -138,7 +138,8 @@ public class BuildingManager extends DominionObjectManager{
 		ProductionSheet production = new ProductionSheet();
 		String query = "SELECT * FROM building WHERE settlement_id=" + settlement_id;
 		ResultSet buildingData = plugin.getDBHandler().querySelect(query);
-		int level = 0, employed = 0;
+		int buildingId = 0, level = 0, employed = 0, workersPerLevel = 0, maxWorkers = 0;
+		double employmentRatio = 0, multiplier = 0;
 		String classType="", resource="";
 		production.settlement = plugin.getDBHandler().getSettlementName(settlement_id);
 		ResultSet getBiome = plugin.getDBHandler().getSettlementData(production.settlement, "biome");
@@ -147,28 +148,39 @@ public class BuildingManager extends DominionObjectManager{
 			String biome = getBiome.getString("biome");
 			getBiome.getStatement().close();
 			while(buildingData.next()){
+				buildingId = buildingData.getInt("building_id");
 				level = buildingData.getInt("level");
 				employed = buildingData.getInt("employed");
 				classType = buildingData.getString("class").toLowerCase();
 				resource = buildingData.getString("resource");
-				
-				if(classType.equalsIgnoreCase("archeryrange")){
+				workersPerLevel = getWorkers(classType);
+				if(plugin.getSpellManager().getActiveSpells(buildingId, "building", "destroy_building").length > 0)
+					continue;
+				if(level == 0)
+					continue;
+				maxWorkers = workersPerLevel * level;
+				if(maxWorkers > 0)
+					employmentRatio = employed / maxWorkers;
+				else
+					employmentRatio = 1;
+				multiplier = level * employmentRatio;
+				if(classType.equalsIgnoreCase("archeryrange") | classType.equalsIgnoreCase("archery_range")){
 					// - Archery Ranges produce nothing currently.
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("armory")){
-					double multiplier = level * (employed / (armory.workers * level));
 					double ironIngot = 0, leather = 0, wood = 0;
 					ResultSet settlement = plugin.getDBHandler().getSettlementData(settlement_id, "*");
 					try{
-						settlement.next();
-						ironIngot = settlement.getDouble("iron_ingot");
-						leather = settlement.getDouble("leather");
-						wood = settlement.getDouble("wood");
+						if(settlement.next()){
+							ironIngot = settlement.getDouble("iron_ingot");
+							leather = settlement.getDouble("leather");
+							wood = settlement.getDouble("wood");
+						}
 						settlement.getStatement().close();
 					} catch (SQLException ex){
 						ex.printStackTrace();
-						break;
+						continue;
 					}
 					if(resource.equalsIgnoreCase("armor")){
 						double consumeIronIngot = multiplier * Armory.armorIronConsumption;
@@ -191,42 +203,43 @@ public class BuildingManager extends DominionObjectManager{
 						production.leather -= multiplier * Armory.weaponLeatherConsumption;
 						production.wood -= multiplier * Armory.weaponWoodConsumption;
 					}
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("bank")){
 					// - Banks produce nothing currently.
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("barracks")){
 					// - Barracks produce nothing currently.
-					break;
+					continue;
 				}
-				else if(classType.equalsIgnoreCase("cattleranch")){
-					double multiplier  = level * (employed / (cattleRanch.workers * level));
+				else if(classType.equalsIgnoreCase("cattleranch") | classType.equalsIgnoreCase("cattle_ranch")){
 					if(biome.equalsIgnoreCase("plains"))
 						multiplier *= (1 + BiomeData.plainsHerdingGroundsBonus);
 					else if(biome.equalsIgnoreCase("desert"))
 						multiplier *= (1 - BiomeData.desertHerdingGroundsPenalty);
+					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "herding_grounds");
+					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
 					double value = multiplier * cattleRanch.getProduction(resource);
 					production.addResource(resource,  value);
-					break;
+					continue;
 				}
-				else if(classType.equalsIgnoreCase("chickenpen")){
-					double multiplier  = level * (employed / (chickenPen.workers * level));
+				else if(classType.equalsIgnoreCase("chickenpen") | classType.equalsIgnoreCase("chicken_pen")){
 					if(biome.equalsIgnoreCase("plains"))
 						multiplier *= (1 + BiomeData.plainsHerdingGroundsBonus);
 					else if(biome.equalsIgnoreCase("desert"))
 						multiplier *= (1 - BiomeData.desertHerdingGroundsPenalty);
+					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "herding_grounds");
+					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
 					double value = multiplier * chickenPen.getProduction(resource);
 					production.addResource(resource,  value);
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("dockyard")){
 					// - Dockyards produce nothing currently.
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("farm")){
-					double multiplier  = level * (employed / (farm.workers * level));
 					if(biome.equalsIgnoreCase("plains"))
 						multiplier *= (1 + BiomeData.plainsFarmBonus);
 					else if(biome.equalsIgnoreCase("mountain") & resource.equalsIgnoreCase("wheat"))
@@ -253,183 +266,181 @@ public class BuildingManager extends DominionObjectManager{
 							multiplier *= (1 - BiomeData.mushroomMelonPenalty);
 					}else if (biome.equalsIgnoreCase("desert"))
 						multiplier *= (1 - BiomeData.desertFarmPenalty);
+					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "farm");
+					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
 					double value = multiplier * farm.getProduction(resource);
 					production.addResource("food",  value);
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("fletcher")){
-					double multiplier = level * (employed / (fletcher.workers * level));
 					double flint = 0, wood = 0, feather = 0;
 					double consumeFlint = multiplier * Fletcher.flintConsumption;
 					double consumeWood = multiplier * Fletcher.woodConsumption;
 					double consumeFeather = multiplier * Fletcher.featherConsumption;
 					ResultSet settlement = plugin.getDBHandler().getSettlementData(settlement_id, "*");
 					try{
-						settlement.next();
-						flint = settlement.getDouble("flint");
-						wood = settlement.getDouble("wood");
-						feather = settlement.getDouble("feather");
+						if(settlement.next()){
+							flint = settlement.getDouble("flint");
+							wood = settlement.getDouble("wood");
+							feather = settlement.getDouble("feather");
+						}
 						settlement.getStatement().close();
 					} catch (SQLException ex){
 						ex.printStackTrace();
-						break;
+						continue;
 					}
 					if(flint - consumeFlint < 0 | wood - consumeWood < 0 | feather - consumeFeather < 0)
-						break;
+						continue;
 					production.arrow += multiplier * Fletcher.arrowProduction;
 					production.flint -= consumeFlint;
 					production.wood -= consumeWood;
 					production.feather -= consumeFeather;
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("granary")){
 					// - Granaries produce nothing.
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("home")){
-					production.population += level * Home.populationProduction;
-					break;
+					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "birth_rate");
+					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
+					production.population += multiplier * Home.populationProduction;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("inn")){
-					double multiplier = level * (employed / (inn.workers * level));
 					if(biome.equalsIgnoreCase("forest"))
 						multiplier *= (1 + BiomeData.forestInnBonus);
+					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "trade");
+					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
 					production.wealth += multiplier * Inn.wealthProduction;
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("library")){
-					double multiplier = level * (employed / (library.workers * level));
 					if(biome.equalsIgnoreCase("swamp"))
 						multiplier *= (1 + BiomeData.swampManaRegenerationBonus);
 					production.mana += multiplier * Library.manaProduction;
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("lighthouse")){
 					// - Lighthouses produce nothing.
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("market")){
-					// - This will only produce wealth when trading is working.
-					break;
+					/* - This will only produce wealth when trading is working.
+					double multiplier = level * (employed / (market.workers * level));
+					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "trade");
+					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
+					*/
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("masonry")){
-					double multiplier = level * (employed / (masonry.workers * level));
 					if(biome.equalsIgnoreCase("mountain"))
 						multiplier *= (1 + BiomeData.mountainMasonryBonus);
+					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "masonry");
+					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
 					
-					double subtractConsumption = 0, subtractBase = 0, consumeResourceValue = 0, consumeBaseValue = 0;
 					String consumeResource = masonry.getConsumptionResource(resource);
-					String consumeBase = Masonry.baseConsumptionResource;
-					ResultSet settlement = plugin.getDBHandler().getSettlementData(settlement_id,  "*");
+					if(consumeResource == null)
+						continue;
+					String consumeBase = Masonry.fuelResource;
+					double subtractConsumption = 0, subtractBase = 0, consumeResourceValue = 0, consumeBaseValue = 0;
 					try{
-						settlement.next();
-						consumeResourceValue = settlement.getDouble(consumeResource);
-						consumeBaseValue = settlement.getDouble(Masonry.baseConsumptionResource);
-						settlement.getStatement().close();
-					} catch (SQLException ex){
+						consumeResourceValue = plugin.getSettlementManager().getMaterial(settlement_id, consumeResource);
+						consumeBaseValue = plugin.getSettlementManager().getMaterial(settlement_id, Masonry.fuelResource);
+					} catch (NullPointerException ex){
 						ex.printStackTrace();
-						break;
+						continue;
 					}
 					subtractConsumption = multiplier * masonry.getConsumption(resource);
 					if(consumeResourceValue - subtractConsumption < 0)
-						break; //subtractConsumption = consumeResourceValue;
-					if(Masonry.consumeBase)
-						subtractBase = multiplier * Masonry.baseConsumption;
+						continue;
+					if(Masonry.consumeFuel && Masonry.fuelOutput > 0)
+						subtractBase = subtractConsumption / Masonry.fuelOutput;
 					if(consumeBaseValue - subtractBase < 0)
-						break; //subtractBase = consumeBaseValue;
-					/*double ratio = subtractConsumption / multiplier * masonry.getConsumption(resource);
-					if(Masonry.consumeBase){
-						double baseRatio = subtractBase / multiplier * Masonry.baseConsumption;
-						if(baseRatio < ratio)
-							ratio = baseRatio;
-					}*/
-					double addValue =multiplier * masonry.getProduction(resource); // * ratio;
+						continue;
+					double addValue =multiplier * masonry.getProduction(resource);
 					production.addResource(consumeResource, -subtractConsumption);
 					production.addResource(consumeBase, -subtractBase);
 					production.addResource(resource, addValue);
 
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("mine")){
-					double multiplier = level * (employed / (mine.workers * level));
 					if(biome.equalsIgnoreCase("mountain"))
 						multiplier *= (1 + BiomeData.mountainMiningBonus);
 					if(biome.equalsIgnoreCase("ocean"))
 						multiplier *= (1 - BiomeData.oceanMiningPenalty);
+					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "mining");
+					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
 					double value = multiplier * mine.getProduction(resource);
 					production.addResource(resource, value);
 					if(Mine.passiveDirt)
 						production.addResource("dirt", (Mine.dirtProduction * multiplier));
 					if(Mine.passiveGravel)
 						production.addResource("gravel", (Mine.gravelProduction * multiplier));
-					break;
+					continue;
 				}
-				else if(classType.equalsIgnoreCase("pigpen")){
-					double multiplier  = level * (employed / (pigPen.workers * level));
+				else if(classType.equalsIgnoreCase("pigpen") | classType.equalsIgnoreCase("pig_pen")){
 					if(biome.equalsIgnoreCase("plains"))
 						multiplier *= (1 + BiomeData.plainsHerdingGroundsBonus);
 					else if(biome.equalsIgnoreCase("desert"))
 						multiplier *= (1 - BiomeData.desertHerdingGroundsPenalty);
+					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "herding_grounds");
+					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
 					double value = multiplier * pigPen.getProduction(resource);
 					production.addResource(resource,  value);
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("quarry")){
-					double multiplier  = level * (employed / (quarry.workers * level));
 					double value = multiplier * quarry.getProduction(resource);
 					production.addResource(resource,  value);
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("sandworks")){
-					double multiplier = level * (employed / (sandworks.workers * level));
+					String consumeResource = sandworks.getConsumptionResource(resource);
+					if(consumeResource == null)
+						continue;
 					if(biome.equalsIgnoreCase("desert"))
 						multiplier *= (1 + BiomeData.desertSandworksBonus);
+					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "sandworks");
+					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
 					double subtractConsumption = 0, subtractBase = 0, consumeResourceValue = 0, consumeBaseValue = 0;
-					String consumeResource = sandworks.getConsumptionResource(resource);
-					String consumeBase = Sandworks.baseConsumptionResource;
-					ResultSet settlement = plugin.getDBHandler().getSettlementData(settlement_id,  "*");
-					try{
-						settlement.next();
-						consumeResourceValue = settlement.getDouble(consumeResource);
-						consumeBaseValue = settlement.getDouble(Masonry.baseConsumptionResource);
-						settlement.getStatement().close();
-					} catch (SQLException ex){
-						ex.printStackTrace();
-						break;
-					}
+					String consumeBase = Sandworks.fuelResource;
+					consumeResourceValue = plugin.getSettlementManager().getMaterial(settlement_id, consumeResource);
+					consumeBaseValue = plugin.getSettlementManager().getMaterial(settlement_id, Sandworks.fuelResource);
 					subtractConsumption = multiplier * sandworks.getConsumption(resource);
 					if(consumeResourceValue - subtractConsumption < 0)
-						break;
-					if(Sandworks.consumeBase)
-						subtractBase = multiplier * Sandworks.baseConsumption;
+						continue;
+					if(Sandworks.consumeFuel && Sandworks.fuelOutput > 0)
+						subtractBase = subtractConsumption / Sandworks.fuelOutput;
 					if(consumeBaseValue - subtractBase < 0)
-						break;
+						continue;
 					double addValue = multiplier * sandworks.getProduction(resource);
 					production.addResource(consumeResource, -subtractConsumption);
 					production.addResource(consumeBase, -subtractBase);
 					production.addResource(resource, addValue);
-					break;
+					continue;
 				}
-				else if(classType.equalsIgnoreCase("sheepranch")){
-					double multiplier  = level * (employed / (sheepRanch.workers * level));
+				else if(classType.equalsIgnoreCase("sheepranch") | classType.equalsIgnoreCase("sheep_ranch")){
 					if(biome.equalsIgnoreCase("plains"))
 						multiplier *= (1 + BiomeData.plainsHerdingGroundsBonus);
 					else if(biome.equalsIgnoreCase("desert"))
 						multiplier *= (1 - BiomeData.desertHerdingGroundsPenalty);
+					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "herding_grounds");
+					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
 					double value = multiplier * sheepRanch.getProduction(resource);
 					production.addResource(resource,  value);
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("shipyard")){
 					// - Shipyards produce nothing currently.
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("spire")){
 					// - Spires produce nothing currently.
-					break;
+					continue;
 				}
-				else if(classType.equalsIgnoreCase("traininggrounds")){
-					double multiplier  = level * (employed / (trainingGrounds.workers * level));
+				else if(classType.equalsIgnoreCase("traininggrounds") | classType.equalsIgnoreCase("training_grounds")){
 					if(biome.equalsIgnoreCase("desert"))
 						multiplier *= (1 + BiomeData.desertTrainingGroundsBonus);
 					double value = multiplier * trainingGrounds.getProduction(resource);
@@ -439,63 +450,61 @@ public class BuildingManager extends DominionObjectManager{
 					double wealth = 0, food = 0, population = 0;
 					ResultSet settlement = plugin.getDBHandler().getSettlementData(settlement_id, "*");
 					try{
-						settlement.next();
-						wealth = settlement.getDouble("wealth");
-						food = settlement.getDouble("food");
-						population = settlement.getDouble("population");
+						if(settlement.next()){
+							wealth = settlement.getDouble("wealth");
+							food = settlement.getDouble("food");
+							population = settlement.getDouble("population");
+						}
 						settlement.getStatement().close();
 					} catch (SQLException ex){
 						ex.printStackTrace();
-						break;
+						continue;
 					}
 					if(wealth - consumeWealth < 0 | food - consumeFood < 0 | population - consumePopulation < 0)
-						break;
+						continue;
 					production.addResource(resource,  value);
 					production.addResource("wealth", -consumeWealth);
 					production.addResource("food", -consumeFood);
 					production.addResource("population", -consumePopulation);
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("warehouse")){
 					// - Warehouses produce nothing.
-					break;
+					continue;
 				}
 				else if(classType.equalsIgnoreCase("woodshop")){
-					double multiplier  = level * (employed / (woodshop.workers * level));
+					String consumeResource = woodshop.getConsumptionResource(resource);
+					if(consumeResource == null)
+						continue;
 					if(biome.equalsIgnoreCase("forest"))
 						multiplier *= (1 + BiomeData.forestWoodshopBonus);
 					double subtractConsumption = 0, subtractBase = 0, consumeResourceValue = 0, consumeBaseValue = 0;
-					String consumeResource = woodshop.getConsumptionResource(resource);
-					String consumeBase = Woodshop.baseConsumptionResource;
-					ResultSet settlement = plugin.getDBHandler().getSettlementData(settlement_id, "*");
-					try{
-						settlement.next();
-						consumeResourceValue = settlement.getDouble(consumeResource);
-						consumeBaseValue = settlement.getDouble(consumeBase);
-						settlement.getStatement().close();
-					} catch (SQLException ex){
-						ex.printStackTrace();
-						break;
-					}
+					String consumeBase = Woodshop.fuelResource;
+					consumeResourceValue = plugin.getSettlementManager().getMaterial(settlement_id, consumeResource);
+					consumeBaseValue = plugin.getSettlementManager().getMaterial(settlement_id, consumeBase);
 					subtractConsumption = multiplier * woodshop.getConsumption(resource);
-					if(Woodshop.consumeBase)
-						subtractBase = Woodshop.baseConsumption;
+					if(Woodshop.consumeFuel && Woodshop.fuelOutput > 0)
+						subtractBase = subtractConsumption / Woodshop.fuelOutput;
 					if(consumeResourceValue - subtractConsumption < 0 | consumeBaseValue - subtractBase < 0)
-						break;
+						continue;
 					double addValue = multiplier * woodshop.getProduction(resource);
 					production.addResource(consumeResource,  -subtractConsumption);
 					production.addResource(consumeBase,  -subtractBase);
 					production.addResource(resource,  addValue);
-					break;
+					continue;
 				}
 			}
 			buildingData.getStatement().close();
-			return production;
 		} catch (SQLException ex){
 			plugin.getLogger().info("SQLException occured while trying to retrieve building data.");
 			ex.printStackTrace();
 			return null;
 		}
+		double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "production");
+		double spellPenalty = plugin.getSpellManager().getPenalty(settlement_id, "settlement", "production");
+		double spellChange = spellBonus - spellPenalty;
+		production.multiplier(spellChange);
+		return production;
 	}
 	
 	/** 

@@ -1,5 +1,11 @@
 package com.pico52.dominion.object.building;
 
+import java.util.List;
+
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Armory</b><br>
  * <br>
@@ -9,10 +15,11 @@ package com.pico52.dominion.object.building;
  * The object controller for all armories.
  */
 public class Armory extends Building{
-	public static int storage;
+	public static int capacity;
 	public static double weaponProduction, weaponIronConsumption, weaponLeatherConsumption, 
 	weaponWoodConsumption, armorProduction, armorIronConsumption, armorLeatherConsumption, 
 	armorWoodConsumption;
+	public static String[] stores;
 	
 	/** 
 	 * <b>Armory</b><br>
@@ -22,17 +29,23 @@ public class Armory extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Armory} class.
 	 */
-	public Armory(){  // The constructor will be used in the future for loading the custom configurations.
-		super(80, 10);
-		storage = 3456;  // - Holds weapons and armors.
-		weaponProduction = .1;
-		armorProduction = .1;
-		weaponIronConsumption = .4;
-		weaponLeatherConsumption = .2;
-		weaponWoodConsumption = .4;
-		armorIronConsumption = .8;
-		armorLeatherConsumption = .2;
-		armorWoodConsumption = .1;
+	public Armory(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.armory.defense.value");
+		defenseBase = config.getBoolean("buildings.armory.defense.base");
+		workers = config.getInt("buildings.armory.workers");
+		structure = config.getBoolean("buildings.armory.structure");
+		capacity = config.getInt("buildings.armory.capacity");
+		List<String> storage = config.getStringList("buildings.armory.stores");
+		stores = storage.toArray(new String[storage.size()]);
+		weaponProduction = config.getDouble("buildings.armory.weapon.production_rate");
+		weaponIronConsumption = config.getDouble("buildings.armory.weapon.costs.iron");
+		weaponLeatherConsumption = config.getDouble("buildings.armory.weapon.costs.leather");
+		weaponWoodConsumption = config.getDouble("buildings.armory.weapon.costs.wood");
+		armorProduction = config.getDouble("buildings.armory.armor.production_rate");
+		armorIronConsumption = config.getDouble("buildings.armory.armor.costs.iron");
+		armorLeatherConsumption = config.getDouble("buildings.armory.armor.costs.leather");
+		armorWoodConsumption = config.getDouble("buildings.armory.armor.costs.wood");
 	}
 	
 	/** 
@@ -46,6 +59,8 @@ public class Armory extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("weapon"))
 			return weaponProduction;
 		if(resource.equalsIgnoreCase("armor"))

@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Lighthouse</b><br>
  * <br>
@@ -10,6 +14,9 @@ package com.pico52.dominion.object.building;
  */
 public class Lighthouse extends Building{
 	
+	public static double speedBonus;
+	public static int maxLevel, range;
+	
 	/** 
 	 * <b>Lighthouse</b><br>
 	 * <br>
@@ -18,8 +25,15 @@ public class Lighthouse extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Lighthouse} class.
 	 */
-	public Lighthouse(){  // The constructor will be used in the future for loading the custom configurations.
-		super(5, 10);
+	public Lighthouse(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.lighthouse.defense.value");
+		defenseBase = config.getBoolean("buildings.lighthouse.defense.base");
+		workers = config.getInt("buildings.lighthouse.workers");
+		structure = config.getBoolean("buildings.lighthouse.structure");
+		maxLevel = config.getInt("buildings.lighthouse.maximum_level");
+		range = config.getInt("buildings.lighthouse.range");
+		speedBonus = config.getDouble("buildings.lighthouse.speed_bonus");
 	}
 	
 	/** 

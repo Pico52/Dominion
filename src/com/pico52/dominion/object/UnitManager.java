@@ -4,6 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+
 import com.pico52.dominion.Dominion;
 import com.pico52.dominion.DominionSettings;
 import com.pico52.dominion.object.unit.Unit;
@@ -35,6 +38,7 @@ import com.pico52.dominion.object.unit.sea.SeaUnit;
 import com.pico52.dominion.object.unit.sea.Sloop;
 
 public class UnitManager extends DominionObjectManager{
+	FileConfiguration config;
 	private double baseHealPercentage;
 	private String landUnitTypes[];
 	private String seaUnitTypes[];
@@ -66,6 +70,7 @@ public class UnitManager extends DominionObjectManager{
 	
 	public UnitManager(Dominion plugin){
 		super(plugin);
+		config = DominionSettings.getUnitsConfig();
 		baseHealPercentage = .01;
 		landUnitTypes = new String[]{"archer", "dreadknight", "footsoldier", "knight", "manatarms", "marksman", "militia", "recruit", "scout", "skirmisher", "swordsman", "trader", "wagon"};
 		seaUnitTypes = new String[]{"caravel", "carrack", "cog", "fishingboat", "frigate1strate", "frigate2ndrate", "frigate3rdrate", "galleon", "galley", "manowar", "schooner", "sloop"};
@@ -96,21 +101,17 @@ public class UnitManager extends DominionObjectManager{
 	}
 	
 	public boolean damage(int unit_id, double damage){
-		ResultSet unit = plugin.getDBHandler().getUnitData(unit_id, "health");
-		double currentHealth = 0, newHealth = 0;
-		try{
-			if(unit.next())
-				currentHealth = unit.getDouble("health");
-			unit.getStatement().close();
-		} catch (SQLException ex){
-			ex.printStackTrace();
-		}
-		newHealth = currentHealth - damage;
-		return plugin.getDBHandler().update("unit", "health", newHealth, "unit_id", unit_id);
+		if(!isReal(unit_id))
+			return true;
+		double health = getHealth(unit_id) - damage;
+		if(health > 0)
+			return plugin.getDBHandler().update("unit", "health", health, "unit_id", unit_id);
+		else
+			return kill(unit_id, "slain");
 	}
 	
 	public boolean heal(int unit_id, double amount){
-		if(amount == 0)
+		if(amount == 0 | !isReal(unit_id))
 			return true;
 		ResultSet unit = plugin.getDBHandler().getUnitData(unit_id, "*");
 		int ownerId = 0;
@@ -161,6 +162,13 @@ public class UnitManager extends DominionObjectManager{
 			ex.printStackTrace();
 		}
 		double speed = getUnit(classType).getSpeed();
+		SpellManager sm = plugin.getSpellManager();
+		for(int spell: sm.getAllSpells("aoe_unit_slow")){
+			// For future, add an option in the config to determine if the slow should affect all units, enemy units, or any unit that isn't their own.
+			if(sm.isWithinAreaOfEffect(xCoord, zCoord, spell))
+				if((speed *= 1 - sm.getPower(spell)) < 0)
+					speed = 0;
+		}
 		if(Math.abs(xCoord - toXCoord) < speed)
 			xCoord = toXCoord;
 		else if(xCoord < toXCoord)
@@ -217,27 +225,33 @@ public class UnitManager extends DominionObjectManager{
 			return false;
 		if(plugin.getDBHandler().remove("unit",  unitId)){
 			removeCurrentCommand(unitId);
-			if(reason.equalsIgnoreCase("none")){
-				if(plugin.isPlayerOnline(playerName))
-					plugin.getServer().getPlayer(playerName).sendMessage(plugin.getLogPrefix() + "Your " + classType + " unit #" + unitId + " has been slain!");
-				plugin.getLogger().info(classType + " owned by " + playerName + " has been slain.");
+			String playerMessage = plugin.getLogPrefix() + "Your " + classType + " unit #" + unitId + " ";
+			String logMessage = classType + " owned by " + playerName + " ";
+			if(reason.equalsIgnoreCase("none") | reason.equalsIgnoreCase("slain")){
+				playerMessage += "has been slain!";
+				logMessage += " has been slain.";
 			} else if (reason.equalsIgnoreCase("starvation")){
-				if(plugin.isPlayerOnline(playerName))
-					plugin.getServer().getPlayer(playerName).sendMessage(plugin.getLogPrefix() + "Your " + classType + " unit #" + unitId + " has starved!");
-				plugin.getLogger().info(classType + " owned by " + playerName + " has starved.");
-			} else if (reason.equalsIgnoreCase("disband")){
-				if(plugin.isPlayerOnline(playerName))
-					plugin.getServer().getPlayer(playerName).sendMessage(plugin.getLogPrefix() + "Your " + classType + " unit #" + unitId + " has been disbanded.");
-				plugin.getLogger().info(classType + " owned by " + playerName + " has been disbanded.");
+				playerMessage += "has starved!";
+				logMessage += " has starved.";
+			} else if (reason.equalsIgnoreCase("spell")){
+				playerMessage += "has sbeen killed by a spell!";
+				logMessage += " has been killed by a spell.";
+			}else if (reason.equalsIgnoreCase("disband")){
+				playerMessage += "has been disbanded.";
+				logMessage += " has been disbanded.";
 			} else if (reason.equalsIgnoreCase("payment")){
-				if(plugin.isPlayerOnline(playerName))
-					plugin.getServer().getPlayer(playerName).sendMessage(plugin.getLogPrefix() + "Your " + classType + " unit #" + unitId + " has left due to not being paid!");
-				plugin.getLogger().info(classType + " owned by " + playerName + " has left due to not being paid.");
+				playerMessage += "has left due to not being paid!";
+				logMessage += " has left due to not being paid.";
 			} else if (reason.equalsIgnoreCase("admin")){
-				if(plugin.isPlayerOnline(playerName))
-					plugin.getServer().getPlayer(playerName).sendMessage(plugin.getLogPrefix() + "Your " + classType + " unit #" + unitId + " has been killed by an administrator!");
-				plugin.getLogger().info(classType + " owned by " + playerName + " has been killed by an administrator.");
+				 playerMessage += "has been killed by an administrator!";
+				logMessage += " has been killed by an administrator.";
+			} else {
+				playerMessage += "has been slain!";
+				logMessage += " has been slain.";
 			}
+			if(plugin.isPlayerOnline(playerName))
+				plugin.getServer().getPlayer(playerName).sendMessage(plugin.getLogPrefix() + playerMessage);
+			plugin.getLogger().info(logMessage);
 			return true;
 		}else{
 			plugin.getLogger().info("Failed to remove the unit: \"" + classType + "\" #" + unitId +" owned by " + playerName + ".");
@@ -247,10 +261,15 @@ public class UnitManager extends DominionObjectManager{
 	
 	public int createUnit(int settlementId, int ownerId, String classification){
 		double health = getUnit(classification).getHealth();
-		return createUnit(settlementId, ownerId, classification, health);
+		return createUnit(settlementId, ownerId, classification, health, true);
 	}
 	
-	public int createUnit(int settlementId, int ownerId, String classification, double health){
+	public int createUnit(int settlementId, int ownerId, String classification, boolean real){
+		double health = getUnit(classification).getHealth();
+		return createUnit(settlementId, ownerId, classification, health, real);
+	}
+	
+	public int createUnit(int settlementId, int ownerId, String classification, double health, boolean real){
 		int newId = -1;
 		double xcoord=0, zcoord=0;
 		ResultSet settlementData = plugin.getDBHandler().getSettlementData(settlementId, "*");
@@ -263,7 +282,7 @@ public class UnitManager extends DominionObjectManager{
 		} catch (SQLException ex){
 			ex.printStackTrace();
 		}
-		plugin.getDBHandler().createUnit(settlementId, classification, ownerId, xcoord, zcoord, health, 0);
+		plugin.getDBHandler().createUnit(settlementId, classification, ownerId, xcoord, zcoord, health, 0, real);
 		newId = plugin.getDBHandler().getNewestId("unit");
 		String playerName = plugin.getDBHandler().getPlayerName(ownerId);
 		if(playerName != null & plugin.isPlayerOnline(playerName))
@@ -490,16 +509,7 @@ public class UnitManager extends DominionObjectManager{
 	
 	public double getDistanceFromItem(int unitId, int itemId){
 		int holderId = plugin.getItemManager().getHolderId(itemId);
-		double itemX = getUnitX(holderId);
-		double itemZ = getUnitZ(holderId);
-		double unitX = getUnitX(unitId);
-		double unitZ = getUnitZ(unitId);
-		double xDifference = Math.abs(itemX - unitX);
-		double zDifference = Math.abs(itemZ - unitZ);
-		if(xDifference > zDifference)
-			return xDifference;
-		else
-			return zDifference;
+		return getDistanceFromUnit(unitId, holderId);
 	}
 	
 	public int getClosestSettlement(int unitId){
@@ -530,12 +540,67 @@ public class UnitManager extends DominionObjectManager{
 			return zDifference;
 	}
 	
+	public int[] getUnitsWithinRange(int unitId, double range) {
+		int[] units = db.getAllIds("unit");
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		for(int unit: units){
+			if(getDistanceFromUnit(unitId, unit) <= range)
+				list.add(new Integer(unit));
+		}
+		int[] sendUnits = new int[list.size()];
+		int i = 0;
+	    for (Integer n : list) {
+	        sendUnits[i++] = n;
+	    }
+		return sendUnits;
+	}
+	
+	public double getDistanceFromUnit(int unitId, int targetUnit){
+		// - For later, make this callculation make more sense.  Make it go by the radius.
+		double targetX = getUnitX(targetUnit);
+		double targetZ = getUnitZ(targetUnit);
+		double unitX = getUnitX(unitId);
+		double unitZ = getUnitZ(unitId);
+		double xDifference = Math.abs(targetX - unitX);
+		double zDifference = Math.abs(targetZ - unitZ);
+		if(xDifference > zDifference)
+			return xDifference;
+		else
+			return zDifference;
+	}
+	
 	public boolean setCommandX(int commandId, double xCoord){
 		return plugin.getDBHandler().update("command", "xcoord", xCoord, "command_id", commandId);
 	}
 	
 	public boolean setCommandZ(int commandId, double zCoord){
 		return plugin.getDBHandler().update("command", "zcoord", zCoord, "command_id", commandId);
+	}
+	
+	/** 
+	 * <b>isVisible</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean isVisible(int unitId, int playerId)
+	 * <br>
+	 * <br>
+	 * @param unitId - The id of the unit whose visibility is in question.
+	 * @param playerId - The id of the player attempting to view this unit.
+	 * @return True if the player can see the unit; false if they cannot.
+	 */
+	public boolean isVisible(int unitId, int playerId){
+		int ownerId = getOwner(unitId);
+		if(ownerId == playerId)
+			return true;
+		SpellManager sm = plugin.getSpellManager();
+		if(sm.getActiveSpells(unitId, "unit", "unit_invisibility").length > 0){
+			double unitX = getUnitX(unitId), unitZ = getUnitZ(unitId);
+			for(int spell: sm.getAllSpells("aoe_reveal_invisible_units")){
+				if(sm.isWithinAreaOfEffect(unitX, unitZ, spell))
+					return true;
+			}
+			return false;
+		}
+		return true;
 	}
 		
 	public boolean isUnit(String unit){
@@ -586,6 +651,19 @@ public class UnitManager extends DominionObjectManager{
 			ex.printStackTrace();
 		}
 		return classification;
+	}
+	
+	public int getOwner(int unitId){
+		ResultSet unit = plugin.getDBHandler().getUnitData(unitId, "owner_id");
+		int ownerId = 0;
+		try{
+			if(unit.next())
+				ownerId = unit.getInt("owner_id");
+			unit.getStatement().close();
+		} catch (SQLException ex){
+			ex.printStackTrace();
+		}
+		return ownerId;
 	}
 	
 	public double getHealth(int unitId){
@@ -675,6 +753,19 @@ public class UnitManager extends DominionObjectManager{
 		return zCoord;
 	}
 	
+	public boolean isReal(int unitId){
+		ResultSet unit = plugin.getDBHandler().getUnitData(unitId, "real");
+		boolean real = true;
+		try{
+			if(unit.next())
+				real = unit.getBoolean("real");
+			unit.getStatement().close();
+		} catch (SQLException ex){
+			ex.printStackTrace();
+		}
+		return real;
+	}
+	
 	public boolean withinRange(int unitId, int targetId){
 		double unitX = getUnitX(unitId);
 		double unitZ = getUnitZ(unitId);
@@ -743,6 +834,47 @@ public class UnitManager extends DominionObjectManager{
 		else if (unit.equalsIgnoreCase("sloop"))
 			return sloop;
 		return null;
+	}
+	
+	public String outputUnitData(){
+		String output = "", name = "", type = "", mat1 = "", mat2 = "";
+		double speed = 0, health = 0, offense = 0, defense = 0, range = 0, foodConsumption = 0, upkeep = 0, buildCost = 0, 
+				trainingTime = 0, capacity = 0, mat1Num = 0, mat2Num = 0;
+		ConfigurationSection section = config.getConfigurationSection("units");
+		for(String unit: section.getKeys(false)){
+			name = config.getString("units." + unit + ".name");
+			type = config.getString("units." + unit + ".type");
+			speed = config.getDouble("units." + unit + ".speed");
+			health = config.getDouble("units." + unit + ".health");
+			offense = config.getDouble("units." + unit + ".offense");
+			defense = config.getDouble("units." + unit + ".defense");
+			range = config.getDouble("units." + unit + ".range");
+			foodConsumption = config.getDouble("units." + unit + ".food_consumption");
+			upkeep = config.getDouble("units." + unit + ".upkeep");
+			buildCost = config.getDouble("units." + unit + ".build_cost");
+			trainingTime = config.getDouble("units." + unit + ".training_time");
+			capacity = config.getDouble("units." + unit + ".capacity");
+			mat1 = config.getString("units." + unit + ".material_1.type");
+			mat2 = config.getString("units." + unit + ".material_2.type");
+			mat1Num = config.getDouble("units." + unit + ".material_1.quantity");
+			mat2Num = config.getDouble("units." + unit + ".material_2.quantity");
+			char colorCode = '5';
+			if(type.equalsIgnoreCase("land"))
+				colorCode = '2';
+			else if (type.equalsIgnoreCase("sea"))
+				colorCode = '9';
+			output += "§" + colorCode + name + "§f - §aHP:§f " + health + "  §aOff:§f " + offense + "  §aDef:§f " + defense + "  §aSpe:§f " + speed + 
+					"  §aRange:§f " + range + "  §aFood:§f " + foodConsumption + "  §aUpK:§f " + upkeep + "  §aBuild:§f " + buildCost + "  §aTime:§f " + 
+					trainingTime + "  §aCap:§f " + capacity;
+			if(!mat1.equalsIgnoreCase("none") & mat1Num > 0)
+				output +=  "  §aMat1:§f " + mat1Num + " " + mat1;
+			if(!mat2.equalsIgnoreCase("none") & mat2Num > 0)
+				output += "  §aMat2:§f " + mat2Num + " " + mat2;
+			output += "\n§a--------------------------§r\n";
+		}
+		if(output == "")
+			output = "No units are currently available.";
+		return output;
 	}
 	
 	public double getBaseHealPercentage(){

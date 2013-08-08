@@ -24,7 +24,7 @@ public class PlayerData extends PlayerSubCommand{
 	 * @param instance - The {@link Dominion} plugin this command executor will be running on.
 	 */
 	public PlayerData(Dominion instance){
-		super(instance, "/dominion data [biome]");
+		super(instance, "/dominion data [biome] [building] [unit] [spell]");
 	}
 	
 	/** 
@@ -49,20 +49,28 @@ public class PlayerData extends PlayerSubCommand{
 		String topBar = "§a======";
 		String middleData = "";
 		String title = "";
-		if(entity.equalsIgnoreCase("biome")){
+		if(entity.equalsIgnoreCase("biome") | entity.equalsIgnoreCase("biomes")){
 			title = "Biome Data";
-			topBar += title + "======§r\n";
 			middleData = plugin.getBiomeData().outputData();
-		} else {
+		} else if(entity.equalsIgnoreCase("building") | entity.equalsIgnoreCase("buildings")){
+			title = "Building Data";
+			middleData += "Building data is not currently working.";
+		} else if(entity.equalsIgnoreCase("unit") | entity.equalsIgnoreCase("units")){
+			title = "Unit Data";
+			middleData = plugin.getUnitManager().outputUnitData();
+		} else if(entity.equalsIgnoreCase("spell") | entity.equalsIgnoreCase("spells")){
+			title = "Spell Data";
+			middleData = plugin.getSpellManager().outputSpellData();
+		}  else {
 			title = "No Data";
-			topBar += title + "======§r\n";
 			middleData += "No data available.";
 		}
+		topBar += title + "======§r\n";
 		String bottomBar = "§a======";
 			for(int i=0; i<title.length();i++)
 				bottomBar += "=";
 		bottomBar += "======§r";
-		String allData = topBar + middleData + bottomBar;
+		String allData = topBar + middleData + "\n" + bottomBar;
 		sender.sendMessage(allData);
 
 		return true;

@@ -4,14 +4,16 @@ public abstract class Unit {
 	protected double speed, health;
 	protected int 
 	offense, defense, range, foodConsumption, 
-	upkeep, buildCost, trainingTime, storageCapacity;
-	protected String material;
+	upkeep, buildCost, trainingTime, capacity, 
+	material1Quantity, material2Quantity;
+	protected String material1, material2, name;
+	protected boolean civilian;
 	
 	public double getSpeed(){
 		return speed;
 	}
 	public double getHealth(){
-		return defense; // This will be health
+		return health;
 	}
 	public int getOffense(){
 		return offense;
@@ -31,16 +33,28 @@ public abstract class Unit {
 	public int getBuildCost(){
 		return buildCost;
 	}
-	/*
-	 * Training time is the number of unit ticks to produce this unit.
-	 */
 	public int getTrainingTime(){
 		return trainingTime;
 	}
-	public int getStorageCapacity(){
-		return storageCapacity;
+	public int getCapacity(){
+		return capacity;
 	}
-	public String getMaterial(){
-		return material;
+	public String getMaterial1(){
+		return material1;
+	}
+	public String getMaterial2(){
+		return material2;
+	}
+	public String getName(){
+		return name;
+	}
+	public int getMaterial1Quantity(){
+		return material1Quantity;
+	}
+	public int getMaterial2Quantity(){
+		return material2Quantity;
+	}
+	public boolean isCivilian(){
+		return civilian;
 	}
 }

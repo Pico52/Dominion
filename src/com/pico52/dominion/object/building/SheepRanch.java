@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>SheepRanch</b><br>
  * <br>
@@ -12,6 +16,7 @@ public class SheepRanch extends Building{
 
 	public static double woolProduction;
 	public static int maxLevel, minimumRange;
+	public static String resource;
 	
 	/** 
 	 * <b>SheepRanch</b><br>
@@ -22,10 +27,15 @@ public class SheepRanch extends Building{
 	 * The constructor clause for the {@link SheepRanch} class.
 	 */
 	public SheepRanch() {
-		super(0, 1, true);
-		woolProduction = .1;
-		maxLevel = 50;
-		minimumRange = 125;
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.sheep_ranch.defense.value");
+		defenseBase = config.getBoolean("buildings.sheep_ranch.defense.base");
+		workers = config.getInt("buildings.sheep_ranch.workers");
+		structure = config.getBoolean("buildings.sheep_ranch.structure");
+		resource = config.getString("buildings.sheep_ranch.resource");
+		woolProduction = config.getDouble("buildings.sheep_ranch.wool_production");
+		maxLevel = config.getInt("buildings.sheep_ranch.maximum_level");
+		minimumRange = config.getInt("buildings.sheep_ranch.minimum_range");
 	}
 
 	/** 
@@ -39,7 +49,9 @@ public class SheepRanch extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
-		if(resource.equalsIgnoreCase("wool"))
+		if(resource == null)
+			return 0;
+		if(resource.equalsIgnoreCase(SheepRanch.resource))
 			return woolProduction;
 		return 0;
 	}

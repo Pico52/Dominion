@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Barracks</b><br>
  * <br>
@@ -9,7 +13,7 @@ package com.pico52.dominion.object.building;
  * The object controller for all barracks.
  */
 public class Barracks extends Building{
-	public static double storage;
+	public static double capacity;
 	
 	/** 
 	 * <b>Barracks</b><br>
@@ -19,9 +23,13 @@ public class Barracks extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Barracks} class.
 	 */
-	public Barracks(){  // The constructor will be used in the future for loading the custom configurations.
-		super(0, 0);
-		storage = 1;
+	public Barracks(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.barracks.defense.value");
+		defenseBase = config.getBoolean("buildings.barracks.defense.base");
+		workers = config.getInt("buildings.barracks.workers");
+		structure = config.getBoolean("buildings.barracks.structure");
+		capacity = config.getDouble("buildings.barracks.capacity");
 	}
 	
 	/** 

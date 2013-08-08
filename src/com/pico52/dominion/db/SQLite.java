@@ -110,7 +110,8 @@ public class SQLite extends Database {
 			ResultSet results = statement.executeQuery(query);
 			return results;
 		}catch (SQLException ex){
-			writeError("Error at SQL Query: " + ex.getMessage(), false);
+			writeError("Error at SQL Query: " + query + "\nMessage: " + ex.getMessage(), false);
+			ex.printStackTrace();
 		}
 		return null;
 	}
@@ -144,46 +145,24 @@ public class SQLite extends Database {
 	}
 	
 	@Override
-	public boolean createTable(String query) {
-		Statement statement = null;
-		System.out.println("In create table.. Query: " + query);
-		try {
-			if (query.equals("") || query == null) {
-				this.writeError("SQL Create Table query empty.", true);
-				return false;
-			}
-			
-			statement = connection.createStatement();
-			boolean success = statement.execute(query);
-			statement.close();
-			return success;
-		} catch (SQLException ex){
-			this.writeError(ex.getMessage(), true);
+	public boolean createTable(String table, String[] columns, String[] dims){
+		// - Check if all there's any information provided at all.
+		if (table.equals("") || table == null) {
+			this.writeError("SQL create table failed due to the table name being null.", true);
 			return false;
 		}
-	}
-	
-	@SuppressWarnings("finally")
-	@Override
-	public boolean createTable(String tableName, String[] columns, String[] dims){
+		if(columns == null){
+			this.writeError("SQL create table failed due to the columns information being null.", true);
+			return false;
+		}
+		if(dims == null){
+			this.writeError("SQL create table failed due to the dimensions information being null.", true);
+			return false;
+		}
 		Statement statement = null;
-			// - Check if all there's any information provided at all.
-			if (tableName.equals("") || tableName == null) {
-				this.writeError("SQL create table failed due to the table name being null.", true);
-				return false;
-			}
-			if(columns == null){
-				this.writeError("SQL create table failed due to the columns information being null.", true);
-				return false;
-			}
-			if(dims == null){
-				this.writeError("SQL create table failed due to the dimensions information being null.", true);
-				return false;
-			}
 		try{
-			// - The information should be there.  Now let's create the query statement.
 			statement = connection.createStatement();
-			String query = "CREATE TABLE " + tableName + "(";
+			String query = "CREATE TABLE " + table + "(";
             for (int i = 0; i < columns.length; i++) {
                 if (i!=0) {
                     query += ",";
@@ -191,19 +170,52 @@ public class SQLite extends Database {
                 query += columns[i] + " " + dims[i];
             }
             query += ")";
-            // - Query statement created.  Now execute it.
             boolean success =	statement.execute(query);
-            System.out.println("##### Query successful: " + query);
             statement.close();
+            if(success)
+            	 System.out.println("Query successful: " + query);
 			return success;
 		} catch (SQLException ex){
 			this.writeError(ex.getMessage(), true);
 			try{  // - Last chance to close this statement.
 				statement.close();
 			} catch (SQLException e){}
-			finally{  // - Statement closed or not, we're out of here!
-				return false;
-			}
+			
+			return false;
+		}
+	}
+	
+	@Override
+	public boolean createColumn(String table, String column, String dim){
+		// - Check if all there's any information provided at all.
+		if (table.equals("") || table == null) {
+			this.writeError("SQL create table failed due to the table name being null.", true);
+			return false;
+		}
+		if(column == null){
+			this.writeError("SQL create table failed due to the column information being null.", true);
+			return false;
+		}
+		if(dim == null){
+			this.writeError("SQL create table failed due to the dimension information being null.", true);
+			return false;
+		}
+		Statement statement = null;
+		try{
+			statement = connection.createStatement();
+			String query = "ALTER TABLE " + table + " ADD " + column + " " + dim;
+			boolean success = statement.execute(query);
+			statement.close();
+			if(success)
+           	 System.out.println("Query successful: " + query);
+			return success;
+		} catch (SQLException ex){
+			this.writeError(ex.getMessage(), true);
+			try{  // - Last chance to close this statement.
+				statement.close();
+			} catch (SQLException e){}
+			
+			return false;
 		}
 	}
 	
@@ -216,12 +228,31 @@ public class SQLite extends Database {
 			if (tables.next()){
 				tables.getStatement().close();
 				return true;
-			}else{
-				tables.getStatement().close();
-				return false;
 			}
+			tables.getStatement().close();
+			return false;
 		} catch (SQLException e) {
 			this.writeError("Failed to check if table \"" + table + "\" exists: " + e.getMessage(), true);
+			return false;
+		}
+	}
+	
+	@Override
+	public boolean checkColumn(String table, String column){
+		if(!checkTable(table))
+			return false;
+		DatabaseMetaData dbm = null;
+		try {
+			dbm = this.open().getMetaData();
+			ResultSet columns = dbm.getColumns(null, null, table, column);
+			if (columns.next()){
+				columns.getStatement().close();
+				return true;
+			}
+			columns.getStatement().close();
+			return false;
+		} catch (SQLException e) {
+			this.writeError("Failed to check if column \"" + column + "\" exists within table \"" + table + "\": " + e.getMessage(), true);
 			return false;
 		}
 	}

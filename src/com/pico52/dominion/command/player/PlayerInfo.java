@@ -68,8 +68,9 @@ public class PlayerInfo extends PlayerSubCommand{
 				allData += "§aDefense: §f" + (int) plugin.getSettlementManager().getDefense(settlementId) + "\n";
 				allData += "§aX-coord: §f" + results.getDouble("xcoord") + "  ";
 				allData += "§aZ-coord: §f" + results.getDouble("zcoord") + "\n";
-				allData += "§aMana: §f" + (int) results.getDouble("mana") + "/" + plugin.getSettlementManager().getMaxMana(settlement) + "\n";
-				allData += "§aPopulation: §f" + (int) results.getDouble("population") + "\n";
+				allData += "§aSpell Power: §f" + plugin.getSettlementManager().getSpellPower(settlementId) + "\n";
+				allData += "§aMana: §f" + (int) results.getDouble("mana") + "/" + plugin.getSettlementManager().getMaxMana(settlementId) + "\n";
+				allData += "§aPopulation: §f" + (int) results.getDouble("population") + "/" + plugin.getSettlementManager().getMaxPopulation(settlementId) + "\n";
 				allData += "§aRecruits: §f" + (int) results.getDouble("recruit") + "\n";
 				allData += "§aPrisoners: §f" + (int) results.getDouble("prisoner") + "\n";
 				allData += "§a======";

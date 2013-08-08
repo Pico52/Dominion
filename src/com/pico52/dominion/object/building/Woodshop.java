@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Woodshop</b><br>
  * <br>
@@ -9,16 +13,17 @@ package com.pico52.dominion.object.building;
  * The object controller for all woodshops.
  */
 public class Woodshop extends Building{
-	public static double woodRate;
-	public static double smeltingRate;
-	public static double baseConsumption;
-	public static double sellingBonus;
-	public static double charcoalRate;
-	public static double dirtRate;
-	public static double woodToCharcoalConsumption;
-	public static double woodToDirtConsumption;
-	public static String baseConsumptionResource;
-	public static boolean consumeBase;
+	public static double 
+	woodRate, 
+	smeltingRate, 
+	fuelOutput, 
+	sellingBonus, 
+	charcoalRate, 
+	dirtRate, 
+	woodToCharcoalConsumption, 
+	woodToDirtConsumption;
+	public static String fuelResource;
+	public static boolean consumeFuel;
 	
 	/** 
 	 * <b>Woodshop</b><br>
@@ -28,18 +33,22 @@ public class Woodshop extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Woodshop} class.
 	 */
-	public Woodshop(){  // The constructor will be used in the future for loading the custom configurations.
-		super(5, 5, true);
-		woodRate = 2.6; // - 32 wood per 24 hours.
-		smeltingRate = 64;  // - 64 items per level can be smelted here.
-		consumeBase = true;
-		baseConsumptionResource = "coal";
-		baseConsumption = 8; // - 1 coal per 8.
-		sellingBonus = .05;  // - % increase to gold value from trading with wood-based resources.
-		charcoalRate = 1;
-		dirtRate = 4;
-		woodToCharcoalConsumption = 1;
-		woodToDirtConsumption = 1;
+	public Woodshop(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.woodshop.defense.value");
+		defenseBase = config.getBoolean("buildings.woodshop.defense.base");
+		workers = config.getInt("buildings.woodshop.workers");
+		structure = config.getBoolean("buildings.woodshop.structure");
+		sellingBonus = config.getDouble("buildings.woodshop.selling_bonus");
+		woodRate = config.getDouble("buildings.woodshop.wood_production");
+		smeltingRate = config.getDouble("buildings.woodshop.smelting_rate");
+		consumeFuel = config.getBoolean("buildings.woodshop.consume_fuel");
+		fuelResource = config.getString("buildings.woodshop.fuel_source");
+		fuelOutput = config.getDouble("buildings.woodshop.fuel_output");
+		charcoalRate = config.getDouble("buildings.woodshop.production.charcoal");
+		dirtRate = config.getDouble("buildings.woodshop.production.dirt");
+		woodToCharcoalConsumption = config.getDouble("buildings.woodshop.consumption.wood_to_charcoal");
+		woodToDirtConsumption = config.getDouble("buildings.woodshop.consumption.wood_to_dirt");
 	}
 	
 	/** 
@@ -53,6 +62,8 @@ public class Woodshop extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("wood"))
 			return woodRate;
 		if(resource.equalsIgnoreCase("charcoal"))
@@ -73,6 +84,8 @@ public class Woodshop extends Building{
 	 * @return The name of the resource being consumed.  Null if no resource is found.
 	 */
 	public String getConsumptionResource(String resource) {
+		if(resource == null)
+			return null;
 		if(resource.equalsIgnoreCase("charcoal"))
 			return "wood";
 		else if(resource.equalsIgnoreCase("dirt"))
@@ -91,6 +104,8 @@ public class Woodshop extends Building{
 	 * @return The number of a resource being consumed.
 	 */
 	public double getConsumption(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase("charcoal"))
 			return woodToCharcoalConsumption * smeltingRate;
 		else if(resource.equalsIgnoreCase("dirt"))

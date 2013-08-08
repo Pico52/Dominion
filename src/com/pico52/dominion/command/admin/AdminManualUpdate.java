@@ -57,9 +57,11 @@ public class AdminManualUpdate extends AdminSubCommand{
 			return true;
 		} else if (task.equalsIgnoreCase("unit") | task.equalsIgnoreCase("units")){
 			new UnitTask(plugin).run();
+			sender.sendMessage(logPrefix + "Manually updated the units tick by 1.");
 			return true;
 		} else if (task.equalsIgnoreCase("spell") | task.equalsIgnoreCase("spells")){
 			new SpellTask(plugin).run();
+			sender.sendMessage(logPrefix + "Manually updated the spells tick by 1.");
 			return true;
 		} else {
 			sender.sendMessage(logPrefix + "Usage: " + usage);

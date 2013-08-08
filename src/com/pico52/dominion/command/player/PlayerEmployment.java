@@ -63,15 +63,17 @@ public class PlayerEmployment extends PlayerSubCommand{
 			return true;
 		}
 		ResultSet results = db.getTableData("building", "*", "settlement_id=" + settlementId);
-		int totalEmployed = 0, workers = 0, employed = 0;
-		String allData = "§a======" + settlement + "======§r\n";
+		int buildingId = 0, totalEmployed = 0, workers = 0, employed = 0;
+		String allData = "§a========" + settlement + "========§r\n";
 		try {
 			while(results.next()){
+				buildingId = results.getInt("building_id");
 				String classType = results.getString("class");
 				workers = plugin.getBuildingManager().getWorkers(classType);
 				employed = results.getInt("employed");
-				if(workers <= 0 & employed <= 0) // - No reason to bog down the results with buildings that don't need employees.
+				if(workers <= 0)
 					continue;
+				allData += "§aId: §f" + buildingId + "  ";
 				allData += "§aClass: §f" + classType + "  ";
 				allData += "§aResource: §f" + results.getString("resource") + "  ";
 				allData += "§aEmployed: §f" + employed + "/" + workers * results.getInt("level") + "\n";
@@ -84,10 +86,10 @@ public class PlayerEmployment extends PlayerSubCommand{
 			return false;
 		}
 		allData += "§aTotal Employed:§f " + totalEmployed + "\n";
-		allData += "§a======";
+		allData += "§a========";
 		for(int i=0; i<settlement.length();i++)
 			allData += "=";
-		allData += "======§r";
+		allData += "========§r";
 		sender.sendMessage(allData);
 		return true;
 	}

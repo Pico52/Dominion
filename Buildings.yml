@@ -1,0 +1,483 @@
+##########################################################################################
+description: >
+  Describes the attributes of all buildings.
+  defense.value: The defense value to be added to the settlement.
+  defense.base: true for no extra benefits per level.  false for per level.
+  workers: The integer number (no decimals) of workers per level required for maximum efficiency.
+  structure: true if it goes by the rules of a structure, false if not.
+  
+  Some buildings will have other common, but not required, attributes.
+  maximum_level:  The highest integer (no decimal) level a building can be.
+  minimum_distance:  The closest integer (no decimal) distance a building can be to another of its type.
+  resource:  The type of resource the building produces unless otherwise specified.  These 
+  should usually not be changed.
+  production:  The quantity of a resource produced each tick.
+  capacity:  The integer (no decimal) number of items that can be stored.
+  stores:  What can be held in the building.  Possible options are: wealth, food, weapon, armor, items.
+warning:
+  -  Do NOT remove buildings.
+##########################################################################################
+
+buildings:
+  archery_range:
+    defense:
+      value: 5
+      base: false
+    workers: 0
+    structure: false
+    # Experience gained for garrisoned archers each tick.
+    experience: 5
+  armory:
+    defense:
+      value: 80
+      base: true
+    workers: 10
+    structure: false
+    capacity: 3456
+    stores:
+      - weapon
+      - armor
+    weapon:
+      # How many weapons that can be made each tick.
+      production_rate: .1
+      # The costs per tick for making this item.
+      costs:
+        iron: .4
+        leather: .2
+        wood: .4
+    armor:
+      # How many pieces of armor that can be made each tick.
+      production_rate: .1
+      # The costs per tick for making this item.
+      costs:
+        iron: .8
+        leather: .2
+        wood: .1
+  bank:
+    defense:
+      value: 40
+      base: true
+    workers: 1
+    structure: false
+    capacity: 3456
+    # What can be stored as currency.
+    stores:
+      - wealth
+  barracks:
+    defense:
+      value: 0
+      base: true
+    workers: 0
+    structure: false
+    # Quantity of soldiers that can be garrisoned here each level.
+    capacity: 1.0
+  cattle_ranch:
+    defense:
+      value: 0
+      base: true
+    workers: 1
+    structure: true
+    # Maximum integer level this building can be before another building must be made.
+    maximum_level: 50
+    # Minimum integer range from other buildings of the same type.
+    minimum_range: 150
+    # Leather produced per tick.
+    leather_production: .05
+  chicken_pen:
+    defense:
+      value: 0
+      base: true
+    workers: 1
+    structure: false
+    # Maximum integer level this building can be before another building must be made.
+    maximum_level: 30
+    # Minimum integer range from other buildings of the same type.
+    minimum_range: 100
+    # Feathers produced per tick.
+    feather_production: .25
+  dockyard:
+    defense:
+      value: 20
+      base: false
+    workers: 20
+    structure: true
+    # Percentage of wealth increase for all naval-based trade.
+    trade_bonus: .15
+    # Number of ships the dockyard can hold each level.
+    # Also determines its level based on how many ships are built there.
+    capacity:
+      small: 8.0
+      medium: 4.0
+      large: 1.0
+    repair:
+      # True to repair civilian vessels; false if not.
+      civilian: true
+      # True to repair war vessels; false if not.
+      war: false
+      # Maximum integer distance a vessel can be repaired by the building.
+      range: 100
+      # Percentage of health that is repaired on all docked ships each tick.
+      rate:
+        small: .1
+        medium: .075
+        large: .05
+  farm:
+    defense:
+      value: 0
+      base: true
+    workers: 1
+    structure: true
+    # Quantity of food produced from each type of farm per tick.
+    production:
+      melon: 16.0
+      mushroom: 16.0
+      potato: 16.0
+      pumpkin: 16.0
+      wheat: 16.0
+    # Percentage of extra food produced for having an automatic harvesting system.
+    auto_harvest_bonus: .15
+  fletcher:
+    defense:
+      value: 40
+      base: true
+    workers: 20
+    structure: false
+    # Arrows produced per tick.
+    arrow_production: 20.0
+    # Quantity of resources consumed per tick.
+    costs:
+      flint: 20.0
+      wood: 2.5
+      feather: 20.0
+  granary:
+    defense:
+      value: 40
+      base: true
+    workers: 1
+    structure: false
+    # Integer amount of food can be held.
+    capacity: 1792
+    stores:
+      - food
+  home:
+    defense:
+      value: 0
+      base: true
+    workers: 0
+    structure: false
+    resource: population
+    # Number of peasants generated each tick.
+    population_production: .2
+    # Number of peasants automatically added to the population once a new home is built.
+    base_population: 3.0
+    # Integer number of peasants that can live in a home.
+    capacity: 5
+  inn:
+    defense:
+      value: 0
+      base: true
+    workers: 1
+    structure: false
+    resource: wealth
+    # Wealth (or resource) produced each tick.
+    wealth_production: .25
+    # Integer number of visitors that can stay here per level.
+    visitor_capacity: 2
+  library:
+    defense:
+      value: 40
+      base: true
+    workers: 1
+    structure: false
+    resource: mana
+    # Mana (or resource) produced each tick.
+    mana_production: .1
+    # Integer amount of mana that can be stored here per level.
+    mana_capacity: 10
+  lighthouse:
+    defense:
+      value: 5
+      base: false
+    workers: 10
+    structure: true
+    maximum_level: 10
+    # Integer distance the speed bonus applies out to per level.
+    range: 250
+    # Percentage speed bonus to all ships within range.
+    speed_bonus: .15
+  market:
+    defense:
+      value: 0
+      base: true
+    workers: 5
+    structure: false
+    resource: wealth
+    # Wealth (or resource) produced each tick.
+    wealth_production: 1.0
+    # Integer number of trade routes that can be linked to here per level.
+    trade_routes: 1
+  masonry:
+    defense:
+      value: 5
+      base: false
+    workers: 5
+    structure: false
+    # Percentage increase in gold value for trading stone-based resources.
+    selling_bonus: .1
+    # Number of items that can be smelted per level.
+    smelting_rate: 64.0
+    # True to consume the fuel source when smelting; false if not.
+    consume_fuel: true
+    # The fuel source to be consumed.
+    fuel_source: coal
+    # The number of items 1 fuel source can smelt.
+    fuel_output: 8.0
+    # The number of items obtained via smelting its respective resource.
+    production:
+      stone: 1.0
+      gravel: 3.0
+      dirt: 2.0
+      flint: 1.0
+      iron: 1.0
+      gold: 1.0
+    # Number of the item consumed to make its respective resource.
+    consumption:
+      cobblestone_to_stone: 1.0
+      cobblestone_to_gravel: 1.0
+      gravel_to_dirt: 1.0
+      gravel_to_flint: 2.0
+      iron_ore_to_iron: 1.0
+      gold_ore_to_gold: 1.0
+  mine:
+    defense:
+      value: 0
+      base: true
+    workers: 40
+    structure: false
+    maximum_level: 1
+    # Whether or not the mine should passively produce junk resources.
+    passive_dirt: true
+    passive_gravel: true
+    # Quantity of the item produced each tick.
+    production:
+      # Dirt and gravel only apply if they are set above to true for production.
+      dirt: 2.6
+      gravel: 2.6
+      redstone: 15
+      cobblestone: 15
+      coal: 6.5
+      iron_ore: 1
+      obsidian: .875
+      lapis_lazuli: .5
+      gold_ore: .5
+      diamond: .25
+  pig_pen:
+    defense:
+      value: 0
+      base: true
+    workers: 1
+    structure: true
+    maximum_level: 40
+    minimum_range: 125
+    resource: food
+    food_production: 15.0
+  quarry:
+    defense:
+      value: 0
+      base: true
+    workers: 5
+    structure: true
+    maximum_level: 8
+    production:
+      clay: 4.0
+      sand: 3.0
+      stone: 2.0
+  sandworks:
+    defense:
+      value: 5
+      base: false
+    workers: 5
+    structure: false
+    # Percentage increase in gold value for trading sand-based resources.
+    selling_bonus: .1
+    # Number of items that can be smelted per level.
+    smelting_rate: 64.0
+    # True to consume the fuel source when smelting; false if not.
+    consume_fuel: true
+    # The fuel source to be consumed.
+    fuel_source: coal
+    # The number of items 1 fuel source can smelt.
+    fuel_output: 8.0
+    # The number of items obtained via smelting its respective resource.
+    production:
+      glass: 1.0
+      sandstone: 1.0
+      gravel: 3.0
+      dirt: 2.0
+    # Number of the item consumed to make its respective resource.
+    consumption:
+      sand_to_glass: 1.0
+      sand_to_sandstone: 4.0
+      sandstone_to_gravel: 1.0
+      gravel_to_dirt: 1.0
+  sheep_ranch:
+    defense:
+      value: 0
+      base: true
+    workers: 1
+    structure: true
+    maximum_level: 50
+    minimum_range: 125
+    resource: wool
+    wool_production: .1
+  shipyard:
+    defense:
+      value: 50
+      base: false
+    workers: 25
+    structure: true
+    # Number of ships the shipyard can hold each level.
+    # Also determines its level based on how many ships are built there.
+    capacity:
+      small: 8.0
+      medium: 4.0
+      large: 1.0
+    repair:
+      # True to repair civilian/war vessels; false if not.
+      civilian: false
+      war: true
+      # Maximum integer distance a vessel can be repaired by the building.
+      range: 100
+      # Percentage of health that is repaired on all docked ships each tick.
+      rate:
+        small: .1
+        medium: .075
+        large: .05
+  spire:
+    defense:
+      value: 5
+      base: false
+    workers: 5
+    structure: false
+    # Base integer spell power added to the settlement.
+    spell_power: 10
+  tower:
+    defense:
+      value: 0
+      base: true
+    workers: 0
+    structure: true
+    # WARNING: Do not set the maximum level above the number of levels specified below.
+    maximum_level: 10
+    # Level attributes - Defense: Integer HP of the tower.  Range: Integer distance it can attack up to.
+    levels:
+      1:
+        name: Pillbox
+        defense: 2
+        range: 20
+      2:
+        name: 'Little Turret'
+        defense: 3
+        range: 60
+      3:
+        name: 'Big Turret'
+        defense: 6
+        range: 100
+      4:
+        name: 'Little Tower'
+        defense: 6
+        range: 140
+      5:
+        name: Tower
+        defense: 10
+        range: 200
+      6:
+        name: 'Big Tower'
+        defense: 15
+        range: 260
+      7:
+        name: Battlement
+        defense: 20
+        range: 320
+      8:
+        name: 'Fort Tower'
+        defense: 25
+        range: 400
+      9:
+        name: 'Castle Tower'
+        defense: 40
+        range: 480
+      10:
+        name: 'Infinity Tower'
+        defense: 40
+        range: 560
+    # Percentage increase/decrease to offense and defense based on what material the tower is made out of.
+    material_bonuses:
+      glass: -.1
+      dirt: -.1
+      gravel: -.1
+      glowstone: -.1
+      ore: -.1
+      fence: 0
+      clay: .25
+      gold: .3
+      wooden_plank: .4
+      netherrack: .5
+      wood: .6
+      cobblestone: .75
+      stone: 1
+      stone_brick: 1
+      stone_slab: 1
+      sandstone: 1
+      sandstone_slab: 1
+      endstone: 1.1
+      nether_brick: 1.1
+      brick: 1.25
+      iron: 1.8
+      obsidian: 2
+      lapis_lazuli: 2.5
+      diamond: 3
+  training_grounds:
+    defense:
+      value: 5
+      base: false
+    workers: 1
+    structure: false
+    # Experience given to every garrisoned melee unit each tick.
+    experience: 5
+  warehouse:
+    defense:
+      value: 40
+      base: true
+    workers: 1
+    structure: false
+    capacity: 3456
+    # What can be held here.
+    stores:
+      - items
+  woodshop:
+    defense:
+      value: 5
+      base: false
+    workers: 5
+    structure: true
+    # Percentage increase in gold value for trading wood-based resources.
+    selling_bonus: .05
+    # Amount of wood produced each tick.
+    wood_production: 2.6
+    # Number of items that can be smelted per level.
+    smelting_rate: 64.0
+    # True to consume the fuel source when smelting; false if not.
+    consume_fuel: true
+    # The fuel source to be consumed.
+    fuel_source: coal
+    # The number of items 1 fuel source can smelt.
+    fuel_output: 8
+    # The number of items obtained via smelting its respective resource.
+    production:
+      charcoal: 1.0
+      dirt: 4.0
+    # The number of the item consumed to make its respective resource.
+    consumption:
+      wood_to_charcoal: 1.0
+      wood_to_dirt: 1.0

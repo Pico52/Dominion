@@ -12,7 +12,19 @@ public abstract class Building {
 	
 	public int workers;
 	public float defense;
-	private boolean structure;
+	protected boolean defenseBase, structure;
+	
+	/** 
+	 * <b>Building</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;protected Building()
+	 * <br>
+	 * <br>
+	 * The constructor clause for the {@link Building} abstract class.
+	 */
+	protected Building(){
+		this(0, 0, false, true);
+	}
 
 	/** 
 	 * <b>Building</b><br>
@@ -40,9 +52,26 @@ public abstract class Building {
 	 * @param structure - Whether or not this building is a structure (can be built outside of a city).
 	 */
 	protected Building(float defense, int workers, boolean structure){
+		this(defense, workers, structure, true);
+	}
+	
+	/** 
+	 * <b>Building</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;protected Building(int defense, int workers, boolean structure, boolean defenseBase)
+	 * <br>
+	 * <br>
+	 * The constructor clause for the {@link Building} abstract class.
+	 * @param defense - The base defense this building provides.
+	 * @param workers - The maximum number of workers that may work here.
+	 * @param structure - Whether or not this building is a structure (can be built outside of a city).
+	 * @param defenseBase - Whether or not the building defense goes by level.  True for flat, false for by level.
+	 */
+	protected Building(float defense, int workers, boolean structure, boolean defenseBase){
 		this.defense = defense;
 		this.workers = workers;
 		this.structure = structure;
+		this.defenseBase = defenseBase;
 	}
 	
 	/** 
@@ -55,6 +84,18 @@ public abstract class Building {
 	 */
 	public boolean isStructure(){
 		return structure;
+	}
+	
+	/** 
+	 * <b>isDefenseBase</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean isDefenseBase()
+	 * <br>
+	 * <br>
+	 * @return True if the building's defense is added irrespective of level.  False if defense is by level.
+	 */
+	public boolean isDefenseBase(){
+		return defenseBase;
 	}
 	
 	/** 

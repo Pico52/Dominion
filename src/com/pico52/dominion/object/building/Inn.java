@@ -1,5 +1,9 @@
 package com.pico52.dominion.object.building;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.pico52.dominion.DominionSettings;
+
 /** 
  * <b>Inn</b><br>
  * <br>
@@ -11,7 +15,7 @@ package com.pico52.dominion.object.building;
 public class Inn extends Building{
 	public static String resource;
 	public static double wealthProduction;
-	public static double visitorStorage;
+	public static int visitorCapacity;
 	
 	/** 
 	 * <b>Inn</b><br>
@@ -21,11 +25,15 @@ public class Inn extends Building{
 	 * <br>
 	 * The constructor clause for the {@link Inn} class.
 	 */
-	public Inn(){  // The constructor will be used in the future for loading the custom configurations.
-		super(0, 1);
-		resource = "wealth";
-		wealthProduction = .25; // 6 per 24 hours.
-		visitorStorage = 2;
+	public Inn(){
+		FileConfiguration config = DominionSettings.getBuildingsConfig();
+		defense = config.getInt("buildings.inn.defense.value");
+		defenseBase = config.getBoolean("buildings.inn.defense.base");
+		workers = config.getInt("buildings.inn.workers");
+		structure = config.getBoolean("buildings.inn.structure");
+		resource = config.getString("buildings.inn.resource");
+		wealthProduction = config.getDouble("buildings.inn.wealth_production");
+		visitorCapacity = config.getInt("buildings.inn.visitor_capacity");
 	}
 	
 	/** 
@@ -39,6 +47,8 @@ public class Inn extends Building{
 	 */
 	@Override
 	public double getProduction(String resource) {
+		if(resource == null)
+			return 0;
 		if(resource.equalsIgnoreCase(Inn.resource))
 			return wealthProduction;
 		else
