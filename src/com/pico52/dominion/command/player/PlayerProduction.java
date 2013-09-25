@@ -52,7 +52,12 @@ public class PlayerProduction extends PlayerSubCommand{
 			sender.sendMessage(logPrefix + "No such settlement \"" + settlement + "\".");
 			return true;
 		}
-		int settlementId = db.getSettlementId(settlement);
+		int playerId = db.getPlayerId(sender.getName()), settlementId = db.getSettlementId(settlement);
+		if(!plugin.getSettlementManager().isOwner(playerId, settlementId) && 
+				!plugin.getPermissionManager().hasPermission(playerId, "production", settlementId)){
+			sender.sendMessage(logPrefix + "You do not have permission to view the production of this settlement.");
+			return true;
+		}
 		ProductionSheet results = plugin.getBuildingManager().getProductions(settlement);
 		String allData = "§a======" + settlement + "======§f\n";
 		allData += "§aMana: §f" + results.mana + "  ";

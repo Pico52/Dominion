@@ -13,6 +13,7 @@ public class Caravel extends SeaUnit{
 		offense = config.getInt("units.caravel.offense");
 		defense = config.getInt("units.caravel.defense");
 		range = config.getInt("units.caravel.range");
+		vision = config.getInt("units.caravel.vision");
 		foodConsumption = config.getInt("units.caravel.food_consumption");
 		upkeep = config.getInt("units.caravel.upkeep");
 		buildCost = config.getInt("units.caravel.build_cost");

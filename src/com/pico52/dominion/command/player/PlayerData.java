@@ -24,7 +24,7 @@ public class PlayerData extends PlayerSubCommand{
 	 * @param instance - The {@link Dominion} plugin this command executor will be running on.
 	 */
 	public PlayerData(Dominion instance){
-		super(instance, "/dominion data [biome] [building] [unit] [spell]");
+		super(instance, "/dominion data [biome / building / unit / spell]");
 	}
 	
 	/** 
@@ -54,7 +54,10 @@ public class PlayerData extends PlayerSubCommand{
 			middleData = plugin.getBiomeData().outputData();
 		} else if(entity.equalsIgnoreCase("building") | entity.equalsIgnoreCase("buildings")){
 			title = "Building Data";
-			middleData += "Building data is not currently working.";
+			middleData += "Building data is not complete.";
+			String[] buildings = plugin.getBuildingManager().getBuildingsList();
+			for(String building: buildings)
+				middleData += building + "\n";
 		} else if(entity.equalsIgnoreCase("unit") | entity.equalsIgnoreCase("units")){
 			title = "Unit Data";
 			middleData = plugin.getUnitManager().outputUnitData();

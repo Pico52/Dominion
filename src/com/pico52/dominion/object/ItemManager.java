@@ -6,9 +6,26 @@ import java.util.ArrayList;
 
 import com.pico52.dominion.Dominion;
 
+/** 
+ * <b>ItemManager</b><br>
+ * <br>
+ * &nbsp;&nbsp;public class ItemManager extends {@link DominionObjectManager}
+ * <br>
+ * <br>
+ * Controller for items.
+ */
 public class ItemManager extends DominionObjectManager{
 	private UnitManager unitManager;
 
+	/** 
+	 * <b>ItemManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public ItemManager()
+	 * <br>
+	 * <br>
+	 * The constructor clause for the {@link ItemManager} class.
+	 * @param instance - The {@link Dominion} plugin this manager will be running on.
+	 */
 	public ItemManager(Dominion plugin) {
 		super(plugin);
 		unitManager = plugin.getUnitManager();

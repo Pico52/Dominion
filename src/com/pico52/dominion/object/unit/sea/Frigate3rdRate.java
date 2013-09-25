@@ -13,6 +13,7 @@ public class Frigate3rdRate extends SeaUnit{
 		offense = config.getInt("units.frigate_3rd_rate.offense");
 		defense = config.getInt("units.frigate_3rd_rate.defense");
 		range = config.getInt("units.frigate_3rd_rate.range");
+		vision = config.getInt("units.frigate_3rd_rate.vision");
 		foodConsumption = config.getInt("units.frigate_3rd_rate.food_consumption");
 		upkeep = config.getInt("units.frigate_3rd_rate.upkeep");
 		buildCost = config.getInt("units.frigate_3rd_rate.build_cost");

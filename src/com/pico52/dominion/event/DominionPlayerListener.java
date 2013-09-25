@@ -1,5 +1,6 @@
 package com.pico52.dominion.event;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -32,7 +33,28 @@ public class DominionPlayerListener implements Listener{
 	
 	@EventHandler
 	public void onPlayerJoinEvent(PlayerJoinEvent event){
-		if(!plugin.getDBHandler().playerExists(event.getPlayer().getName()))
-			plugin.getDBHandler().createPlayer(event.getPlayer().getName());
+		Player player = event.getPlayer();
+		String playerName = player.getName();
+		
+		//---Register new players---//
+		if(!plugin.getDBHandler().playerExists(playerName))
+			plugin.getDBHandler().createPlayer(playerName);
+		
+		//---Handle admin requests---//
+		if(event.getPlayer().isOp()){
+			int[] adminRequests = plugin.getRequestManager().getRequestsToAdmins();
+			String message = plugin.getLogPrefix() + "You have " + adminRequests.length + " admin requests from other players active.";
+			if(adminRequests.length > 0)
+				message += "  Please use the \"/ad requests\" command to view the requests.";
+			player.sendMessage(message);
+		}
+		
+		//---Handle other requests---//
+		int playerId = plugin.getDBHandler().getPlayerId(playerName);
+		int[] playerRequests = plugin.getRequestManager().getRequestsTo(playerId);
+		String message = plugin.getLogPrefix() + "You have " + playerRequests.length + " player requests from other players active.";
+		if(playerRequests.length > 0)
+			message += "  Please use the \"/d requests\" command to view the requests.";
+		player.sendMessage(message);
 	}
 }

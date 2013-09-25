@@ -13,6 +13,7 @@ public class ManOWar extends SeaUnit{
 		offense = config.getInt("units.man_o_war.offense");
 		defense = config.getInt("units.man_o_war.defense");
 		range = config.getInt("units.man_o_war.range");
+		vision = config.getInt("units.man_o_war.vision");
 		foodConsumption = config.getInt("units.man_o_war.food_consumption");
 		upkeep = config.getInt("units.man_o_war.upkeep");
 		buildCost = config.getInt("units.man_o_war.build_cost");

@@ -1,7 +1,5 @@
 package com.pico52.dominion.command.player;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 import org.bukkit.Material;
@@ -54,89 +52,67 @@ public class PlayerWithdraw extends PlayerSubCommand{
 			sender.sendMessage(logPrefix + "You must be online in order to withdraw anything.");
 			return true;
 		}
-		if(args.length == 0 ){	// - They only specified "withdraw" but gave no settlement.  Tell them how to use the command.
+		if(args.length == 0 ){
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		if(args.length == 1){  // - They may have specified the settlement, but they didn't say what to withdraw or how much.
+		if(args.length == 1){
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			sender.sendMessage(logPrefix + "Please issue the command again specifying the material and amount to be withdrawn.");
 			return true;
 		}
-		if (args.length == 2){ // - They may have forgotten to put the amount to withdraw.
+		if (args.length == 2){
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			sender.sendMessage(logPrefix + "Please issue the command again specifying the amount to be withdrawn.");
 			return true;
 		}
-		// - Setting names to the arguments for easy readability.
-		String settlement = args[0];
-		String material = args[1].toLowerCase();
-		int withdrawAmount = 0;
+		String settlement = args[0], material = args[1].toLowerCase();
+		double withdrawAmount = 0;
 		try{
-			withdrawAmount = Integer.parseInt(args[2]);
+			withdrawAmount = Double.parseDouble(args[2]);
 		} catch (NumberFormatException ex){
 			sender.sendMessage(logPrefix + "Incorrect input.  " + args[2] + " is not a number.");
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		if(!db.settlementExists(settlement)){ // - Make sure this settlement is legitimate.
+		if(!db.settlementExists(settlement)){
 			sender.sendMessage(logPrefix + "Settlement: " + settlement + " does not exist.");
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		// - Make sure the material type is legitimate.
 		if(Material.matchMaterial(material) == null){
 			sender.sendMessage(logPrefix + "The material \"" + material + "\" is not a material.");
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		ResultSet lord = db.getSettlementData(settlement, "lord_id");
-		try {
-			if(lord.next()){
-				if(db.getPlayerName(lord.getInt("lord_id")) != sender.getName()){
-					lord.getStatement().close();
-					sender.sendMessage(logPrefix + "You must be the lord of this settlement in order to withdraw from its resources.");
-					return true;
-				}
-			} else {
-				lord.getStatement().close();
-				sender.sendMessage(logPrefix + "Cannot find the lord you are looking for.");
-				plugin.getLogger().info("Can't find the lord of this settlement.");
-				return true;
-			}
-			// By this point, the lord matches the sender, so they are authorized to withdraw.
-			ResultSet info = db.getSettlementData(settlement, material);
-			info.next();
-			int currentMat = info.getInt(material);
-			info.getStatement().close();
-			int newMat = currentMat - withdrawAmount;
-			if(newMat < 0)  // - Check to see if there's that much to be withdrawn.
-				withdrawAmount = currentMat;
-			plugin.getLogger().info(logPrefix + "Withdraw amount: " + withdrawAmount + ".  Material: " + material.toUpperCase());
-			HashMap<Integer, ItemStack> remainderMap = player.getInventory().addItem(new ItemStack(Material.matchMaterial(material.toUpperCase()),withdrawAmount));
-			int remainder = 0;
-			int actualWithdraw = withdrawAmount;
-			if(remainderMap != null){
-				for(int i=0;remainderMap.containsKey(i);i++){
-					remainder += remainderMap.get(i).getAmount();  // - Summing up the total items that were not added.
-				}
-				actualWithdraw = withdrawAmount - remainder;
-			}
-			sender.sendMessage(logPrefix + "Total withdraw: " + actualWithdraw + ".  Remainder not withdrawn: " + remainder);
-			// - Subtract the material from the database.
-			if(db.subtractMaterial(settlement, material.toLowerCase(), actualWithdraw)){
-				sender.sendMessage(logPrefix + "Withdraw successful!");
-				plugin.getLogger().info(logPrefix + "Withdraw successful for command sender: " + sender.getName());
-				return true;
-			}else{
-				sender.sendMessage(logPrefix + "Withdraw failed to subtract resources from the settlement.");
-				plugin.getLogger().info(logPrefix + "Withdraw failed to subtract resources from the settlement.");
-				return true;
-			}
-		}catch(SQLException ex){
-			sender.sendMessage(logPrefix + "An error occured when attempting to find your materials.  Please make sure that \"" + material + "\" is a material.");
-			plugin.getLogger().info(logPrefix + "An error occured when attempting to find materials information.  Material specified: " + material);
+		int playerId = db.getPlayerId(sender.getName()), settlementId = db.getSettlementId(settlement);
+		if(!plugin.getSettlementManager().isOwner(playerId, settlementId)){
+			sender.sendMessage(logPrefix + "You must be the lord of this settlement in order to withdraw from its resources.");
+			return true;
 		}
-		return true;
+		double currentMat = plugin.getSettlementManager().getMaterial(settlementId, material);
+		double newMat = currentMat - withdrawAmount;
+			if(newMat < 0)
+				withdrawAmount = currentMat;
+		plugin.getLogger().info(logPrefix + "Withdraw amount: " + withdrawAmount + ".  Material: " + material.toUpperCase());
+		HashMap<Integer, ItemStack> remainderMap = player.getInventory().addItem(new ItemStack(Material.matchMaterial(material.toUpperCase()),(int) withdrawAmount));
+		double remainder = 0;
+		double actualWithdraw = (int) withdrawAmount;
+		if(remainderMap != null){
+			for(int i=0;remainderMap.containsKey(i);i++){
+				remainder += remainderMap.get(i).getAmount();
+			}
+			actualWithdraw = withdrawAmount - remainder;
+		}
+		sender.sendMessage(logPrefix + "Total withdraw: " + actualWithdraw + ".  Remainder not withdrawn: " + remainder);
+		if(plugin.getSettlementManager().subtractMaterial(settlementId, material, actualWithdraw)){
+			sender.sendMessage(logPrefix + "Withdraw successful!");
+			plugin.getLogger().info(logPrefix + "Withdraw successful for command sender: " + sender.getName());
+			return true;
+		}else{
+			sender.sendMessage(logPrefix + "Withdraw failed to subtract resources from the settlement.");
+			plugin.getLogger().info(logPrefix + "Withdraw failed to subtract resources from the settlement.");
+			return true;
+		}
 	}
 }

@@ -14,6 +14,7 @@ public class DreadKnight extends Unit{
 		offense = config.getInt("units.dread_knight.offense");
 		defense = config.getInt("units.dread_knight.defense");
 		range = config.getInt("units.dread_knight.range");
+		vision = config.getInt("units.dread_knight.vision");
 		foodConsumption = config.getInt("units.dread_knight.food_consumption");
 		upkeep = config.getInt("units.dread_knight.upkeep");
 		buildCost = config.getInt("units.dread_knight.build_cost");

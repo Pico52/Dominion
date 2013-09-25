@@ -71,6 +71,8 @@ public class BuildingManager extends DominionObjectManager{
 	private TrainingGrounds trainingGrounds;
 	private Warehouse warehouse;
 	private Woodshop woodshop;
+	private String[] buildingsList = {"archery_range", "armory", "bank", "barracks", "cattle_ranch", "chicken_pen", "dockyard", "farm", "fletcher", "granary", "home", "inn", "library", "lighthouse", 
+			"market", "masonry", "mine", "pig_pen", "quarry", "sandworks", "sheep_ranch", "shipyard", "spire", "tower", "training_grounds", "warehouse", "woodshop"};
 	
 	/** 
 	 * <b>BuildingManager</b><br>
@@ -549,9 +551,48 @@ public class BuildingManager extends DominionObjectManager{
 		return 0;
 	}
 	
+	/** 
+	 * <b>isBuilding</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean isBuilding({@link String} classification)
+	 * <br>
+	 * <br>
+	 * @param classification - The class of the building to test.
+	 * @return True if the classification is a building; false if it is not.
+	 */
+	public boolean isBuilding(String classification){
+		for(String building: buildingsList){
+			if(classification.equalsIgnoreCase(building))
+				return true;
+		}
+		return false;
+	}
+	
 //---ACCESSORS---//
-	// - These accessors, though the classes are mostly static and public, will hopefully 
-	// - allow other classes to use buildings without importing the files.
+	/** 
+	 * <b>getSettlementId</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public int getSettlementId(int buildingId)
+	 * <br>
+	 * <br>
+	 * @param buildingId - The id of the building.
+	 * @return The id of the settlement the building resides in.
+	 */
+	public int getSettlementId(int buildingId){
+		return db.getSingleColumnInt("building", "settlement_id", buildingId, "building_id");
+	}
+	
+	/** 
+	 * <b>getBuildingsList</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link String}[] getBuildingsList()
+	 * <br>
+	 * <br>
+	 * @return The list of acceptable buildings.
+	 */
+	public String[] getBuildingsList(){
+		return buildingsList;
+	}
 	
 	/** 
 	 * <b>getArcheryRange</b><br>

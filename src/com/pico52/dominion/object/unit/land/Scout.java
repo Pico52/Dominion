@@ -14,6 +14,7 @@ public class Scout extends Unit{
 		offense = config.getInt("units.scout.offense");
 		defense = config.getInt("units.scout.defense");
 		range = config.getInt("units.scout.range");
+		vision = config.getInt("units.scout.vision");
 		foodConsumption = config.getInt("units.scout.food_consumption");
 		upkeep = config.getInt("units.scout.upkeep");
 		buildCost = config.getInt("units.scout.build_cost");

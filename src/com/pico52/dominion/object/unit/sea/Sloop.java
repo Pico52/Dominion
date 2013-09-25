@@ -13,6 +13,7 @@ public class Sloop extends SeaUnit{
 		offense = config.getInt("units.sloop.offense");
 		defense = config.getInt("units.sloop.defense");
 		range = config.getInt("units.sloop.range");
+		vision = config.getInt("units.sloop.vision");
 		foodConsumption = config.getInt("units.sloop.food_consumption");
 		upkeep = config.getInt("units.sloop.upkeep");
 		buildCost = config.getInt("units.sloop.build_cost");

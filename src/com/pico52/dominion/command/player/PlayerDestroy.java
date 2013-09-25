@@ -1,7 +1,6 @@
 package com.pico52.dominion.command.player;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import com.pico52.dominion.Dominion;
 
@@ -41,12 +40,6 @@ public class PlayerDestroy extends PlayerSubCommand{
 	 */
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		Player player = (Player) sender;
-		if(!player.isOnline()){  // - The player must be online for this to work.
-			sender.sendMessage(logPrefix + "You must be online in order to perform this command.  If you are an admin using the system console, " +
-					"try using the \"/ad remove\" command instead.");
-			return true;
-		}
 		if(args.length == 0){
 			sender.sendMessage(logPrefix + "Destroys a building so long as you are the owner of it.");
 			sender.sendMessage(logPrefix + "Usage: " + usage);
@@ -62,12 +55,15 @@ public class PlayerDestroy extends PlayerSubCommand{
 			return true;
 		}
 		int playerId;
-		if((playerId = db.getPlayerId(player.getName())) == -1){
+		if((playerId = db.getPlayerId(sender.getName())) == -1){
 			sender.sendMessage(logPrefix + "Could not find your player Id!");
 			return true;
 		}
-		if(db.getOwnerId("building", building) != playerId){
-			sender.sendMessage(logPrefix + "You are not the owner of this building!");
+		int settlementId = plugin.getBuildingManager().getSettlementId(building);
+		if(db.getOwnerId("building", building) != playerId && 
+				!plugin.getSettlementManager().isOwner(playerId, settlementId) && 
+				!plugin.getPermissionManager().hasPermission(playerId, "destroy", settlementId)){
+			sender.sendMessage(logPrefix + "You do not have permission to destroy this building!");
 			return true;
 		}
 		if(db.remove("building", building)){

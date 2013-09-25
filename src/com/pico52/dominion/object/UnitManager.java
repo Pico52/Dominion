@@ -589,8 +589,9 @@ public class UnitManager extends DominionObjectManager{
 	 */
 	public boolean isVisible(int unitId, int playerId){
 		int ownerId = getOwner(unitId);
-		if(ownerId == playerId)
+		if(ownerId == playerId || plugin.getPermissionManager().hasPermission(playerId, "see", ownerId))
 			return true;
+		// - Check Invisibility
 		SpellManager sm = plugin.getSpellManager();
 		if(sm.getActiveSpells(unitId, "unit", "unit_invisibility").length > 0){
 			double unitX = getUnitX(unitId), unitZ = getUnitZ(unitId);
@@ -600,7 +601,13 @@ public class UnitManager extends DominionObjectManager{
 			}
 			return false;
 		}
-		return true;
+		// - Check Vision
+		for(int unit: getAllPlayerUnits(playerId)){
+			if(withinVisionRange(unit, unitId))
+				return true;
+		}
+		// - Fog of War
+		return false;
 	}
 		
 	public boolean isUnit(String unit){
@@ -641,68 +648,23 @@ public class UnitManager extends DominionObjectManager{
 	}
 	
 	public String getClass(int unitId){
-		ResultSet unit = plugin.getDBHandler().getUnitData(unitId, "class");
-		String classification = "";
-		try{
-			if(unit.next())
-				classification = unit.getString("class");
-			unit.getStatement().close();
-		} catch (SQLException ex){
-			ex.printStackTrace();
-		}
-		return classification;
+		return db.getSingleColumnString("unit", "class", unitId, "unit_Id");
 	}
 	
 	public int getOwner(int unitId){
-		ResultSet unit = plugin.getDBHandler().getUnitData(unitId, "owner_id");
-		int ownerId = 0;
-		try{
-			if(unit.next())
-				ownerId = unit.getInt("owner_id");
-			unit.getStatement().close();
-		} catch (SQLException ex){
-			ex.printStackTrace();
-		}
-		return ownerId;
+		return db.getSingleColumnInt("unit", "owner", unitId, "unit_Id");
 	}
 	
 	public double getHealth(int unitId){
-		ResultSet unit = plugin.getDBHandler().getUnitData(unitId, "health");
-		double health=0;
-		try{
-			if(unit.next())
-				health = unit.getDouble("health");
-			unit.getStatement().close();
-		} catch (SQLException ex){
-			ex.printStackTrace();
-		}
-		return health;
+		return db.getSingleColumnDouble("unit", "health", unitId, "unit_Id");
 	}
 	
 	public double getUnitX(int unitId){
-		ResultSet unit = plugin.getDBHandler().getTableData("unit", unitId, "xcoord", "unit_id");
-		double xCoord = 0;
-		try{
-			if(unit.next())
-				xCoord = unit.getDouble("xcoord");
-			unit.getStatement().close();
-		} catch (SQLException ex){
-			ex.printStackTrace();
-		}
-		return xCoord;
+		return db.getSingleColumnDouble("unit", "xcoord", unitId, "unit_Id");
 	}
 	
 	public double getUnitZ(int unitId){
-		ResultSet unit = plugin.getDBHandler().getTableData("unit", unitId, "zcoord", "unit_id");
-		double zCoord = 0;
-		try{
-			if(unit.next())
-				zCoord = unit.getDouble("zcoord");
-			unit.getStatement().close();
-		} catch (SQLException ex){
-			ex.printStackTrace();
-		}
-		return zCoord;
+		return db.getSingleColumnDouble("unit", "zcoord", unitId, "unit_Id");
 	}
 	
 	public int getTargetId(int unitId){
@@ -710,15 +672,7 @@ public class UnitManager extends DominionObjectManager{
 		int commandId = getCurrentCommandId(unitId);
 		if(commandId == -1)
 			return targetId;
-		ResultSet command = plugin.getDBHandler().getTableData("command", commandId, "target_id", "command_id");
-		try{
-			if(command.next())
-				targetId = command.getInt("target_id");
-			command.getStatement().close();
-		} catch (SQLException ex){
-			ex.printStackTrace();
-		}
-		return targetId;
+		return db.getSingleColumnInt("command", "target_id", commandId, "command_id");
 	}
 	
 	public double getTargetX(int unitId){
@@ -776,6 +730,22 @@ public class UnitManager extends DominionObjectManager{
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean withinVisionRange(int unitId, int targetId){
+		double unitX = getUnitX(unitId);
+		double unitZ = getUnitZ(unitId);
+		double targetX = getUnitX(targetId);
+		double targetZ = getUnitZ(targetId);
+		int range = getUnit(getClass(unitId)).getVision();
+		if(Math.abs(unitX - targetX) <= range & Math.abs(unitZ - targetZ) <= range){
+			return true;
+		}
+		return false;
+	}
+	
+	public int[] getAllPlayerUnits(int playerId){
+		return db.getSpecificIds("unit", playerId, "owner_id");
 	}
 	
 	public Unit getLandUnit(String unit){

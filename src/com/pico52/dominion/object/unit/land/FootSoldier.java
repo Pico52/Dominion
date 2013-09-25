@@ -14,6 +14,7 @@ public class FootSoldier extends Unit{
 		offense = config.getInt("units.foot_soldier.offense");
 		defense = config.getInt("units.foot_soldier.defense");
 		range = config.getInt("units.foot_soldier.range");
+		vision = config.getInt("units.foot_soldier.vision");
 		foodConsumption = config.getInt("units.foot_soldier.food_consumption");
 		upkeep = config.getInt("units.foot_soldier.upkeep");
 		buildCost = config.getInt("units.foot_soldier.build_cost");

@@ -27,7 +27,7 @@ public class PlayerStorage extends PlayerSubCommand{
 	 * @param instance - The {@link Dominion} plugin this command executor will be running on.
 	 */
 	public PlayerStorage(Dominion instance){
-		super(instance, "/dominion [storage/info/stores/materials/mats] [settlement name]");
+		super(instance, "/dominion [storage/stores/materials/mats] [settlement name]");
 	}
 	
 	/** 
@@ -54,7 +54,13 @@ public class PlayerStorage extends PlayerSubCommand{
 		ResultSet results = db.getSettlementData(settlement, "*");
 		try {
 			if(!db.settlementExists(settlement)){
-				sender.sendMessage(logPrefix + "No such kingdom \"" + settlement + "\".");
+				sender.sendMessage(logPrefix + "No such settlement \"" + settlement + "\".");
+				return true;
+			}
+			int playerId = db.getPlayerId(sender.getName()), settlementId = db.getSettlementId(settlement);
+			if(!plugin.getSettlementManager().isOwner(playerId, settlementId) && 
+					!plugin.getPermissionManager().hasPermission(playerId, "storage", settlementId)){
+				sender.sendMessage(logPrefix + "You do not have permission to view the storages of this settlement.");
 				return true;
 			}
 			String allData = "§a======" + settlement + "======§f\n";

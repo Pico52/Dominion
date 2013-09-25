@@ -14,6 +14,7 @@ public class Militia extends Unit{
 		offense = config.getInt("units.militia.offense");
 		defense = config.getInt("units.militia.defense");
 		range = config.getInt("units.militia.range");
+		vision = config.getInt("units.militia.vision");
 		foodConsumption = config.getInt("units.militia.food_consumption");
 		upkeep = config.getInt("units.militia.upkeep");
 		buildCost = config.getInt("units.militia.build_cost");

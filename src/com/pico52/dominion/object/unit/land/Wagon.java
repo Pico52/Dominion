@@ -14,6 +14,7 @@ public class Wagon extends Unit{
 		offense = config.getInt("units.wagon.offense");
 		defense = config.getInt("units.wagon.defense");
 		range = config.getInt("units.wagon.range");
+		vision = config.getInt("units.wagon.vision");
 		foodConsumption = config.getInt("units.wagon.food_consumption");
 		upkeep = config.getInt("units.wagon.upkeep");
 		buildCost = config.getInt("units.wagon.build_cost");

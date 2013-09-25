@@ -90,7 +90,6 @@ public class PlayerList extends PlayerSubCommand{
 								if(casterId != db.getOwnerId("unit", entityId)){
 									SpellManager sm = plugin.getSpellManager();
 									for(int spell: sm.getAllSpells("aoe_reveal_fake_units")){
-										// - For the future - Make a "isFriendlySpell" method in spells so that friendly spells can give vision too.
 										if(sm.isWithinAreaOfEffect(unitX, unitZ, spell) & sm.getCasterId(spell) == casterId)
 											middleData += "§aFAKE§f  ";
 									}

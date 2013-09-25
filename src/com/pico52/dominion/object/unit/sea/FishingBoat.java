@@ -13,6 +13,7 @@ public class FishingBoat extends SeaUnit{
 		offense = config.getInt("units.fishing_boat.offense");
 		defense = config.getInt("units.fishing_boat.defense");
 		range = config.getInt("units.fishing_boat.range");
+		vision = config.getInt("units.fishing_boat.vision");
 		foodConsumption = config.getInt("units.fishing_boat.food_consumption");
 		upkeep = config.getInt("units.fishing_boat.upkeep");
 		buildCost = config.getInt("units.fishing_boat.build_cost");

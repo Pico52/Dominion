@@ -12,10 +12,27 @@ import org.bukkit.configuration.file.FileConfiguration;
 import com.pico52.dominion.Dominion;
 import com.pico52.dominion.DominionSettings;
 
+/** 
+ * <b>SpellManager</b><br>
+ * <br>
+ * &nbsp;&nbsp;public class SpellManager extends {@link DominionObjectManager}
+ * <br>
+ * <br>
+ * Controller for spells.
+ */
 public class SpellManager extends DominionObjectManager{
 	FileConfiguration config;
 	SettlementManager settlementManager;
 
+	/** 
+	 * <b>SpellManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public SpellManager()
+	 * <br>
+	 * <br>
+	 * The constructor clause for the {@link SpellManager} class.
+	 * @param instance - The {@link Dominion} plugin this manager will be running on.
+	 */
 	public SpellManager(Dominion plugin) {
 		super(plugin);
 		config = DominionSettings.getSpellsConfig();
@@ -26,8 +43,9 @@ public class SpellManager extends DominionObjectManager{
 		if(!isSpell(spell))
 			return false;
 		settlementManager = plugin.getSettlementManager();
-		if(db.getOwnerId("settlement", settlementId) != casterId){
-			plugin.sendMessage(db.getPlayerName(casterId), plugin.getLogPrefix()+ "You cannot cast a spell from a settlement you do not own!");
+		if(db.getOwnerId("settlement", settlementId) != casterId && 
+				!plugin.getPermissionManager().hasPermission(casterId, "cast", settlementId)){
+			plugin.sendMessage(db.getPlayerName(casterId), plugin.getLogPrefix()+ "You do not have permission to cast this spell!");
 			return false;
 		}
 		String settlementName = db.getSettlementName(settlementId);

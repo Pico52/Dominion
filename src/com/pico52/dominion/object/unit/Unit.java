@@ -3,7 +3,7 @@ package com.pico52.dominion.object.unit;
 public abstract class Unit {
 	protected double speed, health;
 	protected int 
-	offense, defense, range, foodConsumption, 
+	offense, defense, range, vision, foodConsumption, 
 	upkeep, buildCost, trainingTime, capacity, 
 	material1Quantity, material2Quantity;
 	protected String material1, material2, name;
@@ -23,6 +23,9 @@ public abstract class Unit {
 	}
 	public int getRange(){
 		return range;
+	}
+	public int getVision(){
+		return vision;
 	}
 	public int getFoodConsumption(){
 		return foodConsumption;

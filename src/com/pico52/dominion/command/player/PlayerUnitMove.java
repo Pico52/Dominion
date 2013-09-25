@@ -41,8 +41,7 @@ public class PlayerUnitMove extends PlayerSubCommand{
 		int ownerId = db.getOwnerId("unit", unitId);
 		int playerId = db.getPlayerId(sender.getName());
 		if(ownerId != playerId){
-			sender.sendMessage(logPrefix + "You must be the owner of this unit in order to give it an order.");
-			sender.sendMessage(logPrefix + "Usage: " + usage);
+			sender.sendMessage(logPrefix + "You are not the owner of this unit.");
 			return true;
 		}
 		if(!plugin.getUnitManager().commandToMove(unitId, xCoord, zCoord)){

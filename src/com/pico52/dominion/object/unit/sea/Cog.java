@@ -13,6 +13,7 @@ public class Cog extends SeaUnit{
 		offense = config.getInt("units.cog.offense");
 		defense = config.getInt("units.cog.defense");
 		range = config.getInt("units.cog.range");
+		vision = config.getInt("units.cog.vision");
 		foodConsumption = config.getInt("units.cog.food_consumption");
 		upkeep = config.getInt("units.cog.upkeep");
 		buildCost = config.getInt("units.cog.build_cost");

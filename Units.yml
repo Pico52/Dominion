@@ -8,6 +8,7 @@ description: >
   offense: Amount of base damage the unit can deal to another entity.
   defense: Amount of base defense the unit can use to prevent being damaged.
   range: Maximum distance the unit can attack from.
+  vision: Distance the unit can see other objects.
   food_consumption: Food consumed each unit tick.
   upkeep: Wealth consumed each unit tick.
   build_cost: Wealth required to build.
@@ -33,6 +34,7 @@ units:
     offense: 3
     defense: 3
     range: 50
+    vision: 100
     food_consumption: 3
     upkeep: 5
     build_cost: 100
@@ -54,6 +56,7 @@ units:
     offense: 30
     defense: 500
     range: 45
+    vision: 100
     food_consumption: 5
     upkeep: 5
     build_cost: 500
@@ -75,6 +78,7 @@ units:
     offense: 60
     defense: 850
     range: 50
+    vision: 100
     food_consumption: 15
     upkeep: 15
     build_cost: 1000
@@ -96,6 +100,7 @@ units:
     offense: 15
     defense: 350
     range: 40
+    vision: 100
     food_consumption: 5
     upkeep: 5
     build_cost: 400
@@ -117,6 +122,7 @@ units:
     offense: 10
     defense: 16
     range: 10
+    vision: 100
     food_consumption: 10
     upkeep: 15
     build_cost: 500
@@ -138,6 +144,7 @@ units:
     offense: 0
     defense: 50
     range: 10
+    vision: 100
     food_consumption: 0
     upkeep: 0
     build_cost: 250
@@ -159,6 +166,7 @@ units:
     offense: 3
     defense: 5
     range: 10
+    vision: 100
     food_consumption: 3
     upkeep: 6
     build_cost: 120
@@ -180,6 +188,7 @@ units:
     offense: 100
     defense: 1500
     range: 70
+    vision: 100
     food_consumption: 40
     upkeep: 40
     build_cost: 3000
@@ -201,6 +210,7 @@ units:
     offense: 90
     defense: 1250
     range: 60
+    vision: 100
     food_consumption: 30
     upkeep: 30
     build_cost: 2000
@@ -222,6 +232,7 @@ units:
     offense: 80
     defense: 1000
     range: 50
+    vision: 100
     food_consumption: 20
     upkeep: 20
     build_cost: 1500
@@ -243,6 +254,7 @@ units:
     offense: 85
     defense: 1000
     range: 60
+    vision: 100
     food_consumption: 20
     upkeep: 20
     build_cost: 1250
@@ -264,6 +276,7 @@ units:
     offense: 60
     defense: 450
     range: 10
+    vision: 100
     food_consumption: 5
     upkeep: 5
     build_cost: 400
@@ -285,6 +298,7 @@ units:
     offense: 8
     defense: 14
     range: 10
+    vision: 100
     food_consumption: 8
     upkeep: 12
     build_cost: 400
@@ -306,6 +320,7 @@ units:
     offense: 6
     defense: 10
     range: 10
+    vision: 100
     food_consumption: 6
     upkeep: 10
     build_cost: 350
@@ -327,6 +342,7 @@ units:
     offense: 125
     defense: 1650
     range: 80
+    vision: 100
     food_consumption: 50
     upkeep: 50
     build_cost: 4000
@@ -348,6 +364,7 @@ units:
     offense: 4
     defense: 4
     range: 60
+    vision: 100
     food_consumption: 4
     upkeep: 7
     build_cost: 135
@@ -369,6 +386,7 @@ units:
     offense: 2
     defense: 3
     range: 10
+    vision: 100
     food_consumption: 1
     upkeep: 4
     build_cost: 100
@@ -390,6 +408,7 @@ units:
     offense: 1
     defense: 1
     range: 10
+    vision: 100
     food_consumption: 1
     upkeep: 1
     build_cost: 10
@@ -411,6 +430,7 @@ units:
     offense: 50
     defense: 750
     range: 10
+    vision: 100
     food_consumption: 10
     upkeep: 10
     build_cost: 650
@@ -432,6 +452,7 @@ units:
     offense: 1
     defense: 3
     range: 10
+    vision: 150
     food_consumption: 1
     upkeep: 3
     build_cost: 50
@@ -453,6 +474,7 @@ units:
     offense: 2
     defense: 2
     range: 40
+    vision: 100
     food_consumption: 2
     upkeep: 3
     build_cost: 80
@@ -474,6 +496,7 @@ units:
     offense: 40
     defense: 400
     range: 45
+    vision: 100
     food_consumption: 8
     upkeep: 8
     build_cost: 450
@@ -495,6 +518,7 @@ units:
     offense: 4
     defense: 6
     range: 10
+    vision: 100
     food_consumption: 4
     upkeep: 8
     build_cost: 150
@@ -516,6 +540,7 @@ units:
     offense: 1
     defense: 5
     range: 10
+    vision: 50
     food_consumption: 1
     upkeep: 10
     build_cost: 300
@@ -537,6 +562,7 @@ units:
     offense: 0
     defense: 1
     range: 0
+    vision: 10
     food_consumption: 0
     upkeep: 0
     build_cost: 0

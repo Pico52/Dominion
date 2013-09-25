@@ -14,6 +14,7 @@ public class ManAtArms extends Unit{
 		offense = config.getInt("units.man_at_arms.offense");
 		defense = config.getInt("units.man_at_arms.defense");
 		range = config.getInt("units.man_at_arms.range");
+		vision = config.getInt("units.man_at_arms.vision");
 		foodConsumption = config.getInt("units.man_at_arms.food_consumption");
 		upkeep = config.getInt("units.man_at_arms.upkeep");
 		buildCost = config.getInt("units.man_at_arms.build_cost");

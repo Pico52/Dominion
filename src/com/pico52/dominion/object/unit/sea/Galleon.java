@@ -13,6 +13,7 @@ public class Galleon extends SeaUnit{
 		offense = config.getInt("units.galleon.offense");
 		defense = config.getInt("units.galleon.defense");
 		range = config.getInt("units.galleon.range");
+		vision = config.getInt("units.galleon.vision");
 		foodConsumption = config.getInt("units.galleon.food_consumption");
 		upkeep = config.getInt("units.galleon.upkeep");
 		buildCost = config.getInt("units.galleon.build_cost");

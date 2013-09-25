@@ -14,6 +14,8 @@ import com.pico52.dominion.db.DominionDatabaseHandler;
 import com.pico52.dominion.event.DominionPlayerListener;
 import com.pico52.dominion.object.BuildingManager;
 import com.pico52.dominion.object.ItemManager;
+import com.pico52.dominion.object.PermissionManager;
+import com.pico52.dominion.object.RequestManager;
 import com.pico52.dominion.object.SettlementManager;
 import com.pico52.dominion.object.SpellManager;
 import com.pico52.dominion.object.UnitManager;
@@ -46,6 +48,8 @@ public final class Dominion extends JavaPlugin{
 	private TaskManager taskManager;
 	private SpellManager spellManager;
 	private ItemManager itemManager;
+	private PermissionManager permissionManager;
+	private RequestManager requestManager;
 	
 	@Override
 	public void onEnable(){
@@ -60,6 +64,8 @@ public final class Dominion extends JavaPlugin{
 		unitManager = new UnitManager(this);
 		spellManager = new SpellManager(this);
 		itemManager = new ItemManager(this);
+		permissionManager = new PermissionManager(this);
+		requestManager = new RequestManager(this);
 		biomeData = new BiomeData();
 		
 		playerEvent = new DominionPlayerListener(this);
@@ -224,6 +230,30 @@ public final class Dominion extends JavaPlugin{
 	 */
 	public ItemManager getItemManager(){
 		return itemManager;
+	}
+	
+	/** 
+	 * <b>getPermissionManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link PermissionManager} getPermissionManager()
+	 * <br>
+	 * <br>
+	 * @return The manager controlling permissions.
+	 */
+	public PermissionManager getPermissionManager(){
+		return permissionManager;
+	}
+	
+	/** 
+	 * <b>getRequestManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link RequestManager} getRequestManager()
+	 * <br>
+	 * <br>
+	 * @return The manager controlling requests.
+	 */
+	public RequestManager getRequestManager(){
+		return requestManager;
 	}
 	
 	/** 

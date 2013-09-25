@@ -14,6 +14,7 @@ public class Marksman extends Unit{
 		offense = config.getInt("units.marksman.offense");
 		defense = config.getInt("units.marksman.defense");
 		range = config.getInt("units.marksman.range");
+		vision = config.getInt("units.marksman.vision");
 		foodConsumption = config.getInt("units.marksman.food_consumption");
 		upkeep = config.getInt("units.marksman.upkeep");
 		buildCost = config.getInt("units.marksman.build_cost");

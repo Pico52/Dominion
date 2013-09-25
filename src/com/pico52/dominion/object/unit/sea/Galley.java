@@ -13,6 +13,7 @@ public class Galley extends SeaUnit{
 		offense = config.getInt("units.galley.offense");
 		defense = config.getInt("units.galley.defense");
 		range = config.getInt("units.galley.range");
+		vision = config.getInt("units.galley.vision");
 		foodConsumption = config.getInt("units.galley.food_consumption");
 		upkeep = config.getInt("units.galley.upkeep");
 		buildCost = config.getInt("units.galley.build_cost");

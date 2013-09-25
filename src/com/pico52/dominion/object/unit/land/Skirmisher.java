@@ -14,6 +14,7 @@ public class Skirmisher extends Unit{
 		offense = config.getInt("units.skirmisher.offense");
 		defense = config.getInt("units.skirmisher.defense");
 		range = config.getInt("units.skirmisher.range");
+		vision = config.getInt("units.skirmisher.vision");
 		foodConsumption = config.getInt("units.skirmisher.food_consumption");
 		upkeep = config.getInt("units.skirmisher.upkeep");
 		buildCost = config.getInt("units.skirmisher.build_cost");

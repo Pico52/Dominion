@@ -14,6 +14,7 @@ public class Swordsman extends Unit{
 		offense = config.getInt("units.swordsman.offense");
 		defense = config.getInt("units.swordsman.defense");
 		range = config.getInt("units.swordsman.range");
+		vision = config.getInt("units.swordsman.vision");
 		foodConsumption = config.getInt("units.swordsman.food_consumption");
 		upkeep = config.getInt("units.swordsman.upkeep");
 		buildCost = config.getInt("units.swordsman.build_cost");

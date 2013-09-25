@@ -13,6 +13,7 @@ public class Carrack extends SeaUnit{
 		offense = config.getInt("units.carrack.offense");
 		defense = config.getInt("units.carrack.defense");
 		range = config.getInt("units.carrack.range");
+		vision = config.getInt("units.carrack.vision");
 		foodConsumption = config.getInt("units.carrack.food_consumption");
 		upkeep = config.getInt("units.carrack.upkeep");
 		buildCost = config.getInt("units.carrack.build_cost");

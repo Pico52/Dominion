@@ -3,9 +3,9 @@ name: Dominion
 author: Pico52
 version:
   # The current version of Dominion.
-  version: 0.4.0
+  version: 0.4.1
   # This is for showing the changelog on updates.
-  last_run_version: 0.4.0
+  last_run_version: 0.4.1
 website: 'http://dev.bukkit.org/bukkit-plugins/dominion/'
 ##############################################################
 # You may only edit anything below this point. #

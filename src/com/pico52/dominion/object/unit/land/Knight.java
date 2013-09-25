@@ -14,6 +14,7 @@ public class Knight extends Unit{
 		offense = config.getInt("units.knight.offense");
 		defense = config.getInt("units.knight.defense");
 		range = config.getInt("units.knight.range");
+		vision = config.getInt("units.knight.vision");
 		foodConsumption = config.getInt("units.knight.food_consumption");
 		upkeep = config.getInt("units.knight.upkeep");
 		buildCost = config.getInt("units.knight.build_cost");

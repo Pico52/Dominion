@@ -9,19 +9,25 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.command.player.PlayerBuild;
 import com.pico52.dominion.command.player.PlayerCast;
 import com.pico52.dominion.command.player.PlayerData;
 import com.pico52.dominion.command.player.PlayerDeposit;
 import com.pico52.dominion.command.player.PlayerDestroy;
 import com.pico52.dominion.command.player.PlayerEmploy;
 import com.pico52.dominion.command.player.PlayerEmployment;
+import com.pico52.dominion.command.player.PlayerForbid;
 import com.pico52.dominion.command.player.PlayerGiveToUnit;
 import com.pico52.dominion.command.player.PlayerHolding;
 import com.pico52.dominion.command.player.PlayerInfo;
 import com.pico52.dominion.command.player.PlayerList;
 import com.pico52.dominion.command.player.PlayerListMy;
+import com.pico52.dominion.command.player.PlayerPermit;
 import com.pico52.dominion.command.player.PlayerProduction;
+import com.pico52.dominion.command.player.PlayerRequest;
+import com.pico52.dominion.command.player.PlayerRevoke;
 import com.pico52.dominion.command.player.PlayerStorage;
+import com.pico52.dominion.command.player.PlayerTrade;
 import com.pico52.dominion.command.player.PlayerTrain;
 import com.pico52.dominion.command.player.PlayerUnitAttack;
 import com.pico52.dominion.command.player.PlayerUnitCamp;
@@ -63,6 +69,12 @@ public class PlayerCommand implements CommandExecutor{
 	private static PlayerGiveToUnit playerGiveToUnit;
 	private static PlayerHolding playerHolding;
 	private static PlayerUnitPickUp playerUnitPickUp;
+	private static PlayerBuild playerBuild;
+	private static PlayerPermit playerPermit;
+	private static PlayerRevoke playerRevoke;
+	private static PlayerForbid playerForbid;
+	private static PlayerRequest playerRequest;
+	private static PlayerTrade playerTrade;
 	
 	/** 
 	 * <b>PlayerCommand</b><br>
@@ -97,6 +109,12 @@ public class PlayerCommand implements CommandExecutor{
 		playerGiveToUnit = new PlayerGiveToUnit(plugin);
 		playerHolding = new PlayerHolding(plugin);
 		playerUnitPickUp = new PlayerUnitPickUp(plugin);
+		playerBuild = new PlayerBuild(plugin);
+		playerPermit = new PlayerPermit(plugin);
+		playerRevoke = new PlayerRevoke(plugin);
+		playerForbid = new PlayerForbid(plugin);
+		playerRequest = new PlayerRequest(plugin);
+		playerTrade = new PlayerTrade(plugin);
 	}
 
 	@Override
@@ -105,7 +123,7 @@ public class PlayerCommand implements CommandExecutor{
 		 * View the information of the default settlement.
 		 */
 		if(args.length == 0){
-			sender.sendMessage(plugin.getLogPrefix() + "Usage:  /dominion [info / storage / withdraw / deposit / list / listmy / destroy / employ / employment / data / production / train / attack / move / camp / drop / pickup / holding / disband]");
+			sender.sendMessage(plugin.getLogPrefix() + "Usage:  /dominion [info / storage / withdraw / deposit / list / listmy / destroy / employ / employment / data / request / permit / production / train / attack / move / camp / drop / pickup / holding / disband]");
 			return true;
 		}
 		String subCommand = args[0];
@@ -115,23 +133,23 @@ public class PlayerCommand implements CommandExecutor{
 		args = arguments.toArray(new String[arguments.size()]);
 		
 		//--- SUB-COMMAND EXECUTORS ---//
-		if (subCommand.equalsIgnoreCase("info") | subCommand.equalsIgnoreCase("view") | subCommand.equalsIgnoreCase("i")){
+		if (subCommand.equalsIgnoreCase("info") || subCommand.equalsIgnoreCase("view") || subCommand.equalsIgnoreCase("i")){
 			return playerInfo.execute(sender, args);
 		}
-		if (subCommand.equalsIgnoreCase("storage") | subCommand.equalsIgnoreCase("stores") | subCommand.equalsIgnoreCase("materials")
-				| subCommand.equalsIgnoreCase("mats") | subCommand.equalsIgnoreCase("s")){
+		if (subCommand.equalsIgnoreCase("storage") || subCommand.equalsIgnoreCase("stores") || subCommand.equalsIgnoreCase("materials")
+				|| subCommand.equalsIgnoreCase("mats") || subCommand.equalsIgnoreCase("s")){
 			return playerStorage.execute(sender,args);
 		}
-		if (subCommand.equalsIgnoreCase("withdraw") | subCommand.equalsIgnoreCase("wd") | subCommand.equalsIgnoreCase("w")){
+		if (subCommand.equalsIgnoreCase("withdraw") || subCommand.equalsIgnoreCase("wd") || subCommand.equalsIgnoreCase("w")){
 			return playerWithdraw.execute(sender, args);
 		}
-		if (subCommand.equalsIgnoreCase("deposit") | subCommand.equalsIgnoreCase("d")){
+		if (subCommand.equalsIgnoreCase("deposit") || subCommand.equalsIgnoreCase("d")){
 			return playerDeposit.execute(sender,args);
 		}
-		if(subCommand.equalsIgnoreCase("list") | subCommand.equalsIgnoreCase("l")){
+		if(subCommand.equalsIgnoreCase("list") || subCommand.equalsIgnoreCase("l")){
 			return playerList.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("destroy") | subCommand.equalsIgnoreCase("dismantle") | subCommand.equalsIgnoreCase("burn")){
+		if(subCommand.equalsIgnoreCase("destroy") || subCommand.equalsIgnoreCase("dismantle") || subCommand.equalsIgnoreCase("burn")){
 			return playerDestroy.execute(sender, args);
 		}
 		if(subCommand.equalsIgnoreCase("employ")){
@@ -143,41 +161,59 @@ public class PlayerCommand implements CommandExecutor{
 		if(subCommand.equalsIgnoreCase("data")){
 			return playerData.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("production") | subCommand.equalsIgnoreCase("prod") | subCommand.equalsIgnoreCase("p")){
+		if(subCommand.equalsIgnoreCase("production") || subCommand.equalsIgnoreCase("prod") || subCommand.equalsIgnoreCase("p")){
 			return playerProduction.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("train") | subCommand.equalsIgnoreCase("t")){
+		if(subCommand.equalsIgnoreCase("train") || subCommand.equalsIgnoreCase("t")){
 			return playerTrain.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("attack") | subCommand.equalsIgnoreCase("assault") | subCommand.equalsIgnoreCase("a")){
+		if(subCommand.equalsIgnoreCase("attack") || subCommand.equalsIgnoreCase("assault") || subCommand.equalsIgnoreCase("a")){
 			return playerUnitAttack.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("move") | subCommand.equalsIgnoreCase("m")){
+		if(subCommand.equalsIgnoreCase("move") || subCommand.equalsIgnoreCase("m")){
 			return playerUnitMove.execute(sender, args);
 		}
 		if(subCommand.equalsIgnoreCase("drop")){
 			return playerUnitDrop.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("camp") | subCommand.equalsIgnoreCase("c")){
+		if(subCommand.equalsIgnoreCase("camp") || subCommand.equalsIgnoreCase("c")){
 			return playerUnitCamp.execute(sender, args);
 		}
 		if(subCommand.equalsIgnoreCase("disband")){
 			return playerUnitDisband.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("listmy") | subCommand.equalsIgnoreCase("lm")){
+		if(subCommand.equalsIgnoreCase("listmy") || subCommand.equalsIgnoreCase("lm")){
 			return playerListMy.execute(sender, args);
 		}
 		if(subCommand.equalsIgnoreCase("cast")){
 			return playerCast.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("give") | subCommand.equalsIgnoreCase("givetounit") | subCommand.equalsIgnoreCase("gtu")){
+		if(subCommand.equalsIgnoreCase("give") || subCommand.equalsIgnoreCase("givetounit") || subCommand.equalsIgnoreCase("gtu")){
 			return playerGiveToUnit.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("holding") | subCommand.equalsIgnoreCase("carrying")){
+		if(subCommand.equalsIgnoreCase("holding") || subCommand.equalsIgnoreCase("carrying")){
 			return playerHolding.execute(sender, args);
 		}
-		if(subCommand.equalsIgnoreCase("pickup") | subCommand.equalsIgnoreCase("take") | subCommand.equalsIgnoreCase("grab") | subCommand.equalsIgnoreCase("pu")){
+		if(subCommand.equalsIgnoreCase("pickup") || subCommand.equalsIgnoreCase("take") || subCommand.equalsIgnoreCase("grab") || subCommand.equalsIgnoreCase("pu")){
 			return playerUnitPickUp.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("build") || subCommand.equalsIgnoreCase("construct") || subCommand.equalsIgnoreCase("b")){
+			return playerBuild.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("permit") || subCommand.equalsIgnoreCase("grant")){
+			return playerPermit.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("revoke") || subCommand.equalsIgnoreCase("re")){
+			return playerRevoke.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("forbid") || subCommand.equalsIgnoreCase("prohibit")){
+			return playerForbid.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("request") || subCommand.equalsIgnoreCase("req") || subCommand.equalsIgnoreCase("r")){
+			return playerRequest.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("trade") || subCommand.equalsIgnoreCase("barter")){
+			return playerTrade.execute(sender, args);
 		}
 		
 		return false;

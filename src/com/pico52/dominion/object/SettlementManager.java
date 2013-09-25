@@ -16,13 +16,12 @@ import com.pico52.dominion.object.building.Spire;
 /** 
  * <b>SettlementManager</b><br>
  * <br>
- * &nbsp;&nbsp;public class SettlementManager
+ * &nbsp;&nbsp;public class SettlementManager extends {@link DominionObjectManager}
  * <br>
  * <br>
  * Controller for settlements.
  */
-public class SettlementManager {
-	private static Dominion plugin;
+public class SettlementManager extends DominionObjectManager{
 	private static double baseFoodDecay, baseFoodConsumption, baseStealingRate, baseIncomeTax;
 	
 	/** 
@@ -35,7 +34,7 @@ public class SettlementManager {
 	 * @param instance - The {@link Dominion} plugin this manager will be running on.
 	 */
 	public SettlementManager(Dominion instance){
-		plugin = instance;
+		super(instance);
 		baseFoodDecay = DominionSettings.foodDecay;
 		baseFoodConsumption = DominionSettings.foodConsumption;
 		baseStealingRate = DominionSettings.stealingRate;

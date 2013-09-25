@@ -14,6 +14,7 @@ public class Recruit extends Unit{
 		offense = config.getInt("units.recruit.offense");
 		defense = config.getInt("units.recruit.defense");
 		range = config.getInt("units.recruit.range");
+		vision = config.getInt("units.recruit.vision");
 		foodConsumption = config.getInt("units.recruit.food_consumption");
 		upkeep = config.getInt("units.recruit.upkeep");
 		buildCost = config.getInt("units.recruit.build_cost");

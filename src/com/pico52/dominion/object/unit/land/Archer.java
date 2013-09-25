@@ -14,6 +14,7 @@ public class Archer extends Unit{
 		offense = config.getInt("units.archer.offense");
 		defense = config.getInt("units.archer.defense");
 		range = config.getInt("units.archer.range");
+		vision = config.getInt("units.archer.vision");
 		foodConsumption = config.getInt("units.archer.food_consumption");
 		upkeep = config.getInt("units.archer.upkeep");
 		buildCost = config.getInt("units.archer.build_cost");

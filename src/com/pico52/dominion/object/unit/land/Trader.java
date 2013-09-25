@@ -14,6 +14,7 @@ public class Trader extends Unit{
 		offense = config.getInt("units.trader.offense");
 		defense = config.getInt("units.trader.defense");
 		range = config.getInt("units.trader.range");
+		vision = config.getInt("units.trader.vision");
 		foodConsumption = config.getInt("units.trader.food_consumption");
 		upkeep = config.getInt("units.trader.upkeep");
 		buildCost = config.getInt("units.trader.build_cost");

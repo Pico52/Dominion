@@ -51,6 +51,8 @@ public class DominionDatabaseHandler extends SQLite{
 	private static String[] productionDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "INT DEFAULT 0"};
 	private static String[] permissionColumns = {"permission_id", "owner_id", "grantee_id", "node", "refer_id"};
 	private static String[] permissionDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "INT DEFAULT 0"};
+	private static String[] requestColumns = {"request_id", "owner_id", "target_id", "to_admin", "level", "request", "object_id", "target_object_id", "xcoord", "zcoord"};
+	private static String[] requestDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 1", "TEXT", "INT DEFAULT 0", "INT DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0"};
 //===================Database Setup Complete===================//
 			
 	private static Dominion plugin;
@@ -124,9 +126,13 @@ public class DominionDatabaseHandler extends SQLite{
 			plugin.getLogger().info(plugin.getLogPrefix() + "Must create the permission table..");
 			createTable("permission", permissionColumns, permissionDims);
 		}
+		if(!checkTable("request")){
+			plugin.getLogger().info(plugin.getLogPrefix() + "Must create the request table..");
+			createTable("request", requestColumns, requestDims);
+		}
 		// - All tables should now exist.
 		if(checkTable("settlement") & checkTable("building") & checkTable("trade") & checkTable("kingdom") & checkTable("player") & 
-			checkTable("unit") & checkTable("command") & checkTable("spell") & checkTable("item") & checkTable("production") & checkTable("permission"))
+			checkTable("unit") & checkTable("command") & checkTable("spell") & checkTable("item") & checkTable("production") & checkTable("permission") & checkTable("request"))
 			return setDefaultColumns();
 		return false;
 	}
@@ -217,6 +223,13 @@ public class DominionDatabaseHandler extends SQLite{
 			if(!checkColumn("permission", column)){
 				plugin.getLogger().info("Must create the " + column + " column..");
 				createColumn("permission", column, permissionDims[i]);
+			}
+		}
+		for(int i=0; i < requestColumns.length;i++){
+			column = requestColumns[i];
+			if(!checkColumn("request", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("request", column, requestDims[i]);
 			}
 		}
 		
@@ -941,6 +954,70 @@ public class DominionDatabaseHandler extends SQLite{
 		}
 		return false;
 	}
+	
+	/** 
+	 * <b>createPermission</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createPermission(int ownerId, int granteeId, {@link String} node, int referId)
+	 * <br>
+	 * <br>
+	 * Creates a permission in the database with specified values.
+	 * @param ownerId - The id of the player granting the permission.
+	 * @param granteeId - The Id of the player being given the permission.
+	 * @param node - The permission node being granted.
+	 * @param referId - The Id of the object being referenced if the node is referencing an object.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createPermission(int ownerId, int granteeId, String node, int referId){
+		String query = "INSERT INTO permission(owner_id, grantee_id, node, refer_id) VALUES (" + ownerId + ", " + granteeId + ", \'" + node + "\', " + referId + ")";
+		if(queryWithResult(query)){
+			String owner = getPlayerName(ownerId),
+					grantee = getPlayerName(granteeId), 
+					message = owner + " granted \"" + node + "\" permission ";
+			if(referId > 0)
+				message += "for object " + referId + " ";
+			message += "to " + grantee + ".";
+			plugin.getLogger().info(message);
+			return true;
+		}
+		return false;
+	}
+	
+	/** 
+	 * <b>createRequest</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createRequest(int ownerId, int targetId, boolean toAdmin, int level, {@link String} request, int objectId, double xcoord, double zcoord)
+	 * <br>
+	 * <br>
+	 * Creates a request in the database with specified values.
+	 * @param ownerId - The id of the player that started this request.
+	 * @param targetId - The id of the player this request is being sent to.
+	 * @param toAdmin - True if this request is to all admins; false if it is not.
+	 * @param level - For building requests, the alleged level of the building.
+	 * @param request - The type of request.
+	 * @param objectId - The associated id of the object being referenced if one is being referenced.
+	 * @param targetObjectId - The associated id of the target object being referenced if one is being referenced.
+	 * @param xcoord - The x-coordinate of the object being referenced if one is being referenced.
+	 * @param zcoord - The z-coordinate of the object being referenced if one is being referenced.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createRequest(int ownerId, int targetId, boolean toAdmin, int level, String request, int objectId, int targetObjectId, double xcoord, double zcoord){
+		int toAdmins = 0;
+		if(toAdmin)
+			toAdmins = 1;
+		String query = "INSERT INTO request(owner_id, target_id, to_admin, level, request, object_id, target_object_id, xcoord, zcoord) VALUES (" + ownerId + 
+				", " + targetId + ", " + toAdmins + ", " + level + ", \'" + request + "\', " + objectId + ", " + targetObjectId + ", " + xcoord + ", " + zcoord + ")";
+		if(queryWithResult(query)){
+			String owner = getPlayerName(ownerId),
+					target = getPlayerName(targetId);
+			if(toAdmin)
+				target = "admins";
+			String message = owner + " has requested \"" + request + "\" to " + target + ".  Object Id: " + objectId + "  Level: " + level + "  x: " + xcoord + "  z:" + zcoord;
+			plugin.getLogger().info(message);
+			return true;
+		}
+		return false;
+	}
 //--- CHECK EXISTENCE OF OBJECT ---//
 	/** 
 	 * <b>playerExists</b><br>
@@ -1238,6 +1315,93 @@ public class DominionDatabaseHandler extends SQLite{
 	}
 	
 	/** 
+	 * <b>getSingleColumnInt</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public int getSingleColumnInt({@link String} table, {@link String} column, int id, {@link String} idName)
+	 * <br>
+	 * <br>
+	 * Gets one entry from one column in a table.  Do not use "*".
+	 * @param table - The name of the table to reference.
+	 * @param column - The column to reference.
+	 * @param id - The id of the object.
+	 * @param idName - The column that the identifier is referring to.
+	 * @return The results if there are any.  0 if there are not.
+	 */
+	public int getSingleColumnInt(String table, String column, int id, String idName){
+		if(column.equalsIgnoreCase("*"))
+			return 0;
+		int returnInt = 0;
+		ResultSet request = getTableData(table, id, column, idName);
+		try{
+			if(request.next())
+				returnInt = request.getInt(column);
+			request.getStatement().close();
+		} catch (SQLException ex){
+			plugin.getLogger().info("Error attempting to get the " + column + " of a " + table + ".");
+			ex.printStackTrace();
+		}
+		return returnInt;
+	}
+	
+	/** 
+	 * <b>getSingleColumnDouble</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public int getSingleColumnDouble({@link String} table, {@link String} column, int id, {@link String} idName)
+	 * <br>
+	 * <br>
+	 * Gets one entry from one column in a table.  Do not use "*".
+	 * @param table - The name of the table to reference.
+	 * @param column - The column to reference.
+	 * @param id - The id of the object.
+	 * @param idName - The column that the identifier is referring to.
+	 * @return The results if there are any.  0 if there are not.
+	 */
+	public double getSingleColumnDouble(String table, String column, int id, String idName){
+		if(column.equalsIgnoreCase("*"))
+			return 0;
+		double returnDouble = 0;
+		ResultSet request = getTableData(table, id, column, idName);
+		try{
+			if(request.next())
+				returnDouble = request.getDouble(column);
+			request.getStatement().close();
+		} catch (SQLException ex){
+			plugin.getLogger().info("Error attempting to get the " + column + " of a " + table + ".");
+			ex.printStackTrace();
+		}
+		return returnDouble;
+	}
+	
+	/** 
+	 * <b>getSingleColumnString</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public int getSingleColumnString({@link String} table, {@link String} column, int id, {@link String} idName)
+	 * <br>
+	 * <br>
+	 * Gets one entry from one column in a table.  Do not use "*".
+	 * @param table - The name of the table to reference.
+	 * @param column - The column to reference.
+	 * @param id - The id of the object.
+	 * @param idName - The column that the identifier is referring to.
+	 * @return The results if there are any.  Null if there are not.
+	 */
+	public String getSingleColumnString(String table, String column, int id, String idName){
+		if(column.equalsIgnoreCase("*"))
+			return null;
+		String returnString = null;
+		ResultSet request = getTableData(table, id, column, idName);
+		try{
+			if(request.next())
+				returnString = request.getString(column);
+			request.getStatement().close();
+		} catch (SQLException ex){
+			plugin.getLogger().info("Error attempting to get the " + column + " of a " + table + ".");
+			ex.printStackTrace();
+		}
+		return returnString;
+	}
+	
+	/** 
 	 * <b>getAllIds</b><br>
 	 * <br>
 	 * &nbsp;&nbsp;public int[] getAllIds({@link String} table)
@@ -1253,6 +1417,53 @@ public class DominionDatabaseHandler extends SQLite{
 		try{
 			while(entity.next()){
 				list.add(new Integer(entity.getInt(identifier)));
+			}
+			entity.getStatement().close();
+		} catch (SQLException ex){
+			ex.printStackTrace();
+		}
+		int[] ids = new int[list.size()];
+		int i = 0;
+	    for (Integer n : list) {
+	        ids[i++] = n;
+	    }
+		
+		return ids;
+	}
+	
+	public int[] getSpecificIds(String table, int id, String column){
+		String identifier = table + "_id";
+		ResultSet entity = this.getTableData(table, id, identifier, column);
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		try{
+			while(entity.next()){
+				list.add(new Integer(entity.getInt(identifier)));
+			}
+			entity.getStatement().close();
+		} catch (SQLException ex){
+			ex.printStackTrace();
+		}
+		int[] ids = new int[list.size()];
+		int i = 0;
+	    for (Integer n : list) {
+	        ids[i++] = n;
+	    }
+		
+		return ids;
+	}
+	
+	public int[] getSpecificIds(String table, int id, String column, int[] set){
+		String identifier = table + "_id";
+		ResultSet entity = this.getTableData(table, id, identifier, column);
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		int identity = 0;
+		try{
+			while(entity.next()){
+				identity = entity.getInt(identifier);
+				for(int i: set){
+					if(identity == i)
+						list.add(new Integer(identity));
+				}
 			}
 			entity.getStatement().close();
 		} catch (SQLException ex){

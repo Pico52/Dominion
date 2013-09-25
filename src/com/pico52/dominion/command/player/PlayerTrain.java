@@ -62,21 +62,20 @@ public class PlayerTrain extends PlayerSubCommand{
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		// - In the future, we'll check if the user has the permission to do this rather than only checking if they're the owner of the settlement.
-		int settlementOwner = db.getOwnerId("settlement", db.getSettlementId(settlement));
-		if(db.getPlayerId(sender.getName()) != settlementOwner){
-			sender.sendMessage(logPrefix + "You must be the owner of the settlement in order to train anything there.");
-			sender.sendMessage(logPrefix + "Usage: " + usage);
+		int playerId = db.getPlayerId(sender.getName()), settlementId = db.getSettlementId(settlement);
+		if(!plugin.getSettlementManager().isOwner(playerId, settlementId) && 
+				!plugin.getPermissionManager().hasPermission(playerId, "train", settlementId)){
+			sender.sendMessage(logPrefix + "You do not have permission to train units in this settlement.");
 			return true;
 		}
 		int foodReq = plugin.getUnitManager().getUnit(unit).getFoodConsumption() * 10;
-		if(plugin.getSettlementManager().getMaterial(db.getSettlementId(settlement), "food") < foodReq){
+		if(plugin.getSettlementManager().getMaterial(settlementId, "food") < foodReq){
 			sender.sendMessage(logPrefix + "This unit requires " + foodReq + " food to be built.  " + settlement + " does not have enough food to build the unit.");
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		int wealthReq = plugin.getUnitManager().getUnit(unit).getBuildCost();
-		if(plugin.getSettlementManager().getMaterial(db.getSettlementId(settlement), "wealth") < wealthReq){
+		if(plugin.getSettlementManager().getMaterial(settlementId, "wealth") < wealthReq){
 			sender.sendMessage(logPrefix + "This unit requires " + wealthReq + " wealth to be built.  " + settlement + " does not have enough wealth to build the unit.");
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;

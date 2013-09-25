@@ -13,6 +13,7 @@ public class Schooner extends SeaUnit{
 		offense = config.getInt("units.schooner.offense");
 		defense = config.getInt("units.schooner.defense");
 		range = config.getInt("units.schooner.range");
+		vision = config.getInt("units.schooner.vision");
 		foodConsumption = config.getInt("units.schooner.food_consumption");
 		upkeep = config.getInt("units.schooner.upkeep");
 		buildCost = config.getInt("units.schooner.build_cost");
