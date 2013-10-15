@@ -59,18 +59,13 @@ public class Spire extends Building{
 		if(level <= 0)
 			return 0;
 		int total = 0;
-		boolean done = false;
 		// - Every 10 levels, reduce the additional spell power by 1 for each level.
-		for(int i=spellPower;i>0;i--){
+		for(int i=spellPower;i>0 && level > 0;i--){
 			for(int x=0;x<10;x++){
 				total += i;
-				if(--level <= 0){
-					done = true;
-					break;
-				}
+				if(--level <= 0)
+					return total;
 			}
-			if(done)
-				break;
 		}
 		return total;
 	}

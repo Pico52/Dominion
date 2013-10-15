@@ -1,12 +1,12 @@
 name: Dominion
 main: com.pico52.dominion.Dominion
-version: 0.4.1
+version: 0.4.2
 author: Pico52
 commands:
   dominion:
     aliases: [dom, d]
     description: This is for all users to manage their settlements, buildings, units, and spells.
-    usage: /<command> [info / storage / withdraw / deposit / list / listmy / destroy / employ / employment / data / production / train / attack / move / camp / drop / pickup / holding / disband]
+    usage: /<command> [info / storage / withdraw / deposit / list / listmy / destroy / employ / employment / data / permit / production / train / attack / move / camp / drop / pickup / holding / disband]
     permission: dominion
     permission-message: You don't have <permission>.
   admindominion:

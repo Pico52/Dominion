@@ -3,6 +3,7 @@ package com.pico52.dominion;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -53,7 +54,8 @@ public class DominionSettings {
 	foodDecay, 
 	foodConsumption, 
 	stealingRate, 
-	incomeTax;
+	incomeTax, 
+	baseTradeValue;
 	
 	public static boolean 
 	productionTimerWaitToNextHour, 
@@ -62,6 +64,8 @@ public class DominionSettings {
 	broadcastProductionTick, 
 	broadcastUnitTick, 
 	broadcastSpellTick;
+	
+	public static List<String> harrassableRequests;
 	
     private static FileConfiguration unitsConfig = null;
     private static File unitsConfigFile = null;
@@ -152,6 +156,12 @@ public class DominionSettings {
 		desertSandworksBonus = config.getDouble("biomes.desert.sandworks_bonus");
 		desertFarmPenalty = config.getDouble("biomes.desert.farm_penalty");
 		desertHerdingGroundsPenalty = config.getDouble("biomes.desert.herding_grounds_penalty");
+		
+		//---REQUESTS---//
+		harrassableRequests = config.getStringList("requests.harrassable");
+		
+		//---TRADE---//
+		baseTradeValue = config.getDouble("trade.base_value");
 	}
 	
     public static void reloadUnitsConfig() {

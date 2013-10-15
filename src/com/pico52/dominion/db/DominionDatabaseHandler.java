@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import com.pico52.dominion.Dominion;
@@ -31,12 +32,12 @@ public class DominionDatabaseHandler extends SQLite{
 	private static String[] buildingColumns = {"building_id", "settlement_id", "owner_id", "class", "resource", "level", "xcoord", "zcoord", "employed"};
 	private static String[] buildingDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "TEXT", "INT DEFAULT 0", "DOUBLE DEFAULT 0", 
 		"DOUBLE DEFAULT 0", "INT DEFAULT 0"};
-	private static String[] tradeColumns = {"trade_id", "settlement1_id", "settlement2_id", "income"};
-	private static String[] tradeDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "DOUBLE DEFAULT 0"};
+	private static String[] tradeColumns = {"trade_id", "settlement1_id", "settlement2_id", "income1", "income2"};
+	private static String[] tradeDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0"};
 	private static String[] kingdomColumns = {"kingdom_id", "name", "owner_id", "primarycolor", "secondarycolor"};
 	private static String[] kingdomDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT UNIQUE", "TEXT", "TEXT", "TEXT"};
-	private static String[] playerColumns = {"player_id", "name", "owner_id"};
-	private static String[] playerDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT UNIQUE", "INT DEFAULT 0"};
+	private static String[] playerColumns = {"player_id", "name", "owner_id", "kingdom_id"};
+	private static String[] playerDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT UNIQUE", "INT DEFAULT 0", "INT DEFAULT 0"};
 	private static String[] unitColumns = {"unit_id", "owner_id", "settlement_id", "class", "xcoord", "zcoord", "health", "experience", "real"};
 	private static String[] unitDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "INT DEFAULT 0", 
 		"INT DEFAULT 1"};
@@ -51,8 +52,9 @@ public class DominionDatabaseHandler extends SQLite{
 	private static String[] productionDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "INT DEFAULT 0"};
 	private static String[] permissionColumns = {"permission_id", "owner_id", "grantee_id", "node", "refer_id"};
 	private static String[] permissionDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "INT DEFAULT 0"};
-	private static String[] requestColumns = {"request_id", "owner_id", "target_id", "to_admin", "level", "request", "object_id", "target_object_id", "xcoord", "zcoord"};
-	private static String[] requestDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 1", "TEXT", "INT DEFAULT 0", "INT DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0"};
+	private static String[] requestColumns = {"request_id", "owner_id", "target_id", "to_admin", "level", "request", "object_name", "object_id", "target_object_id", "xcoord", "zcoord", "timestamp"};
+	private static String[] requestDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 1", "TEXT", "TEXT", "INT DEFAULT 0", "INT DEFAULT 0", "DOUBLE DEFAULT 0", 
+		"DOUBLE DEFAULT 0", "INTEGER DEFAULT 0"};
 //===================Database Setup Complete===================//
 			
 	private static Dominion plugin;
@@ -558,7 +560,7 @@ public class DominionDatabaseHandler extends SQLite{
 		String query = "INSERT INTO kingdom(name,owner_id,primarycolor,secondarycolor) VALUES (\'" + name + "\'," + monarch + ",\'" + primaryColor + "\',\'" + secondaryColor + "\')";
 		return queryWithResult(query);
 	}
-
+	
 	/** 
 	 * <b>createSettlement</b><br>
 	 * <br>
@@ -567,12 +569,15 @@ public class DominionDatabaseHandler extends SQLite{
 	 * <br>
 	 * Creates a settlement in the database with default values and the specified name.
 	 * @param name - The name of the new settlement.
+	 * @param ownerId - The id of the owner of the new settlement.
+	 * @param biome - The biome the settlement resides in.
+	 * @param classification - The type of settlement: Town/City/Fortress
+	 * @param xcoord - The x-coordinate of the new settlement.
+	 * @param zcoord - The z-coordinate of the new settlement.
 	 * @return The sucess of the execution of this command.
 	 */
-	public boolean createSettlement(String name){
-		if(name == "" | name == null | settlementExists(name))
-			return false;
-		String query = "INSERT INTO settlement(name,biome,class) VALUES (\'" + name + "\',\'none\',\'town\')";
+	public boolean createSettlement(String name, int ownerId, String biome, String classification, double xcoord, double zcoord){
+		String query = "INSERT INTO settlement(name,owner_id,biome,class,xcoord,zcoord) VALUES (\'" + name + "\'," + ownerId + ",\'" + biome + "\',\'" + classification + "\'," + xcoord + "," + zcoord +")";
 		return queryWithResult(query);
 	}
 
@@ -610,84 +615,27 @@ public class DominionDatabaseHandler extends SQLite{
 			return true;
 		}
 		return false;
-	}	
-	
-	/** 
-	 * <b>createBuilding</b><br>
-	 * <br>
-	 * &nbsp;&nbsp;public boolean createBuilding({@link String} settlement, {@link String} classification)
-	 * <br>
-	 * <br>
-	 * Creates a building in the database with specified values.  Uses default values for unspecified variables.
-	 * @param settlement - The settlement this building will be associated with
-	 * @param classification - The classification of the building.
-	 * @return The sucess of the execution of this command.
-	 */
-	public boolean createBuilding(String settlement, String classification){
-		int settlementId = getSettlementId(settlement), 
-				ownerId = getOwnerId("settlement", settlementId);
-		double xCoord = plugin.getSettlementManager().getX(settlementId), 
-				zCoord = plugin.getSettlementManager().getZ(settlementId);
-		return createBuilding(settlement, ownerId,classification, xCoord, zCoord);
 	}
 	
 	/** 
 	 * <b>createBuilding</b><br>
 	 * <br>
-	 * &nbsp;&nbsp;public boolean createBuilding({@link String} settlement, {@link String} classification, double xcoord, double zcoord)
+	 * &nbsp;&nbsp;public boolean createBuilding(int settlementId, int owner, {@link String} classification, int level, double xcoord, double zcoord)
 	 * <br>
 	 * <br>
 	 * Creates a building in the database with specified values.  Uses default values for unspecified variables.
-	 * @param settlement - The settlement this building will be associated with
-	 * @param classification - The classification of the building.
-	 * @param xcoord - The x coordinate this building is located on.
-	 * @param zcoord - The z coordinate this building is located on.
-	 * @return The sucess of the execution of this command.
-	 */
-	public boolean createBuilding(String settlement, String classification, double xcoord, double zcoord){
-		int settlementId = getSettlementId(settlement), 
-				ownerId = getOwnerId("settlement", settlementId);
-		return createBuilding(settlement, ownerId,classification, xcoord, zcoord);
-	}
-	
-	/** 
-	 * <b>createBuilding</b><br>
-	 * <br>
-	 * &nbsp;&nbsp;public boolean createBuilding({@link String} settlement, {@link String} owner, {@link String} classification)
-	 * <br>
-	 * <br>
-	 * Creates a building in the database with specified values.  Uses default values for unspecified variables.
-	 * @param settlement - The settlement this building will be associated with
-	 * @param owner - The player that will own this building.
-	 * @param classification - The classification of the building.
-	 * @return The sucess of the execution of this command.
-	 */
-	public boolean createBuilding(String settlement, String owner, String classification){
-		int settlementId = getSettlementId(settlement);
-		double xCoord = plugin.getSettlementManager().getX(settlementId), 
-				zCoord = plugin.getSettlementManager().getZ(settlementId);
-		return createBuilding(settlement, getPlayerId(owner),classification, xCoord, zCoord);
-	}
-	
-	/** 
-	 * <b>createBuilding</b><br>
-	 * <br>
-	 * &nbsp;&nbsp;public boolean createBuilding({@link String} settlement, int owner, {@link String} classification, double xcoord, double zcoord)
-	 * <br>
-	 * <br>
-	 * Creates a building in the database with specified values.  Uses default values for unspecified variables.
-	 * @param settlement - The settlement this building will be associated with.
+	 * @param settlementId - The settlement id this building will be associated with.
 	 * @param owner - The id of the player that will own this building.
 	 * @param classification - The classification of the building.
+	 * @param level - The starting level of the building.
 	 * @param xcoord - The x coordinate this building is located on.
 	 * @param zcoord - The z coordinate this building is located on.
 	 * @return The sucess of the execution of this command.
 	 */
-	public boolean createBuilding(String settlement, int owner, String classification, double xcoord, double zcoord){
-		int settlementId = getSettlementId(settlement);
-		String query = "INSERT INTO building(settlement_id, owner_id, class, level, xcoord, zcoord) VALUES (" + settlementId + "," + owner + ",\'" + classification + "\',1," + xcoord +"," + zcoord +")";
+	public boolean createBuilding(int settlementId, int owner, String classification, int level, double xcoord, double zcoord){
+		String query = "INSERT INTO building(settlement_id, owner_id, class, level, xcoord, zcoord) VALUES (" + settlementId + "," + owner + ",\'" + classification + "\'," + level + "," + xcoord +"," + zcoord +")";
 		if(queryWithResult(query)){
-			plugin.getLogger().info("A new " + classification + " building has been created in " + settlement + " at x-" + xcoord + " z-" + zcoord + ".");
+			plugin.getLogger().info("A new " + classification + " building has been created in " + settlementId + " at x-" + xcoord + " z-" + zcoord + ".");
 			return true;
 		}
 		return false;
@@ -956,6 +904,29 @@ public class DominionDatabaseHandler extends SQLite{
 	}
 	
 	/** 
+	 * <b>createTrade</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createTrade(int settlement1Id, int settlement2Id, double income1, double income2);)
+	 * <br>
+	 * <br>
+	 * Creates a trade in the database with specified values.
+	 * @param settlement1Id - The id of the first settlement.
+	 * @param settlement2Id - The id of the second settlement.
+	 * @param income1 - The income value settlement 1 will receive for this trade.
+	 * @param income2 - The income value settlement 2 will receive for this trade.
+	 * @return True if the trade has been created; false if it has not.
+	 */
+	public boolean createTrade(int settlement1Id, int settlement2Id, double income1, double income2){
+		String query = "INSERT INTO trade(settlement1_id, settlement2_id, income1, income2) VALUES (" + settlement1Id + ", " + settlement2Id + ", " + income1 + ", " + income2 + ")";
+		if(queryWithResult(query)){
+			String settlement1 = getSettlementName(settlement1Id), settlement2 = getSettlementName(settlement2Id);
+			plugin.getLogger().info("Trade has been initiated between " + settlement1 + " and " + settlement2 + " with a trade value of " + income1 + " and " + income2 + " respectively.");
+			return true;
+		}
+		return false;
+	}
+	
+	/** 
 	 * <b>createPermission</b><br>
 	 * <br>
 	 * &nbsp;&nbsp;public boolean createPermission(int ownerId, int granteeId, {@link String} node, int referId)
@@ -986,7 +957,7 @@ public class DominionDatabaseHandler extends SQLite{
 	/** 
 	 * <b>createRequest</b><br>
 	 * <br>
-	 * &nbsp;&nbsp;public boolean createRequest(int ownerId, int targetId, boolean toAdmin, int level, {@link String} request, int objectId, double xcoord, double zcoord)
+	 * &nbsp;&nbsp;public boolean createRequest(int ownerId, int targetId, boolean toAdmin, int level, {@link String} request, {@link String} objectName, int objectId, double xcoord, double zcoord)
 	 * <br>
 	 * <br>
 	 * Creates a request in the database with specified values.
@@ -995,24 +966,27 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @param toAdmin - True if this request is to all admins; false if it is not.
 	 * @param level - For building requests, the alleged level of the building.
 	 * @param request - The type of request.
+	 * @param objectName - The name of the object to be added.
 	 * @param objectId - The associated id of the object being referenced if one is being referenced.
 	 * @param targetObjectId - The associated id of the target object being referenced if one is being referenced.
 	 * @param xcoord - The x-coordinate of the object being referenced if one is being referenced.
 	 * @param zcoord - The z-coordinate of the object being referenced if one is being referenced.
 	 * @return The sucess of the execution of this command.
 	 */
-	public boolean createRequest(int ownerId, int targetId, boolean toAdmin, int level, String request, int objectId, int targetObjectId, double xcoord, double zcoord){
+	public boolean createRequest(int ownerId, int targetId, boolean toAdmin, int level, String request, String objectName, int objectId, int targetObjectId, double xcoord, double zcoord){
 		int toAdmins = 0;
 		if(toAdmin)
 			toAdmins = 1;
-		String query = "INSERT INTO request(owner_id, target_id, to_admin, level, request, object_id, target_object_id, xcoord, zcoord) VALUES (" + ownerId + 
-				", " + targetId + ", " + toAdmins + ", " + level + ", \'" + request + "\', " + objectId + ", " + targetObjectId + ", " + xcoord + ", " + zcoord + ")";
+		long now = new Date().getTime();
+		String query = "INSERT INTO request(owner_id, target_id, to_admin, level, request, object_name, object_id, target_object_id, xcoord, zcoord, timestamp) VALUES (" + ownerId + 
+				", " + targetId + ", " + toAdmins + ", " + level + ", \'" + request + "\', \'" + objectName + "\', " +objectId + ", " + targetObjectId + ", " + xcoord + ", " + zcoord + ", " + now + ")";
 		if(queryWithResult(query)){
 			String owner = getPlayerName(ownerId),
 					target = getPlayerName(targetId);
 			if(toAdmin)
 				target = "admins";
-			String message = owner + " has requested \"" + request + "\" to " + target + ".  Object Id: " + objectId + "  Level: " + level + "  x: " + xcoord + "  z:" + zcoord;
+			String message = owner + " has requested \"" + request + "\" to " + target + ".  Object Name: " + objectName + "  Object Id: " + objectId + "  Target Object Id: " + targetObjectId + 
+					"  Level: " + level + "  x: " + xcoord + "  z:" + zcoord;
 			plugin.getLogger().info(message);
 			return true;
 		}

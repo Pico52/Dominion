@@ -54,7 +54,8 @@ public class PlayerList extends PlayerSubCommand{
 		ResultSet results = db.getTableData(entity, "*");
 		String allData = "", middleData = "", entity_id = entity + "_id";
 		int columnCount = 1, entityId = 0, casterId = db.getPlayerId(sender.getName());
-		boolean isUnit = false, isCommand = false, isItem = false, hasName = false, hasDuration = false, hasClass = false, hasType = false;
+		boolean isUnit = false, isCommand = false, isItem = false, isTrade = false, 
+				hasName = false, hasDuration = false, hasClass = false, hasType = false;
 		try{
 			while(results.next()){
 				// - For the future, make this whole section flow better.
@@ -126,6 +127,15 @@ public class PlayerList extends PlayerSubCommand{
 					middleData += "§aQuantity: §f" + quantity + "  ";
 					isItem = true;
 				} catch (SQLException ex){}
+				try{
+					int settlement1 = results.getInt("settlement1_id");
+					int settlement2 = results.getInt("settlement2_id");
+					double value1 = results.getDouble("income1");
+					double value2 = results.getDouble("income2");
+					middleData += "§aSettlement 1:§f " + db.getSettlementName(settlement1) + "(+" + value1 + ")  ";
+					middleData += "§aSettlement 2:§f " + db.getSettlementName(settlement2) + "(+" + value2 + ")  ";
+					isTrade = true;
+				} catch (SQLException ex){}
 				middleData += "\n";
 			}
 			results.getStatement().close();
@@ -142,6 +152,8 @@ public class PlayerList extends PlayerSubCommand{
 			columnCount += 4;
 		if(isItem)
 			columnCount += 2;
+		if(isTrade)
+			columnCount += 4;
 		if(hasName)
 			columnCount++;
 		if(hasDuration)

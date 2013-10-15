@@ -115,6 +115,95 @@ public class BuildingManager extends DominionObjectManager{
 	}
 	
 	/** 
+	 * <b>createBuilding</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createBuilding(int settlementId, {@link String} classification)
+	 * <br>
+	 * <br>
+	 * Creates a building in the database with specified values.  Uses default values for unspecified variables.
+	 * @param settlementId - The settlement id this building will be associated with
+	 * @param classification - The classification of the building.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createBuilding(int settlementId, String classification){
+		double xCoord = plugin.getSettlementManager().getX(settlementId), zCoord = plugin.getSettlementManager().getZ(settlementId);
+		return createBuilding(settlementId, classification, xCoord, zCoord);
+	}
+	
+	/** 
+	 * <b>createBuilding</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createBuilding(int settlement, {@link String} classification, double xcoord, double zcoord)
+	 * <br>
+	 * <br>
+	 * Creates a building in the database with specified values.  Uses default values for unspecified variables.
+	 * @param settlementId - The settlement id this building will be associated with
+	 * @param classification - The classification of the building.
+	 * @param xcoord - The x coordinate this building is located on.
+	 * @param zcoord - The z coordinate this building is located on.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createBuilding(int settlementId, String classification, double xcoord, double zcoord){
+		int ownerId = db.getOwnerId("settlement", settlementId);
+		return createBuilding(settlementId, ownerId,classification, xcoord, zcoord);
+	}
+	
+	/** 
+	 * <b>createBuilding</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createBuilding(int settlementId, ownerId, {@link String} classification)
+	 * <br>
+	 * <br>
+	 * Creates a building in the database with specified values.  Uses default values for unspecified variables.
+	 * @param settlementId - The id settlement this building will be associated with
+	 * @param ownerId - The player id that will own this building.
+	 * @param classification - The classification of the building.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createBuilding(int settlementId, int ownerId, String classification){
+		double xCoord = plugin.getSettlementManager().getX(settlementId), 
+				zCoord = plugin.getSettlementManager().getZ(settlementId);
+		return createBuilding(settlementId, ownerId,classification, xCoord, zCoord);
+	}
+	
+	/** 
+	 * <b>createBuilding</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createBuilding(int settlementId, int owner, {@link String} classification, double xcoord, double zcoord)
+	 * <br>
+	 * <br>
+	 * Creates a building in the database with specified values.
+	 * @param settlementId - The settlement id this building will be associated with.
+	 * @param ownerId - The id of the player that will own this building.
+	 * @param classification - The classification of the building.
+	 * @param xcoord - The x coordinate this building is located on.
+	 * @param zcoord - The z coordinate this building is located on.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createBuilding(int settlementId, int ownerId, String classification, double xcoord, double zcoord){
+		return createBuilding(settlementId, ownerId, classification, 1, xcoord, zcoord);
+	}
+	
+	/** 
+	 * <b>createBuilding</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createBuilding(int settlementId, int owner, {@link String} classification, int level, double xcoord, double zcoord)
+	 * <br>
+	 * <br>
+	 * Creates a building in the database with specified values.
+	 * @param settlementId - The settlement id this building will be associated with.
+	 * @param ownerId - The id of the player that will own this building.
+	 * @param classification - The classification of the building.
+	 * @param level - The starting level of the building.
+	 * @param xcoord - The x coordinate this building is located on.
+	 * @param zcoord - The z coordinate this building is located on.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createBuilding(int settlementId, int ownerId, String classification, int level, double xcoord, double zcoord){
+		return db.createBuilding(settlementId, ownerId, classification, level, xcoord, zcoord);
+	}
+	
+	/** 
 	 * <b>getProductions</b><br>
 	 * <br>
 	 * &nbsp;&nbsp;public {@link ProductionSheet} getProductions({@link String} settlement)

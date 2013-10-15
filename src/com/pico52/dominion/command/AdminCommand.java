@@ -13,6 +13,7 @@ import com.pico52.dominion.command.admin.AdminAdd;
 import com.pico52.dominion.command.admin.AdminBuild;
 import com.pico52.dominion.command.admin.AdminCreate;
 import com.pico52.dominion.command.admin.AdminKill;
+import com.pico52.dominion.command.admin.AdminRequests;
 import com.pico52.dominion.command.admin.AdminSetOwner;
 import com.pico52.dominion.command.admin.AdminManualUpdate;
 import com.pico52.dominion.command.admin.AdminRemove;
@@ -43,6 +44,7 @@ public class AdminCommand implements CommandExecutor{
 	private static AdminManualUpdate adminManualUpdate;
 	private static AdminSetBiome adminSetBiome;
 	private static AdminKill adminKill;
+	private static AdminRequests adminRequests;
 	
 	/** 
 	 * <b>AdminCommand</b><br>
@@ -68,6 +70,7 @@ public class AdminCommand implements CommandExecutor{
 		adminManualUpdate = new AdminManualUpdate(plugin);
 		adminSetBiome = new AdminSetBiome(plugin);
 		adminKill = new AdminKill(plugin);
+		adminRequests = new AdminRequests(plugin);
 	}
 
 	@Override
@@ -120,6 +123,9 @@ public class AdminCommand implements CommandExecutor{
 		}
 		if(subCommand.equalsIgnoreCase("kill")){
 			return adminKill.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("requests") || subCommand.equalsIgnoreCase("reqs")){
+			return adminRequests.execute(sender, args);
 		}
 		
 		return false;

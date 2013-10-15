@@ -41,6 +41,58 @@ public class SettlementManager extends DominionObjectManager{
 		baseIncomeTax = DominionSettings.incomeTax;
 	}
 	
+
+	/** 
+	 * <b>createSettlement</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createSettlement(String name)
+	 * <br>
+	 * <br>
+	 * Creates a settlement in the database with default values and the specified name.
+	 * @param name - The name of the new settlement.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createSettlement(String name){
+		return createSettlement(name, "none", "town");
+	}
+	
+	/** 
+	 * <b>createSettlement</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createSettlement(String name)
+	 * <br>
+	 * <br>
+	 * Creates a settlement in the database with default values and the specified name.
+	 * @param name - The name of the new settlement.
+	 * @param biome - The biome the settlement resides in.
+	 * @param classification - The type of settlement: Town/City/Fortress
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createSettlement(String name, String biome, String classification){
+		return createSettlement(name, 0, biome, classification, 0, 0);
+	}
+	
+	/** 
+	 * <b>createSettlement</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createSettlement(String name)
+	 * <br>
+	 * <br>
+	 * Creates a settlement in the database with default values and the specified name.
+	 * @param name - The name of the new settlement.
+	 * @param ownerId - The id of the owner of the new settlement.
+	 * @param biome - The biome the settlement resides in.
+	 * @param classification - The type of settlement: Town/City/Fortress
+	 * @param xcoord - The x-coordinate of the new settlement.
+	 * @param zcoord - The z-coordinate of the new settlement.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createSettlement(String name, int ownerId, String biome, String classification, double xcoord, double zcoord){
+		if(name == "" | name == null | db.settlementExists(name))
+			return false;
+		return db.createSettlement(name, ownerId, biome, classification, xcoord, zcoord);
+	}
+	
 	/** 
 	 * <b>updateAll</b><br>
 	 * <br>
@@ -51,7 +103,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return True if all of the settlements have been successfully updated.  False if they have not.
 	 */
 	public boolean updateAll(){
-		ResultSet settlements = plugin.getDBHandler().getTableData("settlement", "settlement_id");
+		ResultSet settlements = db.getTableData("settlement", "settlement_id");
 		boolean success = true;
 		try{
 			while(settlements.next()){
@@ -78,7 +130,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return True if the settlement has been successfully updated.  False if it has not.
 	 */
 	public boolean update(String settlement){
-		return update(plugin.getDBHandler().getSettlementId(settlement));
+		return update(db.getSettlementId(settlement));
 	}
 	
 	/** 
@@ -94,51 +146,53 @@ public class SettlementManager extends DominionObjectManager{
 	public boolean update(int settlement_id){
 		ProductionSheet update = plugin.getBuildingManager().getProductions(settlement_id);
 		update.wealth += getIncomeTax(settlement_id);
-		ResultSet settlementData = plugin.getDBHandler().getSettlementData(settlement_id, "*");
-		double maxMana, mana, maxPopulation, population, wealth, food, wood, cobblestone, stone, sand, gravel, 
-		dirt, ironIngot, ironOre, emerald, emeraldOre, goldIngot, goldOre, flint, feather, lapisOre, 
-		diamond, obsidian, netherrack, netherBrick, redstone, brick, glowstone, clay, coal, wool, 
-		leather, arrow, armor, weapon, snow, recruit, prisoner;
+		update.wealth += getTradeValue(settlement_id);
+		ResultSet settlementData = db.getSettlementData(settlement_id, "*");
+		double maxMana=0, mana=0, maxPopulation=0, population=0, wealth=0, food=0, wood=0, cobblestone=0, 
+				stone=0, sand=0, gravel=0, dirt=0, ironIngot=0, ironOre=0, emerald=0, emeraldOre=0, goldIngot=0, goldOre=0, 
+				flint=0, feather=0, lapisOre=0, diamond=0, obsidian=0, netherrack=0, netherBrick=0, redstone=0, brick=0, 
+				glowstone=0, clay=0, coal=0, wool=0, leather=0, arrow=0, armor=0, weapon=0, snow=0, recruit=0, prisoner=0;
 		String name = "";
 		try{
-			settlementData.next();
-			name = settlementData.getString("name");
-			mana = settlementData.getDouble("mana");
-			population = settlementData.getDouble("population");
-			wealth = settlementData.getDouble("wealth");
-			food = settlementData.getDouble("food");
-			wood = settlementData.getDouble("wood");
-			cobblestone = settlementData.getDouble("cobblestone");
-			stone = settlementData.getDouble("stone");
-			sand = settlementData.getDouble("sand");
-			gravel = settlementData.getDouble("gravel");
-			dirt = settlementData.getDouble("dirt");
-			ironIngot = settlementData.getDouble("iron_ingot");
-			ironOre = settlementData.getDouble("iron_ore");
-			emerald = settlementData.getDouble("emerald");
-			emeraldOre = settlementData.getDouble("emerald_ore");
-			goldIngot = settlementData.getDouble("gold_ingot");
-			goldOre = settlementData.getDouble("gold_ore");
-			flint = settlementData.getDouble("flint");
-			feather = settlementData.getDouble("feather");
-			lapisOre = settlementData.getDouble("lapis_ore");
-			diamond = settlementData.getDouble("diamond");
-			obsidian = settlementData.getDouble("obsidian");
-			netherrack = settlementData.getDouble("netherrack");
-			netherBrick = settlementData.getDouble("nether_brick");
-			redstone = settlementData.getDouble("redstone");
-			brick = settlementData.getDouble("brick");
-			glowstone = settlementData.getDouble("glowstone");
-			clay = settlementData.getDouble("clay");
-			coal = settlementData.getDouble("coal");
-			wool = settlementData.getDouble("wool");
-			leather = settlementData.getDouble("leather");
-			arrow = settlementData.getDouble("arrow");
-			armor = settlementData.getDouble("armor");
-			weapon = settlementData.getDouble("weapon");
-			snow = settlementData.getDouble("snow");
-			recruit = settlementData.getDouble("recruit");
-			prisoner = settlementData.getDouble("prisoner");
+			if(settlementData.next()){
+				name = settlementData.getString("name");
+				mana = settlementData.getDouble("mana");
+				population = settlementData.getDouble("population");
+				wealth = settlementData.getDouble("wealth");
+				food = settlementData.getDouble("food");
+				wood = settlementData.getDouble("wood");
+				cobblestone = settlementData.getDouble("cobblestone");
+				stone = settlementData.getDouble("stone");
+				sand = settlementData.getDouble("sand");
+				gravel = settlementData.getDouble("gravel");
+				dirt = settlementData.getDouble("dirt");
+				ironIngot = settlementData.getDouble("iron_ingot");
+				ironOre = settlementData.getDouble("iron_ore");
+				emerald = settlementData.getDouble("emerald");
+				emeraldOre = settlementData.getDouble("emerald_ore");
+				goldIngot = settlementData.getDouble("gold_ingot");
+				goldOre = settlementData.getDouble("gold_ore");
+				flint = settlementData.getDouble("flint");
+				feather = settlementData.getDouble("feather");
+				lapisOre = settlementData.getDouble("lapis_ore");
+				diamond = settlementData.getDouble("diamond");
+				obsidian = settlementData.getDouble("obsidian");
+				netherrack = settlementData.getDouble("netherrack");
+				netherBrick = settlementData.getDouble("nether_brick");
+				redstone = settlementData.getDouble("redstone");
+				brick = settlementData.getDouble("brick");
+				glowstone = settlementData.getDouble("glowstone");
+				clay = settlementData.getDouble("clay");
+				coal = settlementData.getDouble("coal");
+				wool = settlementData.getDouble("wool");
+				leather = settlementData.getDouble("leather");
+				arrow = settlementData.getDouble("arrow");
+				armor = settlementData.getDouble("armor");
+				weapon = settlementData.getDouble("weapon");
+				snow = settlementData.getDouble("snow");
+				recruit = settlementData.getDouble("recruit");
+				prisoner = settlementData.getDouble("prisoner");
+			}
 			settlementData.getStatement().close();
 		}catch (SQLException ex){
 			ex.printStackTrace();
@@ -270,7 +324,7 @@ public class SettlementManager extends DominionObjectManager{
 				", nether_brick=" + update.netherBrick + ", redstone=" + update.redstone + ", brick=" + update.brick + ", glowstone=" + update.glowstone + ", clay=" + update.clay + ", coal=" + update.coal + 
 				", wool=" + update.wool + ", leather=" + update.leather + ", arrow=" + update.arrow + ", armor=" + update.armor + ", weapon=" + update.weapon + ", snow=" + update.snow +
 				", recruit=" + update.recruit + ", prisoner=" + update.prisoner + " WHERE settlement_id=" + settlement_id;
-		if(!plugin.getDBHandler().queryWithResult(query)){
+		if(!db.queryWithResult(query)){
 			plugin.getLogger().info("An error occured while trying to update the resource production in " + name + ".");
 			return false;
 		}
@@ -278,7 +332,7 @@ public class SettlementManager extends DominionObjectManager{
 		
 		//---Upkeep---//
 		update = getAllLosses(settlement_id);
-		settlementData = plugin.getDBHandler().getSettlementData(settlement_id, "*");
+		settlementData = db.getSettlementData(settlement_id, "*");
 		try{
 			settlementData.next();
 			food = settlementData.getDouble("food");
@@ -297,7 +351,7 @@ public class SettlementManager extends DominionObjectManager{
 		update.wealth += wealth;
 		
 		query = "UPDATE settlement SET food=" + update.food + ", wealth=" + update.wealth + " WHERE settlement_id=" + settlement_id;
-		if(!plugin.getDBHandler().queryWithResult(query)){
+		if(!db.queryWithResult(query)){
 			plugin.getLogger().info("An error occured while trying to update the upkeep in " + name + ".");
 			return false;
 		}
@@ -317,7 +371,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return True if the biome was properly set.  False if it was not.
 	 */
 	public boolean setBiome(String settlement, String biome){
-		return setBiome(plugin.getDBHandler().getSettlementId(settlement), biome);
+		return setBiome(db.getSettlementId(settlement), biome);
 	}
 	
 	/** 
@@ -333,7 +387,7 @@ public class SettlementManager extends DominionObjectManager{
 		biome = biome.toLowerCase();
 		if(!plugin.getBiomeData().isBiome(biome))
 			return false;
-		if(plugin.getDBHandler().update("settlement", "biome", biome, "settlement_id", settlementId))
+		if(db.update("settlement", "biome", biome, "settlement_id", settlementId))
 			return true;
 		return false;
 	}
@@ -348,7 +402,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return The amount of wealth generated from income tax.
 	 */
 	public double getIncomeTax(String settlement){
-		return getIncomeTax(plugin.getDBHandler().getSettlementId(settlement));
+		return getIncomeTax(db.getSettlementId(settlement));
 	}
 	
 	/** 
@@ -371,6 +425,23 @@ public class SettlementManager extends DominionObjectManager{
 	}
 	
 	/** 
+	 * <b>getTradeValue</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public double getTradeValue(int settlementId)
+	 * <br>
+	 * <br>
+	 * @param settlementId - The id of the settlement to find the trade value for.
+	 * @return The amount of wealth generated from trade.
+	 */
+	public double getTradeValue(int settlementId){
+		double total = 0;
+		for(int tradeId: db.getAllIds("trade")){
+			total += plugin.getTradeManager().getSettlementIncome(tradeId, settlementId);
+		}
+		return total;
+	}
+	
+	/** 
 	 * <b>getAllLosses</b><br>
 	 * <br>
 	 * &nbsp;&nbsp;public {@link ProductionSheet} getAllLosses({@link String} settlement)
@@ -381,7 +452,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return An object indicating all decomposing/stolen/eaten materials.
 	 */
 	public ProductionSheet getAllLosses(String settlement){
-		return getAllLosses(plugin.getDBHandler().getSettlementId(settlement));
+		return getAllLosses(db.getSettlementId(settlement));
 	}
 	
 	/** 
@@ -412,7 +483,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return The amount of food eaten by peasants each tick.
 	 */
 	public double getFoodConsumption(String settlement){
-		return getIncomeTax(plugin.getDBHandler().getSettlementId(settlement));
+		return getIncomeTax(db.getSettlementId(settlement));
 	}
 	
 	/** 
@@ -427,7 +498,7 @@ public class SettlementManager extends DominionObjectManager{
 	public double getFoodConsumption(int settlement_id){
 		double foodConsumption = 0, population = 0;
 		String biome ="";
-		ResultSet settlementData = plugin.getDBHandler().getSettlementData(settlement_id, "*");
+		ResultSet settlementData = db.getSettlementData(settlement_id, "*");
 		try{
 			settlementData.next();
 			population = settlementData.getDouble("population");
@@ -457,7 +528,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return The amount of food that will decay.
 	 */
 	public double getFoodDecay(String settlement){
-		return getFoodDecay(plugin.getDBHandler().getSettlementId(settlement));
+		return getFoodDecay(db.getSettlementId(settlement));
 	}
 	
 	/** 
@@ -472,7 +543,7 @@ public class SettlementManager extends DominionObjectManager{
 	public double getFoodDecay(int settlement_id){
 		double foodDecay = 0;
 		String settlementQuery = "SELECT * FROM settlement WHERE settlement_id=" + settlement_id;
-		ResultSet settlementData = plugin.getDBHandler().querySelect(settlementQuery);
+		ResultSet settlementData = db.querySelect(settlementQuery);
 		try{
 			settlementData.next();
 			double currentFood = settlementData.getDouble("food");
@@ -482,7 +553,7 @@ public class SettlementManager extends DominionObjectManager{
 				return foodDecay;
 			
 			String buildingQuery = "SELECT * FROM building WHERE settlement_id=" + settlement_id + " AND class=\'granary\'";
-			ResultSet buildingData = plugin.getDBHandler().querySelect(buildingQuery);
+			ResultSet buildingData = db.querySelect(buildingQuery);
 			int granaryLevels = 0, employed = 0;
 			while(buildingData.next()){
 				granaryLevels += buildingData.getInt("level");
@@ -516,7 +587,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return The amount of wealth stolen each update tick.
 	 */
 	public double getWealthStolen(String settlement){
-		return getWealthStolen(plugin.getDBHandler().getSettlementId(settlement));
+		return getWealthStolen(db.getSettlementId(settlement));
 	}
 	
 	/** 
@@ -532,7 +603,7 @@ public class SettlementManager extends DominionObjectManager{
 		double stolenWealth = 0, currentWealth = getMaterial(settlement_id, "wealth");
 		int bankLevels = 0, employed = 0;
 		String buildingQuery = "SELECT * FROM building WHERE settlement_id=" + settlement_id + " AND class=\'bank\'";
-		ResultSet buildingData = plugin.getDBHandler().querySelect(buildingQuery);	
+		ResultSet buildingData = db.querySelect(buildingQuery);	
 		try{
 			while(buildingData.next()){
 				bankLevels += buildingData.getInt("level");
@@ -567,11 +638,11 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return True if the material was successfully added.  False if it was not.
 	 */
 	public boolean addMaterial(int settlementId, String material, double quantity){
-		String owner = plugin.getDBHandler().getOwnerName("settlement", settlementId);
-		if(!plugin.getDBHandler().addMaterial(settlementId, material, quantity))
+		String owner = db.getOwnerName("settlement", settlementId);
+		if(!db.addMaterial(settlementId, material, quantity))
 			return false;
 		if(plugin.isPlayerOnline(owner))
-			plugin.getServer().getPlayer(owner).sendMessage(plugin.getLogPrefix() + quantity + " " + material + " has been added to " + plugin.getDBHandler().getSettlementName(settlementId) + ".");
+			plugin.getServer().getPlayer(owner).sendMessage(plugin.getLogPrefix() + quantity + " " + material + " has been added to " + db.getSettlementName(settlementId) + ".");
 		return true;
 	}
 	
@@ -587,11 +658,11 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return True if the material was successfully subtracted.  False if it was not.
 	 */
 	public boolean subtractMaterial(int settlementId, String material, double quantity){
-		String owner = plugin.getDBHandler().getOwnerName("settlement", settlementId);
-		if(!plugin.getDBHandler().subtractMaterial(settlementId, material, quantity))
+		String owner = db.getOwnerName("settlement", settlementId);
+		if(!db.subtractMaterial(settlementId, material, quantity))
 			return false;
 		if(plugin.isPlayerOnline(owner))
-			plugin.getServer().getPlayer(owner).sendMessage(plugin.getLogPrefix() + quantity + " " + material + " has been subtracted from " + plugin.getDBHandler().getSettlementName(settlementId) + ".");
+			plugin.getServer().getPlayer(owner).sendMessage(plugin.getLogPrefix() + quantity + " " + material + " has been subtracted from " + db.getSettlementName(settlementId) + ".");
 		return true;
 	}
 	
@@ -606,14 +677,14 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return True if the peasants were successfully killed.  False if they were not.
 	 */
 	public boolean killPeasants(int settlementId, double quantity){
-		String owner = plugin.getDBHandler().getOwnerName("settlement", settlementId);
+		String owner = db.getOwnerName("settlement", settlementId);
 		if(!hasMaterial(settlementId, "population", quantity))
 			quantity = this.getMaterial(settlementId, "population");
-		if(!plugin.getDBHandler().subtractMaterial(settlementId, "population", quantity))
+		if(!db.subtractMaterial(settlementId, "population", quantity))
 			return false;
 		if(plugin.isPlayerOnline(owner)){
 			String message = plugin.getLogPrefix() + " ";
-			String settlementName = plugin.getDBHandler().getSettlementName(settlementId);
+			String settlementName = db.getSettlementName(settlementId);
 			if(quantity != 1)
 				message += quantity + " peasants have been killed in " + settlementName + ".";
 			else
@@ -637,9 +708,9 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return The maximum mana of the settlement.
 	 */
 	public double getMaxMana(String settlement){
-		if(!plugin.getDBHandler().settlementExists(settlement))
+		if(!db.settlementExists(settlement))
 			return 0;
-		return getMaxMana(plugin.getDBHandler().getSettlementId(settlement));
+		return getMaxMana(db.getSettlementId(settlement));
 	}
 	
 	/** 
@@ -654,11 +725,11 @@ public class SettlementManager extends DominionObjectManager{
 	public double getMaxMana(int settlement_id){
 		double mana = 0;
 		String query = "SELECT * FROM building WHERE settlement_id=" + settlement_id + " AND class=\'library\'";
-		ResultSet buildingData = plugin.getDBHandler().querySelect(query);
+		ResultSet buildingData = db.querySelect(query);
 		int level = 0, employed = 0, workers = 0;
 		double multiplier = 0;
 		String classType="";
-		ResultSet getBiome = plugin.getDBHandler().getSettlementData(settlement_id, "biome");
+		ResultSet getBiome = db.getSettlementData(settlement_id, "biome");
 		try{
 			getBiome.next();
 			String biome = getBiome.getString("biome");
@@ -699,7 +770,7 @@ public class SettlementManager extends DominionObjectManager{
 	public double getSpellPower(int settlementId){
 		double spellPower = 0;
 		String biome = getBiome(settlementId);
-		ResultSet buildings = plugin.getDBHandler().getTableData("building", "*", "settlement_id=" + settlementId + " AND class=\'spire\'");
+		ResultSet buildings = db.getTableData("building", "*", "settlement_id=" + settlementId + " AND class=\'spire\'");
 		int level = 0, employed = 0, workers = 0;
 		double multiplier = 0;
 		String classType = "";
@@ -741,9 +812,9 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return The maximum population the settlement can have.
 	 */
 	public int getMaxPopulation(String settlement){
-		if(!plugin.getDBHandler().settlementExists(settlement))
+		if(!db.settlementExists(settlement))
 			return 0;
-		return getMaxPopulation(plugin.getDBHandler().getSettlementId(settlement));
+		return getMaxPopulation(db.getSettlementId(settlement));
 	}
 	
 	/** 
@@ -758,7 +829,7 @@ public class SettlementManager extends DominionObjectManager{
 	public int getMaxPopulation(int settlement_id){
 		int maxPopulation = 0;
 		String query = "SELECT * FROM building WHERE settlement_id=" + settlement_id + " AND class=\'home\'";
-		ResultSet buildingData = plugin.getDBHandler().querySelect(query);
+		ResultSet buildingData = db.querySelect(query);
 		int level = 0;
 		try{
 			while(buildingData.next()){
@@ -784,7 +855,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return The x-coordinate of the settlement.
 	 */
 	public double getX(int settlementId){
-		ResultSet settlement = plugin.getDBHandler().getSettlementData(settlementId, "xcoord");
+		ResultSet settlement = db.getSettlementData(settlementId, "xcoord");
 		double xCoord = 0;
 		try{
 			if(settlement.next())
@@ -806,7 +877,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return The z-coordinate of the settlement.
 	 */
 	public double getZ(int settlementId){
-		ResultSet settlement = plugin.getDBHandler().getSettlementData(settlementId, "zcoord");
+		ResultSet settlement = db.getSettlementData(settlementId, "zcoord");
 		double zCoord = 0;
 		try{
 			if(settlement.next())
@@ -828,7 +899,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return The defense of the city.
 	 */
 	public double getDefense(int settlementId){
-		ResultSet settlement = plugin.getDBHandler().getSettlementData(settlementId, "*");
+		ResultSet settlement = db.getSettlementData(settlementId, "*");
 		String type="";
 		double walls=0, baseDefense=0;
 		try{
@@ -864,7 +935,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return The total employed population. -1 if an error occured.
 	 */
 	public int getCurrentlyEmployed(String settlement){
-		return getCurrentlyEmployed(plugin.getDBHandler().getSettlementId(settlement));
+		return getCurrentlyEmployed(db.getSettlementId(settlement));
 	}
 	
 	/** 
@@ -878,7 +949,7 @@ public class SettlementManager extends DominionObjectManager{
 	 */
 	public int getCurrentlyEmployed(int settlement_id){
 		String query = "SELECT * FROM building WHERE settlement_id=" + settlement_id;
-		ResultSet buildingData = plugin.getDBHandler().querySelect(query);
+		ResultSet buildingData = db.querySelect(query);
 		int employed = 0;
 		try{
 			while(buildingData.next()){
@@ -906,7 +977,7 @@ public class SettlementManager extends DominionObjectManager{
 		material = material.toLowerCase();
 		if(material.isEmpty())
 			return 0;
-		ResultSet materialData = plugin.getDBHandler().getSettlementData(settlement_id, material);
+		ResultSet materialData = db.getSettlementData(settlement_id, material);
 		double value = 0;
 		if(materialData == null)
 			return value;
@@ -931,7 +1002,7 @@ public class SettlementManager extends DominionObjectManager{
 	 */
 	public String getBiome(int settlementId){
 		String biome = "";
-		ResultSet data = plugin.getDBHandler().getSettlementData(settlementId, "biome");
+		ResultSet data = db.getSettlementData(settlementId, "biome");
 		try{
 			if(data.next())
 				biome = data.getString("biome");
@@ -954,7 +1025,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return True if the settlement has at least that much material; false if it does not.
 	 */
 	public boolean hasMaterial(String settlement, String material, double quantity){
-		return hasMaterial(plugin.getDBHandler().getSettlementId(settlement), material, quantity);
+		return hasMaterial(db.getSettlementId(settlement), material, quantity);
 	}
 	
 	/** 
@@ -984,7 +1055,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return True if the player is the owner of the settlement; false if they are not.
 	 */
 	public boolean isOwner(String player, String settlement){
-		return isOwner(plugin.getDBHandler().getPlayerId(player), plugin.getDBHandler().getSettlementId(settlement));
+		return isOwner(db.getPlayerId(player), db.getSettlementId(settlement));
 	}
 	
 	/** 
@@ -998,7 +1069,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return True if the player is the owner of the settlement; false if they are not.
 	 */
 	public boolean isOwner(int playerId, String settlement){
-		return isOwner(playerId, plugin.getDBHandler().getSettlementId(settlement));
+		return isOwner(playerId, db.getSettlementId(settlement));
 	}
 	
 	/** 
@@ -1012,7 +1083,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return True if the player is the owner of the settlement; false if they are not.
 	 */
 	public boolean isOwner(String player, int settlementId){
-		return isOwner(plugin.getDBHandler().getPlayerId(player), settlementId);
+		return isOwner(db.getPlayerId(player), settlementId);
 	}
 	
 	/** 
@@ -1026,7 +1097,7 @@ public class SettlementManager extends DominionObjectManager{
 	 * @return True if the player is the owner of the settlement; false if they are not.
 	 */
 	public boolean isOwner(int playerId, int settlementId){
-		return plugin.getDBHandler().getOwnerId("settlement", settlementId) == playerId;
+		return db.getOwnerId("settlement", settlementId) == playerId;
 	}
 
 	//---ACCESSORS---//

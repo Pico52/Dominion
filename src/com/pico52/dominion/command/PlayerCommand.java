@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
 import com.pico52.dominion.command.player.PlayerBuild;
+import com.pico52.dominion.command.player.PlayerCancel;
 import com.pico52.dominion.command.player.PlayerCast;
 import com.pico52.dominion.command.player.PlayerData;
 import com.pico52.dominion.command.player.PlayerDeposit;
@@ -17,6 +18,7 @@ import com.pico52.dominion.command.player.PlayerDestroy;
 import com.pico52.dominion.command.player.PlayerEmploy;
 import com.pico52.dominion.command.player.PlayerEmployment;
 import com.pico52.dominion.command.player.PlayerForbid;
+import com.pico52.dominion.command.player.PlayerFound;
 import com.pico52.dominion.command.player.PlayerGiveToUnit;
 import com.pico52.dominion.command.player.PlayerHolding;
 import com.pico52.dominion.command.player.PlayerInfo;
@@ -25,6 +27,7 @@ import com.pico52.dominion.command.player.PlayerListMy;
 import com.pico52.dominion.command.player.PlayerPermit;
 import com.pico52.dominion.command.player.PlayerProduction;
 import com.pico52.dominion.command.player.PlayerRequest;
+import com.pico52.dominion.command.player.PlayerRequests;
 import com.pico52.dominion.command.player.PlayerRevoke;
 import com.pico52.dominion.command.player.PlayerStorage;
 import com.pico52.dominion.command.player.PlayerTrade;
@@ -74,7 +77,10 @@ public class PlayerCommand implements CommandExecutor{
 	private static PlayerRevoke playerRevoke;
 	private static PlayerForbid playerForbid;
 	private static PlayerRequest playerRequest;
+	private static PlayerRequests playerRequests;
 	private static PlayerTrade playerTrade;
+	private static PlayerCancel playerCancel;
+	private static PlayerFound playerFound;
 	
 	/** 
 	 * <b>PlayerCommand</b><br>
@@ -114,7 +120,10 @@ public class PlayerCommand implements CommandExecutor{
 		playerRevoke = new PlayerRevoke(plugin);
 		playerForbid = new PlayerForbid(plugin);
 		playerRequest = new PlayerRequest(plugin);
+		playerRequests = new PlayerRequests(plugin);
 		playerTrade = new PlayerTrade(plugin);
+		playerCancel = new PlayerCancel(plugin);
+		playerFound = new PlayerFound(plugin);
 	}
 
 	@Override
@@ -210,10 +219,19 @@ public class PlayerCommand implements CommandExecutor{
 			return playerForbid.execute(sender, args);
 		}
 		if(subCommand.equalsIgnoreCase("request") || subCommand.equalsIgnoreCase("req") || subCommand.equalsIgnoreCase("r")){
-			return playerRequest.execute(sender, args);
+			return playerRequest.execute(sender, args);	
+		}
+		if(subCommand.equalsIgnoreCase("requests") || subCommand.equalsIgnoreCase("reqs")){
+			return playerRequests.execute(sender, args);
 		}
 		if(subCommand.equalsIgnoreCase("trade") || subCommand.equalsIgnoreCase("barter")){
 			return playerTrade.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("cancel")){
+			return playerCancel.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("found")){
+			return playerFound.execute(sender, args);
 		}
 		
 		return false;

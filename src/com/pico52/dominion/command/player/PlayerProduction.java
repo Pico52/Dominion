@@ -62,7 +62,7 @@ public class PlayerProduction extends PlayerSubCommand{
 		String allData = "§a======" + settlement + "======§f\n";
 		allData += "§aMana: §f" + results.mana + "  ";
 		allData += "§aPopulation: §f" + results.population + "\n";
-		allData += "§aWealth: §f" + (results.wealth + plugin.getSettlementManager().getIncomeTax(settlementId) - plugin.getSettlementManager().getWealthStolen(settlementId)) + "  ";
+		allData += "§aWealth: §f" + (results.wealth + plugin.getSettlementManager().getTradeValue(settlementId) + plugin.getSettlementManager().getIncomeTax(settlementId) - plugin.getSettlementManager().getWealthStolen(settlementId)) + "  ";
 		allData += "§aFood: §f" + (results.food - plugin.getSettlementManager().getFoodConsumption(settlementId) - plugin.getSettlementManager().getFoodDecay(settlementId)) + "\n";
 		allData += "§aWood: §f" + results.wood + "  ";
 		allData += "§aCobble: §f" + results.cobblestone + "\n";

@@ -1,6 +1,5 @@
 package com.pico52.dominion.command.player;
 
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
@@ -52,6 +51,11 @@ public class PlayerTrade extends PlayerSubCommand{
 			return true;
 		}
 		String settlement = args[0], targetSettlement = args[1];
+		if(settlement == targetSettlement){
+			sender.sendMessage(logPrefix + "Settlements cannot trade with themselves.");
+			sender.sendMessage(logPrefix + "Usage: " + usage);
+			return true;
+		}
 		if(!db.settlementExists(settlement)){
 			sender.sendMessage(logPrefix + "The settlement \"" + settlement + "\" does not exist.");
 			sender.sendMessage(logPrefix + "Usage: " + usage);
@@ -68,13 +72,18 @@ public class PlayerTrade extends PlayerSubCommand{
 			sender.sendMessage(logPrefix + "You do not have permission to initiate trade for " + settlement + ".");
 			return true;
 		}
+		int targetId = db.getSettlementId(targetSettlement), targetOwnerId  = db.getOwnerId("settlement",  targetId);
+		if(targetOwnerId == 0){
+			sender.sendMessage(logPrefix + "There is currently no owner of " + settlement + ".  The trade cannot be made.");
+			return true;
+		}
+		if(plugin.getTradeManager().getNumberOfActiveTradesBetween(settlementId, targetId) > 0){
+			sender.sendMessage(logPrefix + "These settlements already have an active trade agreement.  Multiple trade agreements will be available in a later version of Dominion.");
+			return true;
+		}
+		double xcoord = plugin.getSettlementManager().getX(targetId), zcoord = plugin.getSettlementManager().getZ(targetId);
 		
-		int targetId = db.getSettlementId(targetSettlement), targetOwnerId = db.getOwnerId("settlement", targetId), objectId = settlementId;
-		Location loc = plugin.getServer().getPlayer(sender.getName()).getLocation();
-		double xcoord = loc.getBlockX();
-		double zcoord = loc.getBlockZ();
-
-		if(plugin.getRequestManager().createRequest(requesterId, targetOwnerId, false, 1, "trade", objectId, targetId, xcoord, zcoord))
+		if(plugin.getRequestManager().createRequest(requesterId, targetOwnerId, false, 1, "trade", "", settlementId, targetId, xcoord, zcoord))
 			sender.sendMessage(logPrefix + "Successfully requested a trade between " + settlement + " and " + targetSettlement + ".");
 		else
 			sender.sendMessage(logPrefix + "Failed to send your trade request.");

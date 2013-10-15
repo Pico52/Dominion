@@ -46,36 +46,46 @@ public class AdminCreate extends AdminSubCommand{
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
+		String entity = args[0];
 		if(args.length == 1){
-			if(args[0].equalsIgnoreCase("kingdom")){
-				sender.sendMessage(logPrefix + "Usage: /admindominion create kingdom [kingdom name]");
+			if(entity.equalsIgnoreCase("kingdom")){
+				sender.sendMessage(logPrefix + "Usage: /ad create kingdom [kingdom name]");
 			}
-			if(args[0].equalsIgnoreCase("settlement")){
-				sender.sendMessage(logPrefix + "Usage: /admindominion create settlement [settlement name]");
+			if(entity.equalsIgnoreCase("settlement")){
+				sender.sendMessage(logPrefix + "Usage: /ad create settlement [settlement name]");
 			}
 			return true;
 		}
-		if(args[0].equalsIgnoreCase("kingdom")){
-			if(db.createKingdom(args[1])){
-				sender.sendMessage(logPrefix + "The new kingdom \"" + args[1] + "\" has been created!");
-				plugin.getLogger().info(logPrefix + "The new kingdom \"" + args[1] + "\" has been created!");
+		String entityName = args[1];
+		if(entity.equalsIgnoreCase("kingdom")){
+			if(db.kingdomExists(entityName)){
+				sender.sendMessage(logPrefix + "The kingdom \"" + entityName + "\" already exists.");
+				return true;
+			}
+			if(db.createKingdom(entityName)){
+				sender.sendMessage(logPrefix + "The new kingdom \"" + entityName + "\" has been created!");
+				plugin.getLogger().info(logPrefix + "The new kingdom \"" + entityName + "\" has been created!");
 			}else{
-				sender.sendMessage(logPrefix + "The kingdom \"" + args[1] + "\" could not be created.");
-				plugin.getLogger().info(logPrefix + "The kingdom \"" + args[1] + "\" could not be created");
+				sender.sendMessage(logPrefix + "The kingdom \"" + entityName + "\" could not be created.");
+				plugin.getLogger().info(logPrefix + "The kingdom \"" + entityName + "\" could not be created.");
 			}
 			return true;
 		}
-		if(args[0].equalsIgnoreCase("settlement")){
-			if(db.createSettlement(args[1])){
-				sender.sendMessage(logPrefix + "The new settlement \"" + args[1] + "\" has been created!");
-				plugin.getLogger().info(logPrefix + "The new settlement \"" + args[1] + "\" has been created!");
+		if(entity.equalsIgnoreCase("settlement")){
+			if(db.settlementExists(entityName)){
+				sender.sendMessage(logPrefix + "The settlement \"" + entityName + "\" already exists.");
+				return true;
+			}
+			if(plugin.getSettlementManager().createSettlement(entityName)){
+				sender.sendMessage(logPrefix + "The new settlement \"" + entityName + "\" has been created!");
+				plugin.getLogger().info(logPrefix + "The new settlement \"" + entityName + "\" has been created!");
 			}else{
-				sender.sendMessage(logPrefix + "The settlement \"" + args[1] + "\" could not be created.");
-				plugin.getLogger().info(logPrefix + "The settlement \"" + args[1] + "\" could not be created");
+				sender.sendMessage(logPrefix + "The settlement \"" + entityName + "\" could not be created.");
+				plugin.getLogger().info(logPrefix + "The settlement \"" + entityName + "\" could not be created.");
 			}
 			return true;
 		}
-		
-		return false;
+		sender.sendMessage(logPrefix + "Usage: " + usage);
+		return true;
 	}
 }

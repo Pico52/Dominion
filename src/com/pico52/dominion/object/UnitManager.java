@@ -648,23 +648,23 @@ public class UnitManager extends DominionObjectManager{
 	}
 	
 	public String getClass(int unitId){
-		return db.getSingleColumnString("unit", "class", unitId, "unit_Id");
+		return db.getSingleColumnString("unit", "class", unitId, "unit_id");
 	}
 	
 	public int getOwner(int unitId){
-		return db.getSingleColumnInt("unit", "owner", unitId, "unit_Id");
+		return db.getSingleColumnInt("unit", "owner", unitId, "unit_id");
 	}
 	
 	public double getHealth(int unitId){
-		return db.getSingleColumnDouble("unit", "health", unitId, "unit_Id");
+		return db.getSingleColumnDouble("unit", "health", unitId, "unit_id");
 	}
 	
 	public double getUnitX(int unitId){
-		return db.getSingleColumnDouble("unit", "xcoord", unitId, "unit_Id");
+		return db.getSingleColumnDouble("unit", "xcoord", unitId, "unit_id");
 	}
 	
 	public double getUnitZ(int unitId){
-		return db.getSingleColumnDouble("unit", "zcoord", unitId, "unit_Id");
+		return db.getSingleColumnDouble("unit", "zcoord", unitId, "unit_id");
 	}
 	
 	public int getTargetId(int unitId){

@@ -57,7 +57,7 @@ public class AdminBuild extends AdminSubCommand{
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		if(db.createBuilding(settlement, classification)){
+		if(plugin.getBuildingManager().createBuilding(db.getSettlementId(settlement), classification)){
 			int newBuildingId = db.getNewestId("building");
 			sender.sendMessage(logPrefix + "Successfully created a " + classification + " id#: " + newBuildingId + " for " + settlement + "!");
 			plugin.getLogger().info("Successfully created a " + classification + " for " + settlement + "!");

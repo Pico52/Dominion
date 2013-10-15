@@ -1,5 +1,6 @@
 package com.pico52.dominion.command.player;
 
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
@@ -24,7 +25,7 @@ public class PlayerBuild extends PlayerSubCommand{
 	 * @param instance - The {@link Dominion} plugin this command executor will be running on.
 	 */
 	public PlayerBuild(Dominion instance) {
-		super(instance, "/d build [building type] [settlement] (optional)[level]");
+		super(instance, "/d build [building type] [settlement] (level)");
 	}
 
 	/** 
@@ -70,7 +71,24 @@ public class PlayerBuild extends PlayerSubCommand{
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		sender.sendMessage(logPrefix + "The requests system is still under development.\n" + logPrefix + "No build request has been sent.");
+		int level = 1;
+		if(args.length > 2){
+			try{
+				level = Integer.parseInt(args[2]);
+			} catch (NumberFormatException ex){
+				sender.sendMessage(logPrefix + "Incorrect input.  " + args[2] + " is not a proper level.  Levels must be integers.");
+				sender.sendMessage(logPrefix + "Usage: " + usage);
+				return true;
+			}
+		}
+		Location loc = plugin.getServer().getPlayer(sender.getName()).getLocation();
+		double xcoord = loc.getBlockX();
+		double zcoord = loc.getBlockZ();
+
+		if(plugin.getRequestManager().createRequest(playerId, 0, true, level, "build_" + building, "", settlementId, 0, xcoord, zcoord))
+			sender.sendMessage(logPrefix + "Successfully requested a level " + level + " " + building + " to be created in " + settlement + " at your current location.");
+		else
+			sender.sendMessage(logPrefix + "Failed to create your building request.");
 		return true;
 	}
 }

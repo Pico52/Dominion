@@ -12,10 +12,10 @@ public class PermissionManager extends DominionObjectManager{
 		return createPermission(ownerId, granteeId, node, 0);
 	}
 	
-	public boolean createPermission(int ownerId, int granteeId, String node, int referId){
-		if(!isNode(node))
+	public boolean createPermission(int ownerId, int granteeId, String permission, int referId){
+		if(!isProper(permission))
 			return false;
-		return db.createPermission(ownerId, granteeId, node, referId);
+		return db.createPermission(ownerId, granteeId, permission, referId);
 	}
 	
 	public boolean removePermission(String player, String permission, int referId){
@@ -28,6 +28,14 @@ public class PermissionManager extends DominionObjectManager{
 	
 	public boolean removePermission(int permissionId){
 		return db.remove("permission", permissionId);
+	}
+	
+	public boolean isProper(String permission){
+		if(permission.startsWith("permit_"))
+			permission = permission.replace("permit_", "");
+		else if (permission.startsWith("forbid_"))
+			permission = permission.replace("forbid_", "");
+		return isNode(permission);
 	}
 	
 	public boolean isNode(String node){

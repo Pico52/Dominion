@@ -18,6 +18,7 @@ import com.pico52.dominion.object.PermissionManager;
 import com.pico52.dominion.object.RequestManager;
 import com.pico52.dominion.object.SettlementManager;
 import com.pico52.dominion.object.SpellManager;
+import com.pico52.dominion.object.TradeManager;
 import com.pico52.dominion.object.UnitManager;
 import com.pico52.dominion.task.TaskManager;
 
@@ -48,6 +49,7 @@ public final class Dominion extends JavaPlugin{
 	private TaskManager taskManager;
 	private SpellManager spellManager;
 	private ItemManager itemManager;
+	private TradeManager tradeManager;
 	private PermissionManager permissionManager;
 	private RequestManager requestManager;
 	
@@ -64,6 +66,7 @@ public final class Dominion extends JavaPlugin{
 		unitManager = new UnitManager(this);
 		spellManager = new SpellManager(this);
 		itemManager = new ItemManager(this);
+		tradeManager = new TradeManager(this);
 		permissionManager = new PermissionManager(this);
 		requestManager = new RequestManager(this);
 		biomeData = new BiomeData();
@@ -230,6 +233,18 @@ public final class Dominion extends JavaPlugin{
 	 */
 	public ItemManager getItemManager(){
 		return itemManager;
+	}
+	
+	/** 
+	 * <b>getTradeManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link TradeManager} getTradeManager()
+	 * <br>
+	 * <br>
+	 * @return The manager controlling trade.
+	 */
+	public TradeManager getTradeManager(){
+		return tradeManager;
 	}
 	
 	/** 
