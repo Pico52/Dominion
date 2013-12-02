@@ -59,7 +59,7 @@ public class PlayerProduction extends PlayerSubCommand{
 			return true;
 		}
 		ProductionSheet results = plugin.getBuildingManager().getProductions(settlement);
-		String allData = "§a======" + settlement + "======§f\n";
+		String allData = "§a======" + settlement + "======§r \n";
 		allData += "§aMana: §f" + results.mana + "  ";
 		allData += "§aPopulation: §f" + results.population + "\n";
 		allData += "§aWealth: §f" + (results.wealth + plugin.getSettlementManager().getTradeValue(settlementId) + plugin.getSettlementManager().getIncomeTax(settlementId) - plugin.getSettlementManager().getWealthStolen(settlementId)) + "  ";

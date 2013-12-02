@@ -14,8 +14,8 @@ import com.pico52.dominion.DominionSettings;
  */
 public class Lighthouse extends Building{
 	
-	public static double speedBonus;
-	public static int maxLevel, range;
+	public double speedBonus;
+	public int maxLevel, range;
 	
 	/** 
 	 * <b>Lighthouse</b><br>

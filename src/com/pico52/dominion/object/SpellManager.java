@@ -349,7 +349,7 @@ public class SpellManager extends DominionObjectManager{
 			return false;
 		}
 		UnitManager um = plugin.getUnitManager();
-		double attackPower = um.getUnit(um.getClass(targetId)).getOffense();
+		double attackPower = um.getUnit(um.getClass(targetId)).offense;
 		if((config.getDouble("effects.unit_invisibility.strength_required") * attackPower) > strength)
 			return false;
 		double xCoord = um.getUnitX(targetId);

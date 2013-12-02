@@ -357,6 +357,9 @@ public class SettlementManager extends DominionObjectManager{
 		}
 		plugin.getLogger().info("Successfully updated " + name + " upkeep.");
 		
+		plugin.getUnitManager().grantSettlementExperience(settlement_id, update.landRangedExperience, "ranged");
+		plugin.getUnitManager().grantSettlementExperience(settlement_id, update.landMeleeExperience, "melee");
+		
 		return true;
 	}
 	

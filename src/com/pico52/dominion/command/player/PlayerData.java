@@ -68,7 +68,7 @@ public class PlayerData extends PlayerSubCommand{
 			title = "No Data";
 			middleData += "No data available.";
 		}
-		topBar += title + "======§r\n";
+		topBar += title + "======§r \n";
 		String bottomBar = "§a======";
 			for(int i=0; i<title.length();i++)
 				bottomBar += "=";

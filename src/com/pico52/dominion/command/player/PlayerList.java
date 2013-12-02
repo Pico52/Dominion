@@ -164,7 +164,7 @@ public class PlayerList extends PlayerSubCommand{
 			columnCount++;
 		for(int i=0; i<columnCount;i++)
 			containment += "===";
-		allData += containment + entity.toUpperCase() + containment + "§r\n";
+		allData += containment + entity.toUpperCase() + containment + "§r \n";
 		if(middleData == "")
 			middleData += "There are no objects in " + entity + ".\n";
 		allData += middleData + "§a" + containment;

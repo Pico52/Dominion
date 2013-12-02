@@ -26,7 +26,7 @@ buildings:
     workers: 0
     structure: false
     # Experience gained for garrisoned archers each tick.
-    experience: 5
+    experience: 1.0
   armory:
     defense:
       value: 80
@@ -361,6 +361,16 @@ buildings:
     structure: false
     # Base integer spell power added to the settlement.
     spell_power: 10
+  stable:
+    defense:
+      value: 0
+      base: true
+    workers: 5
+    structure: false
+    # Number of horses the stable can hold per level.
+    capacity: 1
+    # Quantity of food eaten for each horse per production tick.
+    food_consumption: 1
   tower:
     defense:
       value: 0
@@ -444,7 +454,7 @@ buildings:
     workers: 1
     structure: false
     # Experience given to every garrisoned melee unit each tick.
-    experience: 5
+    experience: 1.0
   warehouse:
     defense:
       value: 40

@@ -4,12 +4,40 @@ import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
 
+/** 
+ * <b>AdminKill</b><br>
+ * <br>
+ * &nbsp;&nbsp;public class AdminKill extends {@link AdminSubCommand}
+ * <br>
+ * <br>
+ * The class file for the administrator sub-command "Kill".
+ */
 public class AdminKill extends AdminSubCommand{
 
+	/** 
+	 * <b>AdminKill</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public AdminKill({@link Dominion} instance)
+	 * <br>
+	 * <br>
+	 * The constructor clause for the {@link AdminKill} class.
+	 * @param instance - The {@link Dominion} plugin this command executor will be running on.
+	 */
 	public AdminKill(Dominion instance) {
 		super(instance, "/ad kill [unit id] (optional)[to unitId]");
 	}
 
+	/** 
+	 * <b>execute</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean execute({@link CommandSender} sender,{@link String} args[])
+	 * <br>
+	 * <br>
+	 * Manages the kill sub-command to kill a unit.
+	 * @param sender - The sender of the command.
+	 * @param args - The arguments the player provided.
+	 * @return The sucess of the execution of this command.
+	 */
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if(args.length == 0){

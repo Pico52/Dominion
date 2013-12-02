@@ -44,7 +44,7 @@ public class AdminRequests extends AdminSubCommand{
 		RequestManager rm = plugin.getRequestManager();
 		int playerId = db.getPlayerId(sender.getName());
 		if(args.length == 0){
-			String message = "§a==========Requests==========§f\n";
+			String message = "§a==========Requests==========§r \n";
 			int[] requestsToAdmins = rm.getRequestsToAdmins();
 			if(requestsToAdmins.length == 0)
 				message += "There are no active requests for administrators.\n";

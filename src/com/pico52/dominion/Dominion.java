@@ -15,9 +15,11 @@ import com.pico52.dominion.event.DominionPlayerListener;
 import com.pico52.dominion.object.BuildingManager;
 import com.pico52.dominion.object.ItemManager;
 import com.pico52.dominion.object.PermissionManager;
+import com.pico52.dominion.object.PlayerManager;
 import com.pico52.dominion.object.RequestManager;
 import com.pico52.dominion.object.SettlementManager;
 import com.pico52.dominion.object.SpellManager;
+import com.pico52.dominion.object.SquelchManager;
 import com.pico52.dominion.object.TradeManager;
 import com.pico52.dominion.object.UnitManager;
 import com.pico52.dominion.task.TaskManager;
@@ -44,6 +46,7 @@ public final class Dominion extends JavaPlugin{
 	private DominionPlayerListener playerEvent;
 	private BuildingManager buildingManager;
 	private SettlementManager settlementManager;
+	private PlayerManager playerManager;
 	private UnitManager unitManager;
 	private BiomeData biomeData;
 	private TaskManager taskManager;
@@ -52,6 +55,7 @@ public final class Dominion extends JavaPlugin{
 	private TradeManager tradeManager;
 	private PermissionManager permissionManager;
 	private RequestManager requestManager;
+	private SquelchManager squelchManager;
 	
 	@Override
 	public void onEnable(){
@@ -63,12 +67,14 @@ public final class Dominion extends JavaPlugin{
 		dbHandler.setDefaultTables();
 		buildingManager = new BuildingManager(this);
 		settlementManager = new SettlementManager(this);
+		playerManager = new PlayerManager(this);
 		unitManager = new UnitManager(this);
 		spellManager = new SpellManager(this);
 		itemManager = new ItemManager(this);
 		tradeManager = new TradeManager(this);
 		permissionManager = new PermissionManager(this);
 		requestManager = new RequestManager(this);
+		squelchManager = new SquelchManager(this);
 		biomeData = new BiomeData();
 		
 		playerEvent = new DominionPlayerListener(this);
@@ -200,6 +206,18 @@ public final class Dominion extends JavaPlugin{
 	}
 	
 	/** 
+	 * <b>getPlayerManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link PlayerManager} getPlayerManager()
+	 * <br>
+	 * <br>
+	 * @return The manager controlling players.
+	 */
+	public PlayerManager getPlayerManager(){
+		return playerManager;
+	}
+	
+	/** 
 	 * <b>getUnitManager</b><br>
 	 * <br>
 	 * &nbsp;&nbsp;public {@link UnitManager} getUnitManager()
@@ -269,6 +287,18 @@ public final class Dominion extends JavaPlugin{
 	 */
 	public RequestManager getRequestManager(){
 		return requestManager;
+	}
+	
+	/** 
+	 * <b>getSqueltchManager</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link SquelchManager} getSqueltchManager()
+	 * <br>
+	 * <br>
+	 * @return The manager controlling squeltches.
+	 */
+	public SquelchManager getSqueltchManager(){
+		return squelchManager;
 	}
 	
 	/** 

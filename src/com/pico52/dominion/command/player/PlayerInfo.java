@@ -56,7 +56,7 @@ public class PlayerInfo extends PlayerSubCommand{
 			return true;
 		}
 		ResultSet results = db.getSettlementData(settlement, "*");
-		String allData = "§a======" + settlement + "======§r\n";
+		String allData = "§a======" + settlement + "======§r \n";
 		try {
 			if(results.next()){
 				int settlementId = results.getInt("settlement_id");

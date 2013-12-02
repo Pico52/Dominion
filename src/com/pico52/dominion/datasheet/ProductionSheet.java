@@ -11,10 +11,12 @@ package com.pico52.dominion.datasheet;
 public class ProductionSheet {
 	
 	public String settlement;
-	public double mana, population, wealth, food, wood, cobblestone, stone, sand, gravel, 
-	dirt, ironIngot, ironOre, emerald, emeraldOre, goldIngot, goldOre, flint, feather, lapisOre, 
-	diamond, obsidian, netherrack, netherBrick, redstone, brick, glowstone, clay, coal, wool, 
-	leather, arrow, armor, weapon, snow, recruit, prisoner, experience;
+	public double mana, population, wealth, food, wood, cobblestone, stone, sand, 
+	gravel, dirt, ironIngot, ironOre, emerald, emeraldOre, goldIngot, goldOre, flint, 
+	feather, lapisOre, diamond, obsidian, netherrack, netherBrick, redstone, brick, 
+	glowstone, clay, coal, wool, leather, arrow, armor, weapon, snow, recruit, prisoner, 
+	landRangedExperience, landMeleeExperience, landMountedMeleeExperience, landMountedRangedExperience, landArtilleryExperience, 
+	seaRangedExperience, seaMeleeExperience, seaArtilleryExperience;
 	
 	/** 
 	 * <b>ProductionSheet</b><br>
@@ -62,7 +64,14 @@ public class ProductionSheet {
 		snow = 0;
 		recruit = 0;
 		prisoner = 0;
-		experience = 0;
+		landRangedExperience = 0;
+		landMeleeExperience = 0;
+		landMountedMeleeExperience = 0;
+		landMountedRangedExperience = 0;
+		landArtilleryExperience = 0;
+		seaRangedExperience = 0;
+		seaMeleeExperience = 0;
+		seaArtilleryExperience = 0;
 	}
 	
 	/** 
@@ -75,7 +84,6 @@ public class ProductionSheet {
 	 * @param value - The quantity to add.
 	 */
 	public void addResource(String resource, double value){
-		resource = resource.toLowerCase();
 		if(resource.equalsIgnoreCase("mana")) mana += value;
 		else if(resource.equalsIgnoreCase("population")) population += value;
 		else if(resource.equalsIgnoreCase("wealth")) wealth += value;
@@ -86,19 +94,19 @@ public class ProductionSheet {
 		else if(resource.equalsIgnoreCase("sand")) sand += value;
 		else if(resource.equalsIgnoreCase("gravel")) gravel += value;
 		else if(resource.equalsIgnoreCase("dirt")) dirt += value;
-		else if(resource.equalsIgnoreCase("iron_ingot") | resource.equalsIgnoreCase("ironingot")) ironIngot += value;
-		else if(resource.equalsIgnoreCase("iron_ore") | resource.equalsIgnoreCase("ironore")) ironOre += value;
+		else if(resource.equalsIgnoreCase("iron_ingot") || resource.equalsIgnoreCase("ironingot")) ironIngot += value;
+		else if(resource.equalsIgnoreCase("iron_ore") || resource.equalsIgnoreCase("ironore")) ironOre += value;
 		else if(resource.equalsIgnoreCase("emerald")) emerald += value;
-		else if(resource.equalsIgnoreCase("emerald_ore") | resource.equalsIgnoreCase("emeraldore")) emeraldOre += value;
-		else if(resource.equalsIgnoreCase("gold_ingot") | resource.equalsIgnoreCase("goldingot")) goldIngot += value;
-		else if(resource.equalsIgnoreCase("gold_ore") | resource.equalsIgnoreCase("goldore")) goldOre += value;
+		else if(resource.equalsIgnoreCase("emerald_ore") || resource.equalsIgnoreCase("emeraldore")) emeraldOre += value;
+		else if(resource.equalsIgnoreCase("gold_ingot") || resource.equalsIgnoreCase("goldingot")) goldIngot += value;
+		else if(resource.equalsIgnoreCase("gold_ore") || resource.equalsIgnoreCase("goldore")) goldOre += value;
 		else if(resource.equalsIgnoreCase("flint")) flint += value;
 		else if(resource.equalsIgnoreCase("feather")) feather += value;
 		else if(resource.equalsIgnoreCase("lapis_ore")) lapisOre += value;
 		else if(resource.equalsIgnoreCase("diamond")) diamond += value;
 		else if(resource.equalsIgnoreCase("obsidian")) obsidian += value;
 		else if(resource.equalsIgnoreCase("netherrack")) netherrack += value;
-		else if(resource.equalsIgnoreCase("nether_brick") | resource.equalsIgnoreCase("netherbrick")) netherBrick += value;
+		else if(resource.equalsIgnoreCase("nether_brick") || resource.equalsIgnoreCase("netherbrick")) netherBrick += value;
 		else if(resource.equalsIgnoreCase("redstone")) redstone += value;
 		else if(resource.equalsIgnoreCase("brick")) brick += value;
 		else if(resource.equalsIgnoreCase("glowstone")) glowstone += value;
@@ -112,7 +120,14 @@ public class ProductionSheet {
 		else if(resource.equalsIgnoreCase("snow")) snow += value;
 		else if(resource.equalsIgnoreCase("recruit")) recruit += value;
 		else if(resource.equalsIgnoreCase("prisoner")) prisoner += value;
-		else if(resource.equalsIgnoreCase("experience")) experience += value;
+		else if(resource.equalsIgnoreCase("land_ranged_experience") || resource.equalsIgnoreCase("landrangedexperience")) landRangedExperience += value;
+		else if(resource.equalsIgnoreCase("land_melee_experience") || resource.equalsIgnoreCase("landmeleeexperience")) landMeleeExperience += value;
+		else if(resource.equalsIgnoreCase("land_mounted_melee_experience") || resource.equalsIgnoreCase("landmountedmeleedexperience")) landMountedMeleeExperience += value;
+		else if(resource.equalsIgnoreCase("land_mounted_ranged_experience") || resource.equalsIgnoreCase("landmountedrangedexperience")) landMountedRangedExperience += value;
+		else if(resource.equalsIgnoreCase("land_artillery_experience") || resource.equalsIgnoreCase("landartilleryexperience")) landArtilleryExperience += value;
+		else if(resource.equalsIgnoreCase("sea_ranged_experience") || resource.equalsIgnoreCase("searangedexperience")) seaRangedExperience += value;
+		else if(resource.equalsIgnoreCase("sea_melee_experience") || resource.equalsIgnoreCase("seameleeexperience")) seaMeleeExperience += value;
+		else if(resource.equalsIgnoreCase("sea_artillery_experience") || resource.equalsIgnoreCase("seaartilleryexperience")) seaArtilleryExperience += value;
 	}
 	
 	/** 
@@ -161,7 +176,14 @@ public class ProductionSheet {
 		snow += mergeSheet.snow;
 		recruit += mergeSheet.recruit;
 		prisoner += mergeSheet.prisoner;
-		experience += mergeSheet.experience;
+		landRangedExperience += mergeSheet.landRangedExperience;
+		landMeleeExperience += mergeSheet.landMeleeExperience;
+		landMountedMeleeExperience += mergeSheet.landMountedMeleeExperience;
+		landMountedRangedExperience += mergeSheet.landMountedRangedExperience;
+		landArtilleryExperience += mergeSheet.landArtilleryExperience;
+		seaRangedExperience += mergeSheet.seaRangedExperience;
+		seaMeleeExperience += mergeSheet.seaMeleeExperience;
+		seaArtilleryExperience += mergeSheet.seaArtilleryExperience;
 	}
 	
 	/** 
@@ -174,42 +196,50 @@ public class ProductionSheet {
 	 * @param multiplier - The percentage value to multiply all resources by.
 	 */
 	public void multiplier(double multiplier){
-		mana *= 1 + multiplier;
-		population *= 1 + multiplier;
-		wealth *= 1 + multiplier;
-		food *= 1 + multiplier;
-		wood *= 1 + multiplier;
-		cobblestone *= 1 + multiplier;
-		stone *= 1 + multiplier;
-		sand *= 1 + multiplier;
-		gravel *= 1 + multiplier;
-		dirt *= 1 + multiplier;
-		ironIngot *= 1 + multiplier;
-		ironOre *= 1 + multiplier;
-		emerald *= 1 + multiplier;
-		emeraldOre *= 1 + multiplier;
-		goldIngot *= 1 + multiplier;
-		goldOre *= 1 + multiplier;
-		flint *= 1 + multiplier;
-		feather *= 1 + multiplier;
-		lapisOre *= 1 + multiplier;
-		diamond *= 1 + multiplier;
-		obsidian *= 1 + multiplier;
-		netherrack *= 1 + multiplier;
-		netherBrick *= 1 + multiplier;
-		redstone *= 1 + multiplier;
-		brick *= 1 + multiplier;
-		glowstone *= 1 + multiplier;
-		clay *= 1 + multiplier;
-		coal *= 1 + multiplier;
-		wool *= 1 + multiplier;
-		leather *= 1 + multiplier;
-		arrow *= 1 + multiplier;
-		armor *= 1 + multiplier;
-		weapon *= 1 + multiplier;
-		snow *= 1 + multiplier;
-		recruit *= 1 + multiplier;
-		prisoner *= 1 + multiplier;
-		experience *= 1 + multiplier;
+		multiplier++;
+		mana *= multiplier;
+		population *= multiplier;
+		wealth *= multiplier;
+		food *= multiplier;
+		wood *= multiplier;
+		cobblestone *= multiplier;
+		stone *= multiplier;
+		sand *= multiplier;
+		gravel *= multiplier;
+		dirt *= multiplier;
+		ironIngot *= multiplier;
+		ironOre *= multiplier;
+		emerald *= multiplier;
+		emeraldOre *= multiplier;
+		goldIngot *= multiplier;
+		goldOre *= multiplier;
+		flint *= multiplier;
+		feather *= multiplier;
+		lapisOre *= multiplier;
+		diamond *= multiplier;
+		obsidian *= multiplier;
+		netherrack *= multiplier;
+		netherBrick *= multiplier;
+		redstone *= multiplier;
+		brick *= multiplier;
+		glowstone *= multiplier;
+		clay *= multiplier;
+		coal *= multiplier;
+		wool *= multiplier;
+		leather *= multiplier;
+		arrow *= multiplier;
+		armor *= multiplier;
+		weapon *= multiplier;
+		snow *= multiplier;
+		recruit *= multiplier;
+		prisoner *= multiplier;
+		landRangedExperience *= multiplier;
+		landMeleeExperience *= multiplier;
+		landMountedMeleeExperience *= multiplier;
+		landMountedRangedExperience *= multiplier;
+		landArtilleryExperience *= multiplier;
+		seaRangedExperience *= multiplier;
+		seaMeleeExperience *= multiplier;
+		seaArtilleryExperience *= multiplier;
 	}
 }

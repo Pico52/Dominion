@@ -13,12 +13,12 @@ import com.pico52.dominion.DominionSettings;
  * The object controller for all shipyards.
  */
 public class Shipyard extends Building{
-	public static double 
+	public double 
 	smallShipStorage, mediumShipStorage, largeShipStorage, 
     smallRepairRate, mediumRepairRate, largeRepairRate;
-    public static boolean
+    public boolean
     repairCivilian, repairWar;
-    public static int range;
+    public int range;
 	
 	/** 
 	 * <b>Shipyard</b><br>

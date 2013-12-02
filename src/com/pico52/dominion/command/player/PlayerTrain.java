@@ -68,20 +68,20 @@ public class PlayerTrain extends PlayerSubCommand{
 			sender.sendMessage(logPrefix + "You do not have permission to train units in this settlement.");
 			return true;
 		}
-		int foodReq = plugin.getUnitManager().getUnit(unit).getFoodConsumption() * 10;
+		double foodReq = plugin.getUnitManager().getUnit(unit).foodConsumption * 10;
 		if(plugin.getSettlementManager().getMaterial(settlementId, "food") < foodReq){
 			sender.sendMessage(logPrefix + "This unit requires " + foodReq + " food to be built.  " + settlement + " does not have enough food to build the unit.");
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
-		int wealthReq = plugin.getUnitManager().getUnit(unit).getBuildCost();
+		double wealthReq = plugin.getUnitManager().getUnit(unit).buildCost;
 		if(plugin.getSettlementManager().getMaterial(settlementId, "wealth") < wealthReq){
 			sender.sendMessage(logPrefix + "This unit requires " + wealthReq + " wealth to be built.  " + settlement + " does not have enough wealth to build the unit.");
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
 		if(plugin.getUnitManager().startProduction(settlement, unit)){
-			int trainingTime = plugin.getUnitManager().getUnit(unit).getTrainingTime();
+			int trainingTime = plugin.getUnitManager().getUnit(unit).trainingTime;
 			sender.sendMessage(logPrefix + "Successfully training a new " + unit + " in " + settlement +" that will be finished in " + trainingTime + " unit ticks.");
 		} else {
 			sender.sendMessage(logPrefix + "Failed to train the new unit: \"" + unit + "\"");

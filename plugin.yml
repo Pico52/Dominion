@@ -1,6 +1,6 @@
 name: Dominion
 main: com.pico52.dominion.Dominion
-version: 0.4.2
+version: 1.0.0
 author: Pico52
 commands:
   dominion:

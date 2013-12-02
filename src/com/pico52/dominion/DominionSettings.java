@@ -51,6 +51,8 @@ public class DominionSettings {
 	unitPickUpFromSettlementRange, 
 	unitDropOffInSettlementRange, 
 	unitPickUpRange, 
+	unitGarrisonRange, 
+	unitGarrisonHeal, 
 	foodDecay, 
 	foodConsumption, 
 	stealingRate, 
@@ -58,6 +60,7 @@ public class DominionSettings {
 	baseTradeValue;
 	
 	public static boolean 
+	unitsActive, 
 	productionTimerWaitToNextHour, 
 	unitTimerWaitToNextMinute, 
 	spellTimerWaitToNextMinute, 
@@ -67,6 +70,7 @@ public class DominionSettings {
 	
 	public static List<String> harrassableRequests;
 	
+	private static FileConfiguration config = null;
     private static FileConfiguration unitsConfig = null;
     private static File unitsConfigFile = null;
     private static FileConfiguration spellsConfig = null;
@@ -76,15 +80,18 @@ public class DominionSettings {
 
 	public static void onEnable(Dominion instance){
 		plugin = instance;
-		FileConfiguration config = plugin.getConfig();
+		config = plugin.getConfig();
 		saveDefaultUnitsConfig();
 		saveDefaultSpellsConfig();
 		saveDefaultBuildingsConfig();
 		
 		//---UNITS---//
+		unitsActive = config.getBoolean("units.active");
+		unitGarrisonRange = config.getInt("units.garrison_range");
 		unitPickUpFromSettlementRange = config.getInt("units.pick_up_from_settlement_range");
 		unitDropOffInSettlementRange = config.getInt("units.drop_off_in_settlement_range");
 		unitPickUpRange = config.getInt("units.pick_up_range");
+		unitGarrisonHeal = config.getDouble("units.garrison_heal");
 		
 		//---TASKS---//
 		productionTaskTime = config.getInt("tasks.production_time");
@@ -164,6 +171,10 @@ public class DominionSettings {
 		baseTradeValue = config.getDouble("trade.base_value");
 	}
 	
+	public static void reloadConfig(){
+		config = plugin.getConfig();
+	}
+	
     public static void reloadUnitsConfig() {
         if (unitsConfigFile == null)
         	unitsConfigFile = new File(plugin.getDataFolder(), "Units.yml");
@@ -198,6 +209,12 @@ public class DominionSettings {
             YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
             buildingsConfig.setDefaults(defConfig);
         }
+    }
+    
+    public static FileConfiguration getConfig(){
+    	 if (unitsConfig == null)
+         	reloadConfig();
+    	return config;
     }
     
     public static FileConfiguration getUnitsConfig() {

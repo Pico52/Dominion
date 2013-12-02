@@ -2,8 +2,12 @@ package com.pico52.dominion.object;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
+import org.bukkit.configuration.file.FileConfiguration;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.DominionSettings;
 import com.pico52.dominion.datasheet.BiomeData;
 import com.pico52.dominion.datasheet.ProductionSheet;
 import com.pico52.dominion.object.building.ArcheryRange;
@@ -29,6 +33,7 @@ import com.pico52.dominion.object.building.Sandworks;
 import com.pico52.dominion.object.building.SheepRanch;
 import com.pico52.dominion.object.building.Shipyard;
 import com.pico52.dominion.object.building.Spire;
+import com.pico52.dominion.object.building.Stable;
 import com.pico52.dominion.object.building.Tower;
 import com.pico52.dominion.object.building.TrainingGrounds;
 import com.pico52.dominion.object.building.Warehouse;
@@ -67,12 +72,14 @@ public class BuildingManager extends DominionObjectManager{
 	private SheepRanch sheepRanch;
 	private Shipyard shipyard;
 	private Spire spire;
+	private Stable stable;
 	private Tower tower;
 	private TrainingGrounds trainingGrounds;
 	private Warehouse warehouse;
 	private Woodshop woodshop;
 	private String[] buildingsList = {"archery_range", "armory", "bank", "barracks", "cattle_ranch", "chicken_pen", "dockyard", "farm", "fletcher", "granary", "home", "inn", "library", "lighthouse", 
-			"market", "masonry", "mine", "pig_pen", "quarry", "sandworks", "sheep_ranch", "shipyard", "spire", "tower", "training_grounds", "warehouse", "woodshop"};
+			"market", "masonry", "mine", "pig_pen", "quarry", "sandworks", "sheep_ranch", "shipyard", "spire", "stable", "tower", "training_grounds", "warehouse", "woodshop"};
+	private FileConfiguration config;
 	
 	/** 
 	 * <b>BuildingManager</b><br>
@@ -85,6 +92,7 @@ public class BuildingManager extends DominionObjectManager{
 	 */
 	public BuildingManager(Dominion plugin){
 		super(plugin);
+		config = DominionSettings.getBuildingsConfig();
 		archeryRange = new ArcheryRange();
 		armory = new Armory();
 		bank = new Bank();
@@ -108,6 +116,7 @@ public class BuildingManager extends DominionObjectManager{
 		sheepRanch = new SheepRanch();
 		shipyard = new Shipyard();
 		spire = new Spire();
+		stable = new Stable();
 		tower = new Tower();
 		trainingGrounds = new TrainingGrounds();
 		warehouse = new Warehouse();
@@ -255,8 +264,9 @@ public class BuildingManager extends DominionObjectManager{
 				else
 					employmentRatio = 1;
 				multiplier = level * employmentRatio;
-				if(classType.equalsIgnoreCase("archeryrange") | classType.equalsIgnoreCase("archery_range")){
-					// - Archery Ranges produce nothing currently.
+				if(classType.equalsIgnoreCase("archeryrange") || classType.equalsIgnoreCase("archery_range")){
+					double experience = ArcheryRange.experienceGain * multiplier;
+					production.addResource("landrangedexperience", experience);
 					continue;
 				}
 				else if(classType.equalsIgnoreCase("armory")){
@@ -417,11 +427,8 @@ public class BuildingManager extends DominionObjectManager{
 					continue;
 				}
 				else if(classType.equalsIgnoreCase("market")){
-					/* - This will only produce wealth when trading is working.
-					double multiplier = level * (employed / (market.workers * level));
-					double spellBonus = plugin.getSpellManager().getBonus(settlement_id, "settlement", "trade");
-					multiplier *= (multiplier > 0) ? 1 + spellBonus : 1 - spellBonus;
-					*/
+					// - Markets will generate wealth when passive trade has been improved.
+					
 					continue;
 				}
 				else if(classType.equalsIgnoreCase("masonry")){
@@ -531,13 +538,18 @@ public class BuildingManager extends DominionObjectManager{
 					// - Spires produce nothing currently.
 					continue;
 				}
-				else if(classType.equalsIgnoreCase("traininggrounds") | classType.equalsIgnoreCase("training_grounds")){
+				else if(classType.equalsIgnoreCase("stable")){
+					// - Stables produce nothing currently.
+					continue;
+				}
+				else if(classType.equalsIgnoreCase("traininggrounds") || classType.equalsIgnoreCase("training_grounds")){
 					if(biome.equalsIgnoreCase("desert"))
 						multiplier *= (1 + BiomeData.desertTrainingGroundsBonus);
 					double value = multiplier * trainingGrounds.getProduction(resource);
 					double consumeWealth = TrainingGrounds.wealthConsumption * multiplier;
 					double consumeFood = TrainingGrounds.foodConsumption * multiplier;
 					double consumePopulation = TrainingGrounds.populationConsumption * multiplier;
+					double experience = TrainingGrounds.baseExperienceGain * multiplier;
 					double wealth = 0, food = 0, population = 0;
 					ResultSet settlement = plugin.getDBHandler().getSettlementData(settlement_id, "*");
 					try{
@@ -551,12 +563,13 @@ public class BuildingManager extends DominionObjectManager{
 						ex.printStackTrace();
 						continue;
 					}
-					if(wealth - consumeWealth < 0 | food - consumeFood < 0 | population - consumePopulation < 0)
+					if(wealth - consumeWealth < 0 || food - consumeFood < 0 || population - consumePopulation < 0)
 						continue;
 					production.addResource(resource,  value);
 					production.addResource("wealth", -consumeWealth);
 					production.addResource("food", -consumeFood);
 					production.addResource("population", -consumePopulation);
+					production.addResource("landMeleeExperience", experience);
 					continue;
 				}
 				else if(classType.equalsIgnoreCase("warehouse")){
@@ -608,36 +621,14 @@ public class BuildingManager extends DominionObjectManager{
 	 * @return The number of workers required per level for this building.
 	 */
 	public int getWorkers(String classification){
-		classification = classification.toLowerCase();
-		
-		if(classification.equalsIgnoreCase("archeryrange")) return archeryRange.workers;
-		else if(classification.equalsIgnoreCase("armory")) return armory.workers;
-		else if(classification.equalsIgnoreCase("bank")) return bank.workers;
-		else if(classification.equalsIgnoreCase("barracks")) return barracks.workers;
-		else if(classification.equalsIgnoreCase("cattleranch")) return cattleRanch.workers;
-		else if(classification.equalsIgnoreCase("chickenpen")) return chickenPen.workers;
-		else if(classification.equalsIgnoreCase("dockyard")) return dockyard.workers;
-		else if(classification.equalsIgnoreCase("farm")) return farm.workers;
-		else if(classification.equalsIgnoreCase("fletcher")) return fletcher.workers;
-		else if(classification.equalsIgnoreCase("granary")) return granary.workers;
-		else if(classification.equalsIgnoreCase("home")) return home.workers;
-		else if(classification.equalsIgnoreCase("inn")) return inn.workers;
-		else if(classification.equalsIgnoreCase("library")) return library.workers;
-		else if(classification.equalsIgnoreCase("lighthouse")) return lighthouse.workers;
-		else if(classification.equalsIgnoreCase("market")) return market.workers;
-		else if(classification.equalsIgnoreCase("masonry")) return masonry.workers;
-		else if(classification.equalsIgnoreCase("mine")) return mine.workers;
-		else if(classification.equalsIgnoreCase("pigpen")) return pigPen.workers;
-		else if(classification.equalsIgnoreCase("quarry")) return quarry.workers;
-		else if(classification.equalsIgnoreCase("sandworks")) return sandworks.workers;
-		else if(classification.equalsIgnoreCase("sheepranch")) return sheepRanch.workers;
-		else if(classification.equalsIgnoreCase("shipyard")) return shipyard.workers;
-		else if(classification.equalsIgnoreCase("spire")) return spire.workers;
-		else if(classification.equalsIgnoreCase("tower")) return tower.workers;
-		else if(classification.equalsIgnoreCase("traininggrounds")) return trainingGrounds.workers;
-		else if(classification.equalsIgnoreCase("warehouse")) return warehouse.workers;
-		else if(classification.equalsIgnoreCase("woodshop")) return woodshop.workers;
-		return 0;
+		if(classification.equalsIgnoreCase("archeryrange")) return config.getInt("buildings.archery_range.workers");
+		else if(classification.equalsIgnoreCase("cattleranch")) return config.getInt("buildings.cattle_ranch.workers");
+		else if(classification.equalsIgnoreCase("chickenpen")) return config.getInt("buildings.chicken_pen.workers");
+		else if(classification.equalsIgnoreCase("pigpen")) return config.getInt("buildings.pig_pen.workers");
+		else if(classification.equalsIgnoreCase("sheepranch")) return config.getInt("buildings.sheep_ranch.workers");
+		else if(classification.equalsIgnoreCase("traininggrounds")) return config.getInt("buildings.training_grounds.workers");
+		int workers = config.getInt("buildings." + classification + ".workers");
+		return workers;
 	}
 	
 	/** 
@@ -657,6 +648,39 @@ public class BuildingManager extends DominionObjectManager{
 		return false;
 	}
 	
+	/** 
+	 * <b>getBuildingIds</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public int[] getBuildingIds({@link String} building)
+	 * <br>
+	 * <br>
+	 * @param building - The type of the building.
+	 * @return An array of building ids that are all of the specified building type.
+	 */
+	public int[] getBuildingIds(String building){
+		ArrayList<Integer> buildingList = new ArrayList<Integer>();
+		ResultSet buildingData = db.getTableData("building", "building_id", "class=\'" + building + "\'");
+		try{
+			while(buildingData.next()){
+				buildingList.add(buildingData.getInt("building_id"));
+			}
+			buildingData.getStatement().close();
+		} catch (SQLException ex){
+			ex.printStackTrace();
+		} catch (NullPointerException ex){
+			ex.printStackTrace();
+		} catch (Exception ex){
+			ex.printStackTrace();
+		}
+		int[] buildings = new int[buildingList.size()];
+		int i = 0;
+	    for (Integer n : buildingList) {
+	        buildings[i++] = n;
+	    }
+
+	    return buildings;
+	}
+	
 //---ACCESSORS---//
 	/** 
 	 * <b>getSettlementId</b><br>
@@ -669,6 +693,45 @@ public class BuildingManager extends DominionObjectManager{
 	 */
 	public int getSettlementId(int buildingId){
 		return db.getSingleColumnInt("building", "settlement_id", buildingId, "building_id");
+	}
+	
+	/** 
+	 * <b>getLevel</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public int getLevel(int buildingId)
+	 * <br>
+	 * <br>
+	 * @param buildingId - The id of the building.
+	 * @return The level of the building.
+	 */
+	public int getLevel(int buildingId){
+		return db.getSingleColumnInt("building", "level", buildingId, "building_id");
+	}
+	
+	/** 
+	 * <b>getX</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public double getX(int buildingId)
+	 * <br>
+	 * <br>
+	 * @param buildingId - The id of the building.
+	 * @return The x-coordinate of the building.
+	 */
+	public double getX(int buildingId){
+		return db.getSingleColumnDouble("building", "xcoord", buildingId, "building_id");
+	}
+	
+	/** 
+	 * <b>getZ</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public double getZ(int buildingId)
+	 * <br>
+	 * <br>
+	 * @param buildingId - The id of the building.
+	 * @return The z-coordinate of the building.
+	 */
+	public double getZ(int buildingId){
+		return db.getSingleColumnDouble("building", "zcoord", buildingId, "building_id");
 	}
 	
 	/** 
@@ -957,6 +1020,30 @@ public class BuildingManager extends DominionObjectManager{
 	 */
 	public Spire getSpire(){
 		return spire;
+	}
+	
+	/** 
+	 * <b>getStable</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link Stable} getStable()
+	 * <br>
+	 * <br>
+	 * @return The Stable building.
+	 */
+	public Stable getStable(){
+		return stable;
+	}
+	
+	/** 
+	 * <b>getTower</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public {@link Tower} getTower()
+	 * <br>
+	 * <br>
+	 * @return The Tower building.
+	 */
+	public Tower getTower(){
+		return tower;
 	}
 	
 	/** 

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.DominionSettings;
 
 /** 
  * <b>ItemManager</b><br>
@@ -31,22 +32,30 @@ public class ItemManager extends DominionObjectManager{
 		unitManager = plugin.getUnitManager();
 	}
 	
-	public boolean giveItemToUnit(int itemId, int unitId){
+	public double giveItemToUnit(int itemId, int unitId){
 		double quantity = getItemQuantity(itemId);
 		return giveItemToUnit(itemId, unitId, quantity);
 	}
 	
-	public boolean giveItemToUnit(int itemId, int unitId, double quantity){
+	public double giveItemToUnit(int itemId, int unitId, double quantity){
 		double itemQuantity = getItemQuantity(itemId);
 		if(quantity > itemQuantity)
-			return false;
+			return 0;
 		String type = getItemType(itemId);
-		if(!giveItemToUnit(type, quantity, unitId))
-			return false;
-		return subtractQuantity(itemId, quantity);
+		quantity = giveItemToUnit(type, quantity, unitId);
+		if(quantity <= 0)
+			return 0;
+		if(subtractQuantity(itemId, quantity))
+			return quantity;
+		return 0;
 	}
 	
-	public boolean giveItemToUnit(String type, double quantity, int unitId){
+	public double giveItemToUnit(String type, double quantity, int unitId){
+		double weightRemaining = plugin.getUnitManager().getWeightRemaining(unitId);
+		double itemWeight = this.getWeight(type, quantity);
+		if(itemWeight > weightRemaining){
+			quantity = getQuantityByWeight(type,  weightRemaining);
+		}
 		ResultSet items = db.getTableData("item", unitId, "*", "unit_id");
 		String thisType="";
 		int itemId=0;
@@ -67,12 +76,13 @@ public class ItemManager extends DominionObjectManager{
 			ex.printStackTrace();
 		}
 		if(merged){
-			return db.update("item", "quantity", quantity, "item_id", itemId);
+			if(db.update("item", "quantity", quantity, "item_id", itemId))
+				return 0;
+			return quantity;
 		} else {
 			if(createItem(type, quantity, unitId) != -1)
-				return true;
-			else
-				return false;
+				return quantity;
+			return 0;
 		}
 	}
 	
@@ -210,45 +220,49 @@ public class ItemManager extends DominionObjectManager{
 		return heldItems;
 	}
 	
-	public String getItemType(int itemId){
-		String itemType = "";
-		ResultSet item = db.getTableData("item", itemId, "type", "item_id");
-		try{
-			if(item.next())
-				itemType = item.getString("type");
-			item.getStatement().close();
-		} catch (SQLException ex){
-			plugin.getLogger().info("Error attempting to get the type of an item.");
-			ex.printStackTrace();
-		}
-		return itemType;
+	public double getWeight(int itemId){
+		return getWeight(itemId, getItemQuantity(itemId));
 	}
 	
-	public double getItemQuantity(int itemId){
-		double quantity = -1;
-		ResultSet item = db.getTableData("item", itemId, "quantity", "item_id");
-		try{
-			if(item.next())
-				quantity = item.getDouble("quantity");
-			item.getStatement().close();
-		} catch (SQLException ex){
-			plugin.getLogger().info("Error attempting to get the quantity of an item.");
-			ex.printStackTrace();
-		}
+	public double getWeight(int itemId, double quantity){
+		String type = getItemType(itemId);
+		double multiplier = DominionSettings.getConfig().getDouble("items." + type);
+		return quantity * multiplier;
+	}
+	
+	public double getWeight(String type){
+		return DominionSettings.getConfig().getDouble("items." + type);
+	}
+	
+	public double getWeight(String type, double quantity){
+		return getWeight(type) * quantity;
+	}
+	
+	public double getQuantityByWeight(int itemId, double weight){
+		String itemType = getItemType(itemId);
+		double typeWeight = getWeight(itemType);
+		double itemQuantity = getItemQuantity(itemId);
+		double quantity = weight / typeWeight;
+		if(quantity > itemQuantity)
+			quantity = itemQuantity;
 		return quantity;
 	}
 	
+	public double getQuantityByWeight(String type, double weight){
+		double typeWeight = DominionSettings.getConfig().getDouble("items." + type);
+		double quantity = weight / typeWeight;
+		return quantity;
+	}
+	
+	public String getItemType(int itemId){
+		return db.getSingleColumnString("item", "type", itemId, "item_id");
+	}
+	
+	public double getItemQuantity(int itemId){
+		return db.getSingleColumnDouble("item", "quantity", itemId, "item_id");
+	}
+	
 	public int getHolderId(int itemId){
-		int holderId = -1;
-		ResultSet item = db.getTableData("item", itemId, "unit_id", "item_id");
-		try{
-			if(item.next())
-				holderId = item.getInt("unit_id");
-			item.getStatement().close();
-		} catch (SQLException ex){
-			plugin.getLogger().info("Error attempting to get the holder id of an item.");
-			ex.printStackTrace();
-		}
-		return holderId;
+		return db.getSingleColumnInt("item", "unit_id", itemId, "item_id");
 	}
 }

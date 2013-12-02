@@ -10,94 +10,15 @@ import org.bukkit.configuration.file.FileConfiguration;
 import com.pico52.dominion.Dominion;
 import com.pico52.dominion.DominionSettings;
 import com.pico52.dominion.object.unit.Unit;
-import com.pico52.dominion.object.unit.land.Archer;
-import com.pico52.dominion.object.unit.land.DreadKnight;
-import com.pico52.dominion.object.unit.land.FootSoldier;
-import com.pico52.dominion.object.unit.land.Knight;
-import com.pico52.dominion.object.unit.land.ManAtArms;
-import com.pico52.dominion.object.unit.land.Marksman;
-import com.pico52.dominion.object.unit.land.Militia;
-import com.pico52.dominion.object.unit.land.Recruit;
-import com.pico52.dominion.object.unit.land.Scout;
-import com.pico52.dominion.object.unit.land.Skirmisher;
-import com.pico52.dominion.object.unit.land.Swordsman;
-import com.pico52.dominion.object.unit.land.Trader;
-import com.pico52.dominion.object.unit.land.Wagon;
-import com.pico52.dominion.object.unit.sea.Caravel;
-import com.pico52.dominion.object.unit.sea.Carrack;
-import com.pico52.dominion.object.unit.sea.Cog;
-import com.pico52.dominion.object.unit.sea.FishingBoat;
-import com.pico52.dominion.object.unit.sea.Frigate1stRate;
-import com.pico52.dominion.object.unit.sea.Frigate2ndRate;
-import com.pico52.dominion.object.unit.sea.Frigate3rdRate;
-import com.pico52.dominion.object.unit.sea.Galleon;
-import com.pico52.dominion.object.unit.sea.Galley;
-import com.pico52.dominion.object.unit.sea.ManOWar;
-import com.pico52.dominion.object.unit.sea.Schooner;
-import com.pico52.dominion.object.unit.sea.SeaUnit;
-import com.pico52.dominion.object.unit.sea.Sloop;
 
 public class UnitManager extends DominionObjectManager{
 	FileConfiguration config;
 	private double baseHealPercentage;
-	private String landUnitTypes[];
-	private String seaUnitTypes[];
-	private Archer archer;
-	private DreadKnight dreadKnight;
-	private FootSoldier footSoldier;
-	private Knight knight;
-	private ManAtArms manAtArms;
-	private Marksman marksman;
-	private Militia militia;
-	private Recruit recruit;
-	private Scout scout;
-	private Skirmisher skirmisher;
-	private Swordsman swordsman;
-	private Trader trader;
-	private Wagon wagon;
-	private Caravel caravel;
-	private Carrack carrack;
-	private Cog cog;
-	private FishingBoat fishingBoat;
-	private Frigate1stRate frigate1stRate;
-	private Frigate2ndRate frigate2ndRate;
-	private Frigate3rdRate frigate3rdRate;
-	private Galleon galleon;
-	private Galley galley;
-	private ManOWar manOWar;
-	private Schooner schooner;
-	private Sloop sloop;
 	
 	public UnitManager(Dominion plugin){
 		super(plugin);
 		config = DominionSettings.getUnitsConfig();
-		baseHealPercentage = .01;
-		landUnitTypes = new String[]{"archer", "dreadknight", "footsoldier", "knight", "manatarms", "marksman", "militia", "recruit", "scout", "skirmisher", "swordsman", "trader", "wagon"};
-		seaUnitTypes = new String[]{"caravel", "carrack", "cog", "fishingboat", "frigate1strate", "frigate2ndrate", "frigate3rdrate", "galleon", "galley", "manowar", "schooner", "sloop"};
-		archer = new Archer();
-		dreadKnight = new DreadKnight();
-		footSoldier = new FootSoldier();
-		knight = new Knight();
-		manAtArms = new ManAtArms();
-		marksman = new Marksman();
-		militia = new Militia();
-		recruit = new Recruit();
-		scout = new Scout();
-		skirmisher = new Skirmisher();
-		swordsman = new Swordsman();
-		trader = new Trader();
-		wagon = new Wagon();
-		caravel = new Caravel();
-		carrack = new Carrack();
-		cog = new Cog();
-		fishingBoat = new FishingBoat();
-		frigate1stRate = new Frigate1stRate();
-		frigate2ndRate = new Frigate2ndRate();
-		frigate3rdRate = new Frigate3rdRate();
-		galleon = new Galleon();
-		manOWar = new ManOWar();
-		schooner = new Schooner();
-		sloop = new Sloop();
+		baseHealPercentage = config.getDouble("units.base_heal");
 	}
 	
 	public boolean damage(int unit_id, double damage){
@@ -111,7 +32,7 @@ public class UnitManager extends DominionObjectManager{
 	}
 	
 	public boolean heal(int unit_id, double amount){
-		if(amount == 0 | !isReal(unit_id))
+		if(amount == 0 || !isReal(unit_id))
 			return true;
 		ResultSet unit = plugin.getDBHandler().getUnitData(unit_id, "*");
 		int ownerId = 0;
@@ -128,7 +49,7 @@ public class UnitManager extends DominionObjectManager{
 			ex.printStackTrace();
 		}
 		ownerName = plugin.getDBHandler().getPlayerName(ownerId);
-		double maxHealth = getUnit(classType).getHealth();
+		double maxHealth = getUnit(classType).health;
 		newHealth = currentHealth + amount;
 		if(newHealth > maxHealth){
 			amount = maxHealth - currentHealth;
@@ -161,7 +82,9 @@ public class UnitManager extends DominionObjectManager{
 		} catch (SQLException ex){
 			ex.printStackTrace();
 		}
-		double speed = getUnit(classType).getSpeed();
+		double speed = getUnit(classType).speed;
+		if(isSeaUnit(classType) && isAffectedByLighthouse(unitId))
+			speed *= 1 + plugin.getBuildingManager().getLighthouse().speedBonus;
 		SpellManager sm = plugin.getSpellManager();
 		for(int spell: sm.getAllSpells("aoe_unit_slow")){
 			// For future, add an option in the config to determine if the slow should affect all units, enemy units, or any unit that isn't their own.
@@ -234,7 +157,7 @@ public class UnitManager extends DominionObjectManager{
 				playerMessage += "has starved!";
 				logMessage += " has starved.";
 			} else if (reason.equalsIgnoreCase("spell")){
-				playerMessage += "has sbeen killed by a spell!";
+				playerMessage += "has been killed by a spell!";
 				logMessage += " has been killed by a spell.";
 			}else if (reason.equalsIgnoreCase("disband")){
 				playerMessage += "has been disbanded.";
@@ -260,12 +183,12 @@ public class UnitManager extends DominionObjectManager{
 	}
 	
 	public int createUnit(int settlementId, int ownerId, String classification){
-		double health = getUnit(classification).getHealth();
+		double health = getUnit(classification).health;
 		return createUnit(settlementId, ownerId, classification, health, true);
 	}
 	
 	public int createUnit(int settlementId, int ownerId, String classification, boolean real){
-		double health = getUnit(classification).getHealth();
+		double health = getUnit(classification).health;
 		return createUnit(settlementId, ownerId, classification, health, real);
 	}
 	
@@ -292,12 +215,14 @@ public class UnitManager extends DominionObjectManager{
 	}
 	
 	public boolean startProduction(String settlement, String unit){
+		if(!DominionSettings.unitsActive)
+			return false;
 		boolean success = false;
 		int settlementId = plugin.getDBHandler().getSettlementId(settlement);
 		double currentFood = plugin.getSettlementManager().getMaterial(settlementId, "food");
 		double currentWealth = plugin.getSettlementManager().getMaterial(settlementId, "wealth");
-		int foodReq = getUnit(unit).getFoodConsumption() * 10;
-		int wealthReq = getUnit(unit).getBuildCost();
+		double foodReq = getUnit(unit).foodConsumption * 10;
+		double wealthReq = getUnit(unit).buildCost;
 		if(currentFood < foodReq | currentWealth < wealthReq)
 			return false;
 		boolean food = plugin.getDBHandler().subtractMaterial(settlementId, "food", foodReq);
@@ -461,7 +386,7 @@ public class UnitManager extends DominionObjectManager{
 		boolean success = true;
 		for(int item: itemIds){
 			if(count <= 0)
-				break;
+				return success;
 			thisQuantity = plugin.getItemManager().getItemQuantity(item);
 			if(count <= thisQuantity){
 				if(pickUpItem(unitId, item, count))
@@ -484,12 +409,16 @@ public class UnitManager extends DominionObjectManager{
 	}
 	
 	public boolean pickUpItem(int unitId, int itemId, double quantity){
+		ItemManager im = plugin.getItemManager();
 		if(getDistanceFromItem(unitId, itemId) > DominionSettings.unitPickUpRange)
 			return false;
-		int holderId = plugin.getItemManager().getHolderId(itemId);
+		int holderId = im.getHolderId(itemId);
 		if(!getClass(holderId).equalsIgnoreCase("wagon"))
 			return false;
-		return plugin.getItemManager().giveItemToUnit(itemId, unitId, quantity);
+		double weightRemaining = getWeightRemaining(unitId);
+		if(im.getWeight(itemId, quantity) > weightRemaining)
+			quantity = im.getQuantityByWeight(itemId, weightRemaining);
+		return (im.giveItemToUnit(itemId, unitId, quantity) > 0);
 	}
 	
 	public int[] getItemsWithinRange(int unitId, double range){
@@ -569,12 +498,154 @@ public class UnitManager extends DominionObjectManager{
 			return zDifference;
 	}
 	
+	public int[] getUnitsInSettlement(int settlementId){
+		int[] units = db.getAllIds("unit");
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		for(int unit: units){
+			if(getDistanceFromSettlement(unit, settlementId) <= DominionSettings.unitGarrisonRange)
+				list.add(new Integer(unit));
+		}
+		int[] sendUnits = new int[list.size()];
+		int i = 0;
+	    for (Integer n : list) {
+	        sendUnits[i++] = n;
+	    }
+		return sendUnits;
+	}
+	
 	public boolean setCommandX(int commandId, double xCoord){
 		return plugin.getDBHandler().update("command", "xcoord", xCoord, "command_id", commandId);
 	}
 	
 	public boolean setCommandZ(int commandId, double zCoord){
 		return plugin.getDBHandler().update("command", "zcoord", zCoord, "command_id", commandId);
+	}
+	
+	public boolean grantSettlementExperience(int settlementId, double experience, String weaponType){
+		int[] units = getUnitsInSettlement(settlementId);
+		boolean success = true;
+		String unitClass = "";
+		for(int unit: units){
+			unitClass = getClass(unit);
+			if(getWeaponClass(unitClass).equalsIgnoreCase(weaponType) && 
+					getUnitType(unitClass).equalsIgnoreCase("land") &&
+					isFriendlyToObject(unit, settlementId, "settlement"))
+				if(!grantExperience(unit, experience))
+					success = false;
+		}
+		return success;
+	}
+	
+	public boolean grantExperience(int unitId, double experience){
+		experience += getExperience(unitId);
+		return db.update("unit", "experience", experience, "unit_id", unitId);
+	}
+	
+	public boolean isFriendlyToObject(int unitId, int objectId, String object){
+		// - This will check friendliness status in the future.
+		return true;
+	}
+	
+	public boolean isAffectedByLighthouse(int unitId){
+		BuildingManager bm = plugin.getBuildingManager();
+		int[] lighthouses = bm.getBuildingIds("lighthouse");
+		double range=0, lighthouseX=0, lighthouseZ=0;
+		for(int lighthouse: lighthouses){
+			range = bm.getLevel(lighthouse) * bm.getLighthouse().range;
+			lighthouseX = bm.getX(lighthouse);
+			lighthouseZ = bm.getZ(lighthouse);
+			if(isFriendlyToObject(unitId, lighthouse, "building") && 
+					withinRange(unitId, range, lighthouseX, lighthouseZ))
+				return true;
+		}
+		return false;
+	}
+	
+	public double getHealRate(int unitId){
+		double healRate = baseHealPercentage;
+		String classType = getClass(unitId);
+		if(isSeaUnit(classType)){
+			Unit ship = getUnit(classType);
+			BuildingManager bm = plugin.getBuildingManager();
+			
+			int[] dockyards = bm.getBuildingIds("dockyard");
+			int[] shipyards = bm.getBuildingIds("shipyard");
+			double dockyardRange = bm.getDockyard().range, shipyardRange = bm.getShipyard().range, 
+					dockyardRepair=0, shipyardRepair=0, xCoord, zCoord;
+			boolean atDockyard = false, atShipyard = false;
+			for(int dockyard: dockyards){
+				xCoord = bm.getX(dockyard);
+				zCoord = bm.getZ(dockyard);
+				if(withinRange(unitId, dockyardRange, xCoord, zCoord) && 
+						isFriendlyToObject(unitId, dockyard, "building"))
+					atDockyard = true;
+			}
+			for(int shipyard: shipyards){
+				xCoord = bm.getX(shipyard);
+				zCoord = bm.getZ(shipyard);
+				if(withinRange(unitId, shipyardRange, xCoord, zCoord) && 
+						isFriendlyToObject(unitId, shipyard, "building"))
+					atShipyard = true;
+			}
+			if(ship.civilian){
+				if(bm.getDockyard().repairCivilian && atDockyard == true){
+					if(ship.size.equalsIgnoreCase("small")){
+						dockyardRepair = bm.getDockyard().smallRepairRate;
+					} else if (ship.size.equalsIgnoreCase("medium")){
+						dockyardRepair = bm.getDockyard().mediumRepairRate;
+					} else if (ship.size.equalsIgnoreCase("large")){
+						dockyardRepair = bm.getDockyard().largeRepairRate;
+					}
+				}
+				if(bm.getShipyard().repairCivilian && atShipyard == true){
+					if(ship.size.equalsIgnoreCase("small")){
+						shipyardRepair = bm.getShipyard().smallRepairRate;
+					} else if (ship.size.equalsIgnoreCase("medium")){
+						shipyardRepair = bm.getShipyard().mediumRepairRate;
+					} else if (ship.size.equalsIgnoreCase("large")){
+						shipyardRepair = bm.getShipyard().largeRepairRate;
+					}
+				}
+				if(dockyardRepair > shipyardRepair)
+					healRate = dockyardRepair;
+				else
+					healRate = shipyardRepair;
+			} else {
+				if(bm.getDockyard().repairWar && atDockyard == true){
+					if(ship.size.equalsIgnoreCase("small")){
+						dockyardRepair = bm.getDockyard().smallRepairRate;
+					} else if (ship.size.equalsIgnoreCase("medium")){
+						dockyardRepair = bm.getDockyard().mediumRepairRate;
+					} else if (ship.size.equalsIgnoreCase("large")){
+						dockyardRepair = bm.getDockyard().largeRepairRate;
+					}
+				}
+				if(bm.getShipyard().repairWar && atShipyard == true){
+					if(ship.size.equalsIgnoreCase("small")){
+						shipyardRepair = bm.getShipyard().smallRepairRate;
+					} else if (ship.size.equalsIgnoreCase("medium")){
+						shipyardRepair = bm.getShipyard().mediumRepairRate;
+					} else if (ship.size.equalsIgnoreCase("large")){
+						shipyardRepair = bm.getShipyard().largeRepairRate;
+					}
+				}
+				if(dockyardRepair > shipyardRepair)
+					healRate = dockyardRepair;
+				else
+					healRate = shipyardRepair;
+			}
+		} else if(isGarrisoned(unitId))
+			healRate = DominionSettings.unitGarrisonHeal;
+		return healRate;
+	}
+	
+	public boolean isGarrisoned(int unitId){
+		int[] settlements = db.getAllIds("settlement");
+		for(int settlement: settlements){
+			if(getDistanceFromSettlement(unitId, settlement) <= DominionSettings.unitGarrisonRange)
+				return true;
+		}
+		return false;
 	}
 	
 	/** 
@@ -611,40 +682,54 @@ public class UnitManager extends DominionObjectManager{
 	}
 		
 	public boolean isUnit(String unit){
-		return (isLandUnit(unit) | isSeaUnit(unit));
+		String name = config.getString("units." + unit + ".name");
+		return unit.equalsIgnoreCase(name);
 	}
 	
 	public boolean isLandUnit(String unit){
-		for(String type: landUnitTypes){
-			if(unit.equalsIgnoreCase(type))
+		String type = config.getString("units." + unit + ".type");
+		if(type.equalsIgnoreCase("land"))
 				return true;
-		}
 		return false;
 	}
 	
 	public boolean isSeaUnit(String unit){
-		for(String type: seaUnitTypes){
-			if(unit.equalsIgnoreCase(type))
+		String type = config.getString("units." + unit + ".type");
+		if(type.equalsIgnoreCase("sea"))
 				return true;
-		}
 		return false;
 	}
 	
 	public String getUnitType(String unit){
-		if(isLandUnit(unit))
-			return "land";
-		else if (isSeaUnit(unit))
-			return "sea";
-		else return null;
+		return config.getString("units." + unit + ".type");
+	}
+	
+	public String getWeaponClass(String unit){
+		return config.getString("units." + unit + ".weapon_class");
 	}
 	
 	public Unit getUnit(String unit){
-		String type = getUnitType(unit);
-		if(type.equalsIgnoreCase("land"))
-			return getLandUnit(unit);
-		else if (type.equalsIgnoreCase("sea"))
-			return getSeaUnit(unit);
-		else return null;
+		Unit unitData = new Unit();
+		unitData.name = config.getString("units." + unit + ".name");
+		unitData.type = config.getString("units." + unit + ".type");
+		unitData.speed = config.getDouble("units." + unit + ".speed");
+		unitData.health = config.getDouble("units." + unit + ".health");
+		unitData.offense = config.getDouble("units." + unit + ".offense");
+		unitData.defense = config.getDouble("units." + unit + ".defense");
+		unitData.range = config.getDouble("units." + unit + ".range");
+		unitData.foodConsumption = config.getDouble("units." + unit + ".food_consumption");
+		unitData.upkeep = config.getDouble("units." + unit + ".upkeep");
+		unitData.buildCost = config.getDouble("units." + unit + ".build_cost");
+		unitData.trainingTime = config.getInt("units." + unit + ".training_time");
+		unitData.capacity = config.getDouble("units." + unit + ".capacity");
+		unitData.size = config.getString("units." + unit + ".size");
+		unitData.civilian = config.getBoolean("units." + unit + ".civilian");
+		unitData.material1 = config.getString("units." + unit + ".material_1.type");
+		unitData.material2 = config.getString("units." + unit + ".material_2.type");
+		unitData.material1Quantity = config.getDouble("units." + unit + ".material_1.quantity");
+		unitData.material2Quantity = config.getDouble("units." + unit + ".material_2.quantity");
+
+		return unitData;
 	}
 	
 	public String getClass(int unitId){
@@ -665,6 +750,10 @@ public class UnitManager extends DominionObjectManager{
 	
 	public double getUnitZ(int unitId){
 		return db.getSingleColumnDouble("unit", "zcoord", unitId, "unit_id");
+	}
+	
+	public double getExperience(int unitId){
+		return db.getSingleColumnDouble("unit", "experience", unitId, "unit_id");
 	}
 	
 	public int getTargetId(int unitId){
@@ -719,28 +808,45 @@ public class UnitManager extends DominionObjectManager{
 		}
 		return real;
 	}
+
+	public double getWeight(int unitId){
+		int[] items = plugin.getItemManager().getHeldItemIds(unitId);
+		double weight = 0;
+		for(int item: items){
+			weight += plugin.getItemManager().getWeight(item);
+		}
+		return weight;
+	}
+	
+	public double getWeightRemaining(int unitId){
+		double weight = getWeight(unitId);
+		double capacity = getCapacity(unitId);
+		return capacity - weight;
+	}
+	
+	public double getCapacity(int unitId){
+		return getUnit(getClass(unitId)).capacity;
+	}
 	
 	public boolean withinRange(int unitId, int targetId){
-		double unitX = getUnitX(unitId);
-		double unitZ = getUnitZ(unitId);
 		double targetX = getUnitX(targetId);
 		double targetZ = getUnitZ(targetId);
-		int range = getUnit(getClass(unitId)).getRange();
-		if(Math.abs(unitX - targetX) <= range & Math.abs(unitZ - targetZ) <= range){
-			return true;
-		}
-		return false;
+		double range = getUnit(getClass(unitId)).range;
+		return withinRange(unitId, range, targetX, targetZ);
 	}
 	
 	public boolean withinVisionRange(int unitId, int targetId){
-		double unitX = getUnitX(unitId);
-		double unitZ = getUnitZ(unitId);
 		double targetX = getUnitX(targetId);
 		double targetZ = getUnitZ(targetId);
-		int range = getUnit(getClass(unitId)).getVision();
-		if(Math.abs(unitX - targetX) <= range & Math.abs(unitZ - targetZ) <= range){
+		double range = getUnit(getClass(unitId)).vision;
+		return withinRange(unitId, range, targetX, targetZ);
+	}
+	
+	public boolean withinRange(int unitId, double range, double xcoord, double zcoord){
+		double unitX = getUnitX(unitId);
+		double unitZ = getUnitZ(unitId);
+		if(Math.abs(unitX - xcoord) <= range && Math.abs(unitZ - zcoord) <= range)
 			return true;
-		}
 		return false;
 	}
 	
@@ -748,68 +854,10 @@ public class UnitManager extends DominionObjectManager{
 		return db.getSpecificIds("unit", playerId, "owner_id");
 	}
 	
-	public Unit getLandUnit(String unit){
-		if(unit.equalsIgnoreCase("archer"))
-			return archer;
-		else if (unit.equalsIgnoreCase("dreadknight"))
-			return dreadKnight;
-		else if (unit.equalsIgnoreCase("footsoldier"))
-			return footSoldier;
-		else if (unit.equalsIgnoreCase("knight"))
-			return knight;
-		else if (unit.equalsIgnoreCase("manataarms"))
-			return manAtArms;
-		else if (unit.equalsIgnoreCase("marksman"))
-			return marksman;
-		else if (unit.equalsIgnoreCase("militia"))
-			return militia;
-		else if (unit.equalsIgnoreCase("recruit"))
-			return recruit;
-		else if (unit.equalsIgnoreCase("scout"))
-			return scout;
-		else if (unit.equalsIgnoreCase("skirmisher"))
-			return skirmisher;
-		else if (unit.equalsIgnoreCase("swordsman"))
-			return swordsman;
-		else if (unit.equalsIgnoreCase("trader"))
-			return trader;
-		else if (unit.equalsIgnoreCase("wagon"))
-			return wagon;
-		return null;
-	}
-	
-	public SeaUnit getSeaUnit(String unit){
-		if (unit.equalsIgnoreCase("caravel"))
-			return caravel;
-		else if (unit.equalsIgnoreCase("carrack"))
-			return carrack;
-		else if (unit.equalsIgnoreCase("cog"))
-			return cog;
-		else if (unit.equalsIgnoreCase("fishingboat"))
-			return fishingBoat;
-		else if (unit.equalsIgnoreCase("frigate1strate"))
-			return frigate1stRate;
-		else if (unit.equalsIgnoreCase("frigate2ndrate"))
-			return frigate2ndRate;
-		else if (unit.equalsIgnoreCase("frigate3rdrate"))
-			return frigate3rdRate;
-		else if (unit.equalsIgnoreCase("galleon"))
-			return galleon;
-		else if (unit.equalsIgnoreCase("galley"))
-			return galley;
-		else if (unit.equalsIgnoreCase("manowar"))
-			return manOWar;
-		else if (unit.equalsIgnoreCase("schooner"))
-			return schooner;
-		else if (unit.equalsIgnoreCase("sloop"))
-			return sloop;
-		return null;
-	}
-	
 	public String outputUnitData(){
 		String output = "", name = "", type = "", mat1 = "", mat2 = "";
-		double speed = 0, health = 0, offense = 0, defense = 0, range = 0, foodConsumption = 0, upkeep = 0, buildCost = 0, 
-				trainingTime = 0, capacity = 0, mat1Num = 0, mat2Num = 0;
+		double speed = 0, health = 0, offense = 0, defense = 0, range = 0, foodConsumption = 0, upkeep = 0, 
+				buildCost = 0, trainingTime = 0, capacity = 0, mat1Num = 0, mat2Num = 0;
 		ConfigurationSection section = config.getConfigurationSection("units");
 		for(String unit: section.getKeys(false)){
 			name = config.getString("units." + unit + ".name");
@@ -840,7 +888,7 @@ public class UnitManager extends DominionObjectManager{
 				output +=  "  §aMat1:§f " + mat1Num + " " + mat1;
 			if(!mat2.equalsIgnoreCase("none") & mat2Num > 0)
 				output += "  §aMat2:§f " + mat2Num + " " + mat2;
-			output += "\n§a--------------------------§r\n";
+			output += "\n§a--------------------------§r \n";
 		}
 		if(output == "")
 			output = "No units are currently available.";
@@ -850,85 +898,34 @@ public class UnitManager extends DominionObjectManager{
 	public double getBaseHealPercentage(){
 		return baseHealPercentage;
 	}
+	
 	public String[] getLandUnitTypes(){
+		ArrayList<String> stringList = new ArrayList<String>();
+		String name = "", type = "";
+		ConfigurationSection section = config.getConfigurationSection("units");
+		for(String unit: section.getKeys(false)){
+			name = config.getString("units." + unit + ".name");
+			type = config.getString("units." + unit + ".type");
+			if(type.equalsIgnoreCase("land"))
+				stringList.add(name);
+		}
+		String landUnitTypes[] = new String[stringList.size()];
+		landUnitTypes = stringList.toArray(landUnitTypes);
 		return landUnitTypes;
 	}
+	
 	public String[] getSeaUnitTypes(){
+		ArrayList<String> stringList = new ArrayList<String>();
+		String name = "", type = "";
+		ConfigurationSection section = config.getConfigurationSection("units");
+		for(String unit: section.getKeys(false)){
+			name = config.getString("units." + unit + ".name");
+			type = config.getString("units." + unit + ".type");
+			if(type.equalsIgnoreCase("sea"))
+				stringList.add(name);
+		}
+		String seaUnitTypes[] = new String[stringList.size()];
+		seaUnitTypes = stringList.toArray(seaUnitTypes);
 		return seaUnitTypes;
-	}
-	public Archer getArcher(){
-		return archer;
-	}
-	public DreadKnight getDreadKnight(){
-		return dreadKnight;
-	}
-	public FootSoldier getFootSoldier(){
-		return footSoldier;
-	}
-	public Knight getKnight(){
-		return knight;
-	}
-	public ManAtArms getManAtArms(){
-		return manAtArms;
-	}
-	public Marksman getMarksman(){
-		return marksman;
-	}
-	public Militia getMilitia(){
-		return militia;
-	}
-	public Recruit getRecruit(){
-		return recruit;
-	}
-	public Scout getScout(){
-		return scout;
-	}
-	public Skirmisher getSkirmisher(){
-		return skirmisher;
-	}
-	public Swordsman getSwordsman(){
-		return swordsman;
-	}
-	public Trader getTrader(){
-		return trader;
-	}
-	public Wagon getWagon(){
-		return wagon;
-	}
-	public Caravel getCaravel(){
-		return caravel;
-	}
-	public Carrack getCarrack(){
-		return carrack;
-	}
-	public Cog getCog(){
-		return cog;
-	}
-	public FishingBoat getFishingBoat(){
-		return fishingBoat;
-	}
-	public Frigate1stRate getFrigate1stRate(){
-		return frigate1stRate;
-	}
-	public Frigate2ndRate getFrigate2ndRate(){
-		return frigate2ndRate;
-	}
-	public Frigate3rdRate getFrigate3rdRate(){
-		return frigate3rdRate;
-	}
-	public Galleon getGalleon(){
-		return galleon;
-	}
-	public Galley getGalley(){
-		return galley;
-	}
-	public ManOWar getManOWar(){
-		return manOWar;
-	}
-	public Schooner getSchooner(){
-		return schooner;
-	}
-	public Sloop getSloop(){
-		return sloop;
 	}
 }

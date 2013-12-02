@@ -19,7 +19,9 @@ import com.pico52.dominion.command.admin.AdminManualUpdate;
 import com.pico52.dominion.command.admin.AdminRemove;
 import com.pico52.dominion.command.admin.AdminSetBiome;
 import com.pico52.dominion.command.admin.AdminSetMaterial;
+import com.pico52.dominion.command.admin.AdminSquelch;
 import com.pico52.dominion.command.admin.AdminSubtract;
+import com.pico52.dominion.command.admin.AdminUnsquelch;
 import com.pico52.dominion.command.admin.AdminUpdate;
 
 /** 
@@ -45,6 +47,8 @@ public class AdminCommand implements CommandExecutor{
 	private static AdminSetBiome adminSetBiome;
 	private static AdminKill adminKill;
 	private static AdminRequests adminRequests;
+	private static AdminSquelch adminSquelch;
+	private static AdminUnsquelch adminUnsquelch;
 	
 	/** 
 	 * <b>AdminCommand</b><br>
@@ -71,6 +75,8 @@ public class AdminCommand implements CommandExecutor{
 		adminSetBiome = new AdminSetBiome(plugin);
 		adminKill = new AdminKill(plugin);
 		adminRequests = new AdminRequests(plugin);
+		adminSquelch = new AdminSquelch(plugin);
+		adminUnsquelch = new AdminUnsquelch(plugin);
 	}
 
 	@Override
@@ -126,6 +132,12 @@ public class AdminCommand implements CommandExecutor{
 		}
 		if(subCommand.equalsIgnoreCase("requests") || subCommand.equalsIgnoreCase("reqs")){
 			return adminRequests.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("squelch")){
+			return adminSquelch.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("unsquelch")){
+			return adminUnsquelch.execute(sender, args);
 		}
 		
 		return false;

@@ -65,6 +65,10 @@ public class PlayerBuild extends PlayerSubCommand{
 		}
 		String player = sender.getName();
 		int playerId = db.getPlayerId(player), settlementId = db.getSettlementId(settlement);
+		if(plugin.getSqueltchManager().isSquelched(playerId, "build_" + building) || plugin.getSqueltchManager().isSquelched(playerId, "build") || plugin.getSqueltchManager().isSquelched(playerId, "all")){
+			sender.sendMessage(logPrefix + "You do not have permission to use this request: \"build_" + building + "\".");
+			return true;
+		}
 		if(!plugin.getSettlementManager().isOwner(playerId, settlementId) && 
 				!plugin.getPermissionManager().hasPermission(playerId, "build", settlementId)){
 			sender.sendMessage(logPrefix + "You do not have permission to build in this settlement.");

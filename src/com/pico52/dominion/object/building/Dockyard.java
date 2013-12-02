@@ -13,12 +13,12 @@ import com.pico52.dominion.DominionSettings;
  * The object controller for all dockyards.
  */
 public class Dockyard extends Building{
-    public static double tradeBonus, 
+    public double tradeBonus, 
     smallShipStorage, mediumShipStorage, largeShipStorage, 
     smallRepairRate, mediumRepairRate, largeRepairRate;
-    public static boolean
+    public boolean
     repairCivilian, repairWar;
-    public static int range;
+    public int range;
     
 	/** 
 	 * <b>Dockyard</b><br>

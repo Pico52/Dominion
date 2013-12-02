@@ -3,6 +3,7 @@ package com.pico52.dominion.command.player;
 import org.bukkit.command.CommandSender;
 
 import com.pico52.dominion.Dominion;
+import com.pico52.dominion.DominionSettings;
 
 public class PlayerUnitDisband extends PlayerSubCommand{
 
@@ -12,6 +13,10 @@ public class PlayerUnitDisband extends PlayerSubCommand{
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
+		if(!DominionSettings.unitsActive){
+			sender.sendMessage(logPrefix + "Units are currently not available on this server.");
+			return true;
+		}
 		if(args.length == 0){
 			sender.sendMessage(logPrefix + "Disbands a unit.");
 			sender.sendMessage(logPrefix + "Usage: " + usage);

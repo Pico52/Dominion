@@ -78,6 +78,10 @@ public class PlayerRequest extends PlayerSubCommand{
 			return true;
 		}
 		int requesterId = db.getPlayerId(sender.getName()), targetId = db.getPlayerId(player), objectId = 0;
+		if(plugin.getSqueltchManager().isSquelched(requesterId, request)|| plugin.getSqueltchManager().isSquelched(requesterId, "all")){
+			sender.sendMessage(logPrefix + "You do not have permission to use this request: \"" + request + "\".");
+			return true;
+		}
 		if(plugin.getRequestManager().harassableRequestExistsAlready(requesterId, targetId, request)){
 			sender.sendMessage(logPrefix + "You already have an active request of that type for " + player + ".");
 			return true;

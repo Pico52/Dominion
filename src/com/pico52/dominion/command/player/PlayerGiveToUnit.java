@@ -14,6 +14,10 @@ public class PlayerGiveToUnit extends PlayerSubCommand{
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
+		if(!DominionSettings.unitsActive){
+			sender.sendMessage(logPrefix + "Units are currently not available on this server.");
+			return true;
+		}
 		if(args.length == 0){
 			sender.sendMessage(logPrefix + "Gives materials from a settlement to a unit.");
 			sender.sendMessage(logPrefix + "Usage: " + usage);
@@ -80,15 +84,16 @@ public class PlayerGiveToUnit extends PlayerSubCommand{
 			sender.sendMessage(logPrefix + "The unit is too far from " + settlement + " to pick up the item.");
 			return true;
 		}
-		if(!plugin.getItemManager().giveItemToUnit(material, quantity, unitId)){
+		double quantityGiven = plugin.getItemManager().giveItemToUnit(material, quantity, unitId);
+		if(quantityGiven <= 0){
 			sender.sendMessage(logPrefix + "Failed to give " + material + " x(" + quantity + ") to the unit.");
 			return true;
 		}
-		if(plugin.getSettlementManager().subtractMaterial(settlementId, material, quantity)){
-			sender.sendMessage(logPrefix + "Successfully gave " + quantity + " " + material + " to unit #" + unitId + ".");
+		if(plugin.getSettlementManager().subtractMaterial(settlementId, material, quantityGiven)){
+			sender.sendMessage(logPrefix + "Successfully gave " + quantityGiven + " " + material + " to unit #" + unitId + ".");
 			return true;
 		} else {
-			sender.sendMessage(logPrefix + "Failed to subtract the " + material + " x(" + quantity + ") from " + settlement + ".");
+			sender.sendMessage(logPrefix + "Failed to subtract the " + material + " x(" + quantityGiven + ") from " + settlement + ".");
 			return true;
 		}
 	}

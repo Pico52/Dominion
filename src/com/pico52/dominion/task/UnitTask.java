@@ -89,8 +89,8 @@ public class UnitTask extends DominionTimerTask{
 	
 	private void feedUnits(){
 		ResultSet units = db.getTableData("unit", "*");
-		int unitId, settlementId, consumption;
-		double food;
+		int unitId, settlementId;
+		double food, consumption;
 		String classType;
 		try{
 			while(units.next()){
@@ -99,9 +99,9 @@ public class UnitTask extends DominionTimerTask{
 				classType = units.getString("class");
 				food = plugin.getSettlementManager().getMaterial(settlementId, "food");
 				if(unitManager.getUnitType(classType).equalsIgnoreCase("land"))
-					consumption = unitManager.getLandUnit(classType).getFoodConsumption();
+					consumption = unitManager.getUnit(classType).foodConsumption;
 				else if (unitManager.getUnitType(classType).equalsIgnoreCase("sea"))
-					consumption = unitManager.getSeaUnit(classType).getFoodConsumption();
+					consumption = unitManager.getUnit(classType).foodConsumption;
 				else
 					consumption = 0;
 				if(food - consumption < 0){
@@ -119,8 +119,8 @@ public class UnitTask extends DominionTimerTask{
 	
 	private void payUnits(){
 		ResultSet units = db.getTableData("unit", "*");
-		int unitId, settlementId, consumption;
-		double wealth;
+		int unitId, settlementId;
+		double wealth, consumption;
 		String classType;
 		try{
 			while(units.next()){
@@ -129,9 +129,9 @@ public class UnitTask extends DominionTimerTask{
 				classType = units.getString("class");
 				wealth = plugin.getSettlementManager().getMaterial(settlementId, "wealth");
 				if(unitManager.getUnitType(classType).equalsIgnoreCase("land"))
-					consumption = unitManager.getLandUnit(classType).getUpkeep();
+					consumption = unitManager.getUnit(classType).upkeep;
 				else if (unitManager.getUnitType(classType).equalsIgnoreCase("sea"))
-					consumption = unitManager.getSeaUnit(classType).getUpkeep();
+					consumption = unitManager.getUnit(classType).upkeep;
 				else
 					consumption = 0;
 				if(wealth - consumption < 0){
@@ -183,7 +183,7 @@ public class UnitTask extends DominionTimerTask{
 				unitId = commands.getInt("unit_id");
 				targetId = commands.getInt("target_id");
 				if(unitManager.withinRange(unitId, targetId))
-					unitManager.damage(targetId, unitManager.getUnit(unitManager.getClass(unitId)).getOffense());
+					unitManager.damage(targetId, unitManager.getUnit(unitManager.getClass(unitId)).offense);
 				if(unitManager.getHealth(targetId) <= 0)
 					unitManager.commandToCamp(unitId);
 			}
@@ -215,18 +215,16 @@ public class UnitTask extends DominionTimerTask{
 	
 	private void healCampedUnits(){
 		ResultSet commands = plugin.getDBHandler().getTableData("command", "*", "command=\"camp\"");
-		int unitId;
-		double maxHealth, difference;
-		String classType;
+		int unitId=0;
+		double maxHealth=0, difference=0, healRate=0;
+		String classType="";
 		try{
 			while(commands.next()){
 				unitId = commands.getInt("unit_id");
-				ResultSet unit = plugin.getDBHandler().getUnitData(unitId, "*");
-				unit.next();
-				classType = unit.getString("class");
-				unit.getStatement().close();
-				maxHealth = unitManager.getUnit(classType).getHealth();
-				difference = maxHealth * plugin.getUnitManager().getBaseHealPercentage();
+				classType = unitManager.getClass(unitId);
+				maxHealth = unitManager.getUnit(classType).health;
+				healRate = unitManager.getHealRate(unitId);
+				difference = maxHealth * healRate;
 				unitManager.heal(unitId, difference);
 			}
 			commands.getStatement().close();

@@ -91,12 +91,14 @@ public class TaskManager {
 		} else
 			log.info("Repeating production task scheduled.");
 		
-		unitTask = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new UnitTask(plugin), unitDelay, DominionSettings.unitTaskTime * 20);
-		if(unitTask == -1){
-			log.info("Could not schedule the repeating unit task.");
-			success = false;
-		} else
-			log.info("Repeating unit task scheduled.");
+		if(DominionSettings.unitsActive){
+			unitTask = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new UnitTask(plugin), unitDelay, DominionSettings.unitTaskTime * 20);
+			if(unitTask == -1){
+				log.info("Could not schedule the repeating unit task.");
+				success = false;
+			} else
+				log.info("Repeating unit task scheduled.");
+		}
 		
 		spellTask = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new SpellTask(plugin), spellDelay, DominionSettings.spellTaskTime * 20);
 		if(spellTask == -1){

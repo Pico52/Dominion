@@ -127,6 +127,10 @@ public class PlayerListMy extends PlayerSubCommand{
 			sender.sendMessage("There was an error communicating with the database.");
 			ex.printStackTrace();
 			return false;
+		}catch (Exception ex){
+			sender.sendMessage("There was an unhandled exception.");
+			ex.printStackTrace();
+			return false;
 		}
 		allData = "§a";
 		String containment = "=";
@@ -146,7 +150,7 @@ public class PlayerListMy extends PlayerSubCommand{
 			columnCount++;
 		for(int i=0; i<columnCount;i++)
 			containment += "===";
-		allData += containment + entity.toUpperCase() + containment + "§r\n";
+		allData += containment + entity.toUpperCase() + containment + "§r \n";
 		if(middleData == "")
 			middleData += "There are no objects in " + entity + ".\n";
 		allData += middleData + "§a" + containment;

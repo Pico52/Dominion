@@ -61,6 +61,10 @@ public class PlayerFound extends PlayerSubCommand{
 		Location loc = plugin.getServer().getPlayer(sender.getName()).getLocation();
 		double xcoord = loc.getX(), zcoord = loc.getZ();
 		if(entity.equalsIgnoreCase("kingdom")){
+			if(plugin.getSqueltchManager().isSquelched(ownerId, "found_kingdom") || plugin.getSqueltchManager().isSquelched(ownerId, "all")){
+				sender.sendMessage(logPrefix + "You do not have permission to use this request: \"found_kingdom\".");
+				return true;
+			}
 			if(db.kingdomExists(entityName)){
 				sender.sendMessage(logPrefix + "The kingdom \"" + entityName + "\" already exists.");
 				return true;
@@ -75,6 +79,10 @@ public class PlayerFound extends PlayerSubCommand{
 			return true;
 		}
 		if(entity.equalsIgnoreCase("settlement")){
+			if(plugin.getSqueltchManager().isSquelched(ownerId, "found_settlement")|| plugin.getSqueltchManager().isSquelched(ownerId, "all")){
+				sender.sendMessage(logPrefix + "You do not have permission to use this request: \"found_settlement\".");
+				return true;
+			}
 			if(db.settlementExists(entityName)){
 				sender.sendMessage(logPrefix + "The settlement \"" + entityName + "\" already exists.");
 				return true;

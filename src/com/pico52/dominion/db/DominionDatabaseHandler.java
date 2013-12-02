@@ -32,8 +32,8 @@ public class DominionDatabaseHandler extends SQLite{
 	private static String[] buildingColumns = {"building_id", "settlement_id", "owner_id", "class", "resource", "level", "xcoord", "zcoord", "employed"};
 	private static String[] buildingDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "TEXT", "TEXT", "INT DEFAULT 0", "DOUBLE DEFAULT 0", 
 		"DOUBLE DEFAULT 0", "INT DEFAULT 0"};
-	private static String[] tradeColumns = {"trade_id", "settlement1_id", "settlement2_id", "income1", "income2"};
-	private static String[] tradeDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0"};
+	private static String[] tradeColumns = {"trade_id", "settlement1_id", "settlement2_id", "income1", "income2", "connection"};
+	private static String[] tradeDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "TEXT"};
 	private static String[] kingdomColumns = {"kingdom_id", "name", "owner_id", "primarycolor", "secondarycolor"};
 	private static String[] kingdomDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "TEXT UNIQUE", "TEXT", "TEXT", "TEXT"};
 	private static String[] playerColumns = {"player_id", "name", "owner_id", "kingdom_id"};
@@ -55,6 +55,9 @@ public class DominionDatabaseHandler extends SQLite{
 	private static String[] requestColumns = {"request_id", "owner_id", "target_id", "to_admin", "level", "request", "object_name", "object_id", "target_object_id", "xcoord", "zcoord", "timestamp"};
 	private static String[] requestDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 0", "INT DEFAULT 1", "TEXT", "TEXT", "INT DEFAULT 0", "INT DEFAULT 0", "DOUBLE DEFAULT 0", 
 		"DOUBLE DEFAULT 0", "INTEGER DEFAULT 0"};
+	private static String[] squelchColumns = {"squelch_id", "player_id", "request"};
+	private static String[] squelchDims = {"INTEGER PRIMARY KEY AUTOINCREMENT", "INT DEFAULT 0", "TEXT"};
+	
 //===================Database Setup Complete===================//
 			
 	private static Dominion plugin;
@@ -132,9 +135,14 @@ public class DominionDatabaseHandler extends SQLite{
 			plugin.getLogger().info(plugin.getLogPrefix() + "Must create the request table..");
 			createTable("request", requestColumns, requestDims);
 		}
+		if(!checkTable("squelch")){
+			plugin.getLogger().info(plugin.getLogPrefix() + "Must create the squelch table..");
+			createTable("squelch", squelchColumns, squelchDims);
+		}
 		// - All tables should now exist.
-		if(checkTable("settlement") & checkTable("building") & checkTable("trade") & checkTable("kingdom") & checkTable("player") & 
-			checkTable("unit") & checkTable("command") & checkTable("spell") & checkTable("item") & checkTable("production") & checkTable("permission") & checkTable("request"))
+		if(checkTable("settlement") && checkTable("building") && checkTable("trade") && checkTable("kingdom") && checkTable("player") && checkTable("unit") && 
+				checkTable("command") && checkTable("spell") && checkTable("item") && checkTable("production") && checkTable("permission") && checkTable("request") && 
+				checkTable("squelch"))
 			return setDefaultColumns();
 		return false;
 	}
@@ -232,6 +240,13 @@ public class DominionDatabaseHandler extends SQLite{
 			if(!checkColumn("request", column)){
 				plugin.getLogger().info("Must create the " + column + " column..");
 				createColumn("request", column, requestDims[i]);
+			}
+		}
+		for(int i=0; i < squelchColumns.length;i++){
+			column = squelchColumns[i];
+			if(!checkColumn("squelch", column)){
+				plugin.getLogger().info("Must create the " + column + " column..");
+				createColumn("squelch", column, squelchDims[i]);
 			}
 		}
 		
@@ -671,7 +686,7 @@ public class DominionDatabaseHandler extends SQLite{
 	 * @return The sucess of the execution of this command.
 	 */
 	public boolean createProduction(String settlement, String classification, int ownerId){
-		int duration = plugin.getUnitManager().getUnit(classification).getTrainingTime();
+		int duration = plugin.getUnitManager().getUnit(classification).trainingTime;
 		return createProduction(settlement, classification, ownerId, duration);
 	}
 	
@@ -988,6 +1003,26 @@ public class DominionDatabaseHandler extends SQLite{
 			String message = owner + " has requested \"" + request + "\" to " + target + ".  Object Name: " + objectName + "  Object Id: " + objectId + "  Target Object Id: " + targetObjectId + 
 					"  Level: " + level + "  x: " + xcoord + "  z:" + zcoord;
 			plugin.getLogger().info(message);
+			return true;
+		}
+		return false;
+	}
+	
+	/** 
+	 * <b>createSquelch</b><br>
+	 * <br>
+	 * &nbsp;&nbsp;public boolean createSquelch(int playerId, String request)
+	 * <br>
+	 * <br>
+	 * Creates a squelch in the database with specified values.
+	 * @param playerId - The Id of the player being squelched.
+	 * @param request - The type of request the player will no longer be able to use.
+	 * @return The sucess of the execution of this command.
+	 */
+	public boolean createSquelch(int playerId, String request){
+		String query = "INSERT INTO squelch(player_id, request) VALUES (" + playerId + ", \'" + request + "\')";
+		if(queryWithResult(query)){
+			plugin.getLogger().info(getPlayerName(playerId) + " has had their " + request + " request ability squelched.");
 			return true;
 		}
 		return false;

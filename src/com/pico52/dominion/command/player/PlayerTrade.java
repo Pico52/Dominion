@@ -67,6 +67,10 @@ public class PlayerTrade extends PlayerSubCommand{
 			return true;
 		}
 		int requesterId = db.getPlayerId(sender.getName()), settlementId = db.getSettlementId(settlement);
+		if(plugin.getSqueltchManager().isSquelched(requesterId, "trade")|| plugin.getSqueltchManager().isSquelched(requesterId, "all")){
+			sender.sendMessage(logPrefix + "You do not have permission to use this request: \"Trade\".");
+			return true;
+		}
 		if(!plugin.getSettlementManager().isOwner(requesterId, settlementId) && 
 				!plugin.getPermissionManager().hasPermission(requesterId, "trade", settlementId)){
 			sender.sendMessage(logPrefix + "You do not have permission to initiate trade for " + settlement + ".");

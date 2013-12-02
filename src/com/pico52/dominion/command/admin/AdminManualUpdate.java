@@ -26,7 +26,7 @@ public class AdminManualUpdate extends AdminSubCommand{
 	 * @param instance - The {@link Dominion} plugin this command executor will be running on.
 	 */
 	public AdminManualUpdate(Dominion instance) {
-		super(instance, "/ad manualupdate [settlement / spell / unit]");
+		super(instance, "/ad manualupdate [settlement / spell / unit] (# of updates)");
 	}
 
 	/** 
@@ -47,21 +47,42 @@ public class AdminManualUpdate extends AdminSubCommand{
 			sender.sendMessage(logPrefix + "Usage: " + usage);
 			return true;
 		}
+		int totalRuns = 1;
+		boolean success = true;
+		if(args.length >= 2){
+			try{
+				totalRuns = Integer.parseInt(args[1]);
+			} catch (NumberFormatException ex){
+				sender.sendMessage(logPrefix + "\"" + args[1] + "\" is not a proper integer (no decimals).");
+				sender.sendMessage(logPrefix + "Usage: " + usage);
+				return true;
+			}
+		}
 		String task = args[0];
 		if(task.equalsIgnoreCase("settlement") | task.equalsIgnoreCase("settlements")){
-			if(plugin.getSettlementManager().updateAll()){
-				sender.sendMessage(logPrefix + "Successfully updated all settlements.");
-			} else {
-				sender.sendMessage(logPrefix + "At least one of the settlements has not been updated.");
+			sender.sendMessage(logPrefix + "Starting a manual update to advance settlements " + totalRuns + " time(s).");
+			for(int runs = totalRuns; runs > 0; runs--){
+				if(!plugin.getSettlementManager().updateAll())
+					success = false;
 			}
+			if(success)
+				sender.sendMessage(logPrefix + "Successfully updated all settlements " + totalRuns + " time(s).");
+			else
+				sender.sendMessage(logPrefix + "At least one of the settlements has not been updated.");
 			return true;
 		} else if (task.equalsIgnoreCase("unit") | task.equalsIgnoreCase("units")){
-			new UnitTask(plugin).run();
-			sender.sendMessage(logPrefix + "Manually updated the units tick by 1.");
+			sender.sendMessage(logPrefix + "Starting a manual update to advance units " + totalRuns + " time(s).");
+			for(int runs = totalRuns; runs > 0; runs--){
+				new UnitTask(plugin).run();
+			}
+			sender.sendMessage(logPrefix + "Manually updated the units tick by " + totalRuns + ".");
 			return true;
 		} else if (task.equalsIgnoreCase("spell") | task.equalsIgnoreCase("spells")){
-			new SpellTask(plugin).run();
-			sender.sendMessage(logPrefix + "Manually updated the spells tick by 1.");
+			sender.sendMessage(logPrefix + "Starting a manual update to advance spells " + totalRuns + " time(s).");
+			for(int runs = totalRuns; runs > 0; runs--){
+				new SpellTask(plugin).run();
+			}
+			sender.sendMessage(logPrefix + "Manually updated the spells tick by " + totalRuns + ".");
 			return true;
 		} else {
 			sender.sendMessage(logPrefix + "Usage: " + usage);

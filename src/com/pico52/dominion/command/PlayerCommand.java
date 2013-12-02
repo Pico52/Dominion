@@ -38,6 +38,7 @@ import com.pico52.dominion.command.player.PlayerUnitDisband;
 import com.pico52.dominion.command.player.PlayerUnitDrop;
 import com.pico52.dominion.command.player.PlayerUnitMove;
 import com.pico52.dominion.command.player.PlayerUnitPickUp;
+import com.pico52.dominion.command.player.PlayerWhoIs;
 import com.pico52.dominion.command.player.PlayerWithdraw;
 
 /** 
@@ -81,6 +82,7 @@ public class PlayerCommand implements CommandExecutor{
 	private static PlayerTrade playerTrade;
 	private static PlayerCancel playerCancel;
 	private static PlayerFound playerFound;
+	private static PlayerWhoIs playerWhoIs;
 	
 	/** 
 	 * <b>PlayerCommand</b><br>
@@ -124,6 +126,7 @@ public class PlayerCommand implements CommandExecutor{
 		playerTrade = new PlayerTrade(plugin);
 		playerCancel = new PlayerCancel(plugin);
 		playerFound = new PlayerFound(plugin);
+		playerWhoIs = new PlayerWhoIs(plugin);
 	}
 
 	@Override
@@ -232,6 +235,9 @@ public class PlayerCommand implements CommandExecutor{
 		}
 		if(subCommand.equalsIgnoreCase("found")){
 			return playerFound.execute(sender, args);
+		}
+		if(subCommand.equalsIgnoreCase("whois") || subCommand.equalsIgnoreCase("who_is") || subCommand.equalsIgnoreCase("who") || subCommand.equalsIgnoreCase("wi")){
+			return playerWhoIs.execute(sender, args);
 		}
 		
 		return false;
